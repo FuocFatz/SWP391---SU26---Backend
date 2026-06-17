@@ -23,6 +23,11 @@ public class HorseController {
         return service.getAll();
     }
 
+    @GetMapping("/owner/{ownerId}")
+    public List<Horse> getByOwner(@PathVariable @NonNull Long ownerId) {
+        return service.getByOwner(ownerId);
+    }
+
     @GetMapping("/{id}")
     public Horse getById(@PathVariable @NonNull Long id) {
         return service.getById(id);

@@ -3,6 +3,7 @@ package com.equix.horseracingsystem.service;
 import com.equix.horseracingsystem.entity.User;
 import com.equix.horseracingsystem.repository.UserRepository;
 import org.springframework.lang.NonNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,19 +12,35 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User create(@NonNull User user) {
+        if (user.getPassword() != null && !user.getPassword().startsWith("$2")) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        if (user.getRewardPoints() == null) {
+            user.setRewardPoints(0);
+        }
+        if (user.getEnabled() == null) {
+            user.setEnabled(true);
+        }
         return userRepository.save(user);
     }
 
     @Override
     public List<User> getAll() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public List<User> getByRole(String role) {
+        return userRepository.findByRole(role.toUpperCase());
     }
 
     @Override

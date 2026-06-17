@@ -6,6 +6,7 @@ import com.equix.horseracingsystem.dto.LoginRequest;
 import com.equix.horseracingsystem.dto.RegisterRequest;
 import com.equix.horseracingsystem.entity.User;
 import com.equix.horseracingsystem.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -17,19 +18,22 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthController(
             UserRepository userRepository,
-            JwtUtil jwtUtil) {
+            JwtUtil jwtUtil,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request) {
+    public AuthResponse register(@RequestBody RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return "Email already exists";
+            throw new RuntimeException("Email already exists");
         }
 
         User user = new User();
@@ -37,9 +41,9 @@ public class AuthController {
         user.setUsername(request.getUsername());
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
-        user.setRole(request.getRole());
+        user.setRole(normalizeRole(request.getRole()));
 
         user.setEnabled(true);
         user.setRewardPoints(0);
@@ -47,9 +51,10 @@ public class AuthController {
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 
-        userRepository.save(user);
+        User saved = userRepository.save(user);
+        String token = jwtUtil.generateToken(saved.getEmail());
 
-        return "Register Success";
+        return toAuthResponse(token, saved);
     }
 
     @PostMapping("/login")
@@ -59,12 +64,31 @@ public class AuthController {
                 .findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email not found"));
 
-        if (!request.getPassword().equals(user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Wrong Password");
         }
 
         String token = jwtUtil.generateToken(user.getEmail());
 
-        return new AuthResponse(token);
+        return toAuthResponse(token, user);
+    }
+
+    private String normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "OWNER";
+        }
+        return role.toUpperCase();
+    }
+
+    private AuthResponse toAuthResponse(String token, User user) {
+        return new AuthResponse(
+                token,
+                user.getId(),
+                user.getUsername(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getRewardPoints()
+        );
     }
 }

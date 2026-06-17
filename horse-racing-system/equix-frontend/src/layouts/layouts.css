@@ -1,0 +1,40 @@
+/* ---- Layout Styles ---- */
+
+/* Public Layout */
+.public-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.public-content {
+  flex: 1;
+  margin-top: var(--navbar-height);
+}
+
+/* Dashboard Layout */
+.dashboard-layout {
+  min-height: 100vh;
+}
+
+.dashboard-body {
+  display: flex;
+  margin-top: var(--navbar-height);
+  min-height: calc(100vh - var(--navbar-height));
+}
+
+.dashboard-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: var(--space-8);
+  min-height: calc(100vh - var(--navbar-height));
+  background: var(--bg-primary);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .dashboard-content {
+    margin-left: 0;
+    padding: var(--space-4);
+  }
+}

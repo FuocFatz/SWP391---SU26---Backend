@@ -11,6 +11,8 @@ public interface UserService {
 
     List<User> getAll();
 
+    List<User> getByRole(String role);
+
     User getById(@NonNull Long id);
 
     User update(@NonNull Long id, User user);

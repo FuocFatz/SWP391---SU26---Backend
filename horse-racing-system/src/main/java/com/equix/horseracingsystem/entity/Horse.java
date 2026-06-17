@@ -86,4 +86,31 @@ public class Horse {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+        if (healthStatus == null) {
+            healthStatus = "HEALTHY";
+        }
+        if (totalRaces == null) {
+            totalRaces = 0;
+        }
+        if (totalWins == null) {
+            totalWins = 0;
+        }
+        if (totalTop3 == null) {
+            totalTop3 = 0;
+        }
+        if (totalPoints == null) {
+            totalPoints = 0;
+        }
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

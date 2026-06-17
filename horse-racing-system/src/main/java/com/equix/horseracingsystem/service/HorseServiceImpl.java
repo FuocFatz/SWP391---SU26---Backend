@@ -22,6 +22,11 @@ public class HorseServiceImpl implements HorseService {
     }
 
     @Override
+    public List<Horse> getByOwner(@NonNull Long ownerId) {
+        return repo.findByOwnerId(ownerId);
+    }
+
+    @Override
     public Horse getById(@NonNull Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horse not found: " + id));

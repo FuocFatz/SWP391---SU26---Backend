@@ -9,6 +9,8 @@ public interface HorseService {
 
     List<Horse> getAll();
 
+    List<Horse> getByOwner(@NonNull Long ownerId);
+
     Horse getById(@NonNull Long id);
 
     Horse create(@NonNull Horse horse);

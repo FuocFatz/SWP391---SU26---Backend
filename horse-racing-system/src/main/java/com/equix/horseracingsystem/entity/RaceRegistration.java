@@ -1,0 +1,88 @@
+package com.equix.horseracingsystem.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "race_registrations")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class RaceRegistration {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "race_id")
+    private Long raceId;
+
+    @Column(name = "horse_id")
+    private Long horseId;
+
+    @Column(name = "owner_id")
+    private Long ownerId;
+
+    @Column(name = "jockey_id")
+    private Long jockeyId;
+
+    @Column(name = "lane_number")
+    private Integer laneNumber;
+
+    private String status;
+
+    @Column(name = "owner_confirmed")
+    private Boolean ownerConfirmed;
+
+    @Column(name = "jockey_confirmed")
+    private Boolean jockeyConfirmed;
+
+    @Column(name = "referee_approved")
+    private Boolean refereeApproved;
+
+    @Column(name = "health_check_status")
+    private String healthCheckStatus;
+
+    @Column(name = "referee_notes", length = 1000)
+    private String refereeNotes;
+
+    @Column(name = "withdraw_reason", length = 1000)
+    private String withdrawReason;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+        if (status == null) {
+            status = "PENDING_ADMIN";
+        }
+        if (ownerConfirmed == null) {
+            ownerConfirmed = false;
+        }
+        if (jockeyConfirmed == null) {
+            jockeyConfirmed = false;
+        }
+        if (refereeApproved == null) {
+            refereeApproved = false;
+        }
+        if (healthCheckStatus == null) {
+            healthCheckStatus = "PENDING";
+        }
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}

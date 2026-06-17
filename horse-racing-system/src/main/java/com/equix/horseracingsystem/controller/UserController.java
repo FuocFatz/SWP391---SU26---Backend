@@ -28,6 +28,11 @@ public class UserController {
         return userService.getAll();
     }
 
+    @GetMapping("/role/{role}")
+    public List<User> getByRole(@PathVariable String role) {
+        return userService.getByRole(role);
+    }
+
     @GetMapping("/{id}")
     public User getById(@PathVariable @NonNull Long id) {
         return userService.getById(id);
