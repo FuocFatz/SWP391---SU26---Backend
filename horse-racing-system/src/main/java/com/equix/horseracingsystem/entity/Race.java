@@ -24,26 +24,43 @@ public class Race {
     @Column(name = "tournament_id")
     private Long tournamentId;
 
+    // DB column is named `race_name`
+    @Column(name = "race_name")
     private String name;
 
+    // `type` column not present in current DB schema; keeping as transient
+    @Transient
     private String type;
 
-    @Column(name = "distance_m")
+    // map to DB column `race_distance`
+    @Column(name = "race_distance")
     private Integer distanceM;
 
+    // DB column is `track_condition`
+    @Column(name = "track_condition")
     private String surface;
 
     @Column(name = "race_date")
     private LocalDate raceDate;
 
-    @Column(name = "race_time")
+    // `race_time` column not present in current DB; keeping as transient
+    @Transient
     private LocalTime raceTime;
 
-    @Column(name = "max_participants")
+    // DB uses `total_lanes` instead of `max_participants`
+    @Column(name = "total_lanes")
     private Integer maxParticipants;
 
-    @Column(name = "prize_pool")
+    // DB column is `prize_points` (INT type)
+    @Column(name = "prize_points")
     private BigDecimal prizePool;
+
+    // Additional DB columns that exist
+    @Column(name = "weather")
+    private String weather;
+
+    @Column(name = "location")
+    private String location;
 
     private String status;
 

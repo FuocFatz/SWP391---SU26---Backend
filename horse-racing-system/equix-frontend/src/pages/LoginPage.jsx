@@ -120,6 +120,11 @@ function LoginPage() {
             <Link to="/register" className="auth-switch-link">Create one</Link>
           </p>
 
+          <p className="auth-switch">
+            Forgot password?{' '}
+            <Link to="/reset-password" className="auth-switch-link">Reset it</Link>
+          </p>
+
           <div className="auth-dev-panel">
             <span className="auth-dev-label">Quick Login</span>
             <div className="auth-dev-buttons">

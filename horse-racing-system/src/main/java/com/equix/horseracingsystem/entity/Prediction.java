@@ -6,7 +6,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "predictions")
+@Table(name = "predictions", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_prediction_spectator_race", columnNames = {"spectator_id", "race_id"})
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,7 +47,7 @@ public class Prediction {
     void onCreate() {
         createdAt = LocalDateTime.now();
         if (status == null) {
-            status = "PENDING";
+            status = "ACTIVE"; // ACTIVE until locked/settled
         }
         if (rewardPoints == null) {
             rewardPoints = 0;

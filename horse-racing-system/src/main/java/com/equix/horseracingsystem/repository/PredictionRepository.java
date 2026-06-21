@@ -8,4 +8,5 @@ import java.util.List;
 public interface PredictionRepository extends JpaRepository<Prediction, Long> {
     List<Prediction> findByRaceId(Long raceId);
     List<Prediction> findBySpectatorId(Long spectatorId);
+    List<Prediction> findBySpectatorIdAndRaceId(Long spectatorId, Long raceId);
 }
