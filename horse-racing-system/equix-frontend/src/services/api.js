@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090/api';
 
 async function request(path, options = {}) {
   const token = localStorage.getItem('equix_token');
@@ -111,6 +111,26 @@ export const api = {
   },
   getHorseLeaderboard: () => request('/races/leaderboard/horses'),
   getJockeyLeaderboard: () => request('/races/leaderboard/jockeys'),
+  // Notifications
+  getNotifications: (userId) => request(`/notifications?userId=${userId}`),
+  markNotificationRead: (notificationId) => request(`/notifications/${notificationId}/read`, {
+    method: 'PATCH',
+  }),
+  // Password Reset
+  requestPasswordReset: (email) => request('/auth/password-reset/request', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  }),
+  confirmPasswordReset: (token, newPassword) => request('/auth/password-reset/confirm', {
+    method: 'POST',
+    body: JSON.stringify({ token, newPassword }),
+  }),
+  // Predictions (enhanced)
+  placePrediction: (payload) => request('/predictions', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+  getRaceById: (raceId) => request(`/races/${raceId}`),
 };
 
 export default api;
