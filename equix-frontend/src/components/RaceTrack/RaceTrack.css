@@ -1,0 +1,196 @@
+/* ---- RaceTrack ---- */
+.race-track {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Timer */
+.race-track-timer {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-6);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.race-track-timer-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.race-track-timer-label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+}
+
+.race-track-timer-display.live .race-track-timer-label {
+  color: var(--color-primary);
+  animation: pulse 1.5s infinite;
+}
+
+.race-track-timer-value {
+  font-family: var(--font-heading);
+  font-size: var(--fs-5xl);
+  font-weight: var(--fw-black);
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+
+/* Lanes */
+.race-track-lanes {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.race-track-lane {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.race-track-lane-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 140px;
+}
+
+.race-track-lane-number {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-glass-light);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  color: var(--text-tertiary);
+}
+
+.race-track-lane-name {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.race-track-lane-bar {
+  flex: 1;
+  height: 36px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.race-track-lane-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  border-radius: var(--radius-md);
+  transition: width 0.8s ease;
+}
+
+.race-track-horse-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  transition: left 0.8s ease;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: 50%;
+}
+
+.race-track-horse-marker svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Positions */
+.race-track-positions {
+  padding: var(--space-6);
+  border-top: 1px solid var(--border-primary);
+  background: var(--bg-tertiary);
+}
+
+.race-track-positions-title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-4);
+}
+
+.race-track-position-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.race-track-position-row.top {
+  background: var(--bg-glass-light);
+}
+
+.race-track-position-rank {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  min-width: 28px;
+  text-align: center;
+}
+
+.race-track-position-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  min-width: 10px;
+}
+
+.race-track-position-name {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.race-track-position-jockey {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .race-track-lane-info {
+    min-width: 100px;
+  }
+
+  .race-track-lane-name {
+    font-size: var(--fs-xs);
+  }
+
+  .race-track-timer-value {
+    font-size: var(--fs-3xl);
+  }
+}

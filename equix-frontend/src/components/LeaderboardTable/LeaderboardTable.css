@@ -1,0 +1,42 @@
+/* ---- LeaderboardTable ---- */
+.leaderboard-wrapper {
+  width: 100%;
+}
+
+.leaderboard-table tr.rank-1 td {
+  background: rgba(243, 156, 18, 0.04);
+}
+
+.leaderboard-table tr.rank-2 td {
+  background: rgba(192, 192, 192, 0.03);
+}
+
+.leaderboard-table tr.rank-3 td {
+  background: rgba(205, 127, 50, 0.03);
+}
+
+.leaderboard-rank {
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-base);
+}
+
+.leaderboard-rank.top {
+  font-size: var(--fs-lg);
+}
+
+.leaderboard-horse-name {
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+.leaderboard-points {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-bold);
+  color: var(--color-secondary-light);
+}
+
+.leaderboard-prize {
+  font-family: var(--font-heading);
+  font-weight: var(--fw-semibold);
+  color: var(--color-accent);
+}
