@@ -1,64 +1,80 @@
 package com.equix.horseracingsystem.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
-@Entity
-@Table(name = "race_results")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "race_results")
 public class RaceResult {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "race_id")
-    private Long raceId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "race_id", nullable = false)
+    private Race race;
 
-    @Column(name = "registration_id")
-    private Long registrationId;
+    @NotNull
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "registration_id", nullable = false)
+    private RaceRegistration registration;
 
-    @Column(name = "horse_id")
-    private Long horseId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "horse_id", nullable = false)
+    private Horse horse;
 
-    @Column(name = "jockey_id")
-    private Long jockeyId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "jockey_id", nullable = false)
+    private User jockey;
 
-    @Column(name = "owner_id")
-    private Long ownerId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     @Column(name = "finish_position")
     private Integer finishPosition;
 
-    @Column(name = "finish_time_seconds")
+    @Column(name = "finish_time_seconds", precision = 10, scale = 3)
     private BigDecimal finishTimeSeconds;
 
+    @ColumnDefault("0")
     @Column(name = "points_awarded")
     private Integer pointsAwarded;
 
-    @Column(name = "violation_notes", length = 1000)
+    @ColumnDefault("0")
+    @Column(name = "dnf")
+    private Boolean dnf;
+
+    @ColumnDefault("0")
+    @Column(name = "disqualified")
+    private Boolean disqualified;
+
+    @Nationalized
+    @Lob
+    @Column(name = "violation_notes")
     private String violationNotes;
 
+    @ColumnDefault("1")
+    @Column(name = "official")
     private Boolean official;
 
+    @ColumnDefault("getdate()")
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    @PrePersist
-    void onCreate() {
-        createdAt = LocalDateTime.now();
-        if (official == null) {
-            official = true;
-        }
-        if (pointsAwarded == null) {
-            pointsAwarded = 0;
-        }
-    }
+
 }

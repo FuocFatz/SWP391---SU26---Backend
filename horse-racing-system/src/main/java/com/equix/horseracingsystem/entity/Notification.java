@@ -1,46 +1,69 @@
 package com.equix.horseracingsystem.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Nationalized;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
-@Entity
-@Table(name = "notifications")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "notifications")
 public class Notification {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    private String type; // e.g., GUESS_LOCKED, RACE_CANCELLED
+    @Size(max = 50)
+    @NotNull
+    @Nationalized
+    @Column(name = "category", nullable = false, length = 50)
+    private String category;
 
-    private String channel; // IN_APP, EMAIL, PUSH
+    @Size(max = 20)
+    @Nationalized
+    @ColumnDefault("'IN_APP'")
+    @Column(name = "channel", length = 20)
+    private String channel;
 
+    @Size(max = 150)
+    @NotNull
+    @Nationalized
+    @Column(name = "title", nullable = false, length = 150)
     private String title;
 
-    @Column(length = 2000)
+    @NotNull
+    @Nationalized
+    @Lob
+    @Column(name = "message", nullable = false)
     private String message;
 
-    @Column(name = "deep_link")
+    @Size(max = 500)
+    @Nationalized
+    @Column(name = "deep_link", length = 500)
     private String deepLink;
 
-    private Boolean read;
+    @ColumnDefault("0")
+    @Column(name = "is_read")
+    private Boolean isRead;
 
+    @ColumnDefault("getdate()")
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-        if (read == null) read = false;
-    }
+
 }

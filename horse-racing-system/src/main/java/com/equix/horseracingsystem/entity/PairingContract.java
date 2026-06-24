@@ -13,16 +13,12 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "jockey_invitations")
-public class JockeyInvitation {
+@Table(name = "pairing_contracts")
+public class PairingContract {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "race_id")
-    private Race race;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -31,36 +27,26 @@ public class JockeyInvitation {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "jockey_id", nullable = false)
     private User jockey;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
     @Size(max = 20)
     @Nationalized
-    @ColumnDefault("'PENDING'")
+    @ColumnDefault("'ACTIVE'")
     @Column(name = "status", length = 20)
     private String status;
-
-    @Nationalized
-    @Lob
-    @Column(name = "message")
-    private String message;
-
-    @Nationalized
-    @Lob
-    @Column(name = "response_note")
-    private String responseNote;
 
     @ColumnDefault("getdate()")
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @Column(name = "responded_at")
-    private Instant respondedAt;
+    @Column(name = "dissolved_at")
+    private Instant dissolvedAt;
 
 
 }

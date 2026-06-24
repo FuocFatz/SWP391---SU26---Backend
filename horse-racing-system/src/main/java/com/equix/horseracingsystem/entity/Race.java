@@ -1,102 +1,108 @@
 package com.equix.horseracingsystem.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Nationalized;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Entity
-@Table(name = "races")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "races")
 public class Race {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "tournament_id")
-    private Long tournamentId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "tournament_id", nullable = false)
+    private Tournament tournament;
 
-    // DB column is named `race_name`
-    @Column(name = "race_name")
-    private String name;
+    @Size(max = 150)
+    @NotNull
+    @Nationalized
+    @Column(name = "race_name", nullable = false, length = 150)
+    private String raceName;
 
-    // `type` column not present in current DB schema; keeping as transient
-    @Transient
-    private String type;
+    @Size(max = 20)
+    @NotNull
+    @Nationalized
+    @Column(name = "race_type", nullable = false, length = 20)
+    private String raceType;
 
-    // map to DB column `race_distance`
-    @Column(name = "race_distance")
-    private Integer distanceM;
+    @NotNull
+    @Column(name = "race_distance", nullable = false)
+    private Integer raceDistance;
 
-    // DB column is `track_condition`
-    @Column(name = "track_condition")
-    private String surface;
+    @Size(max = 50)
+    @Nationalized
+    @ColumnDefault("'Turf'")
+    @Column(name = "track_condition", length = 50)
+    private String trackCondition;
 
-    @Column(name = "race_date")
+    @NotNull
+    @Column(name = "race_date", nullable = false)
     private LocalDate raceDate;
 
-    // `race_time` column not present in current DB; keeping as transient
-    @Transient
+    @NotNull
+    @Column(name = "race_time", nullable = false)
     private LocalTime raceTime;
 
-    // DB uses `total_lanes` instead of `max_participants`
+    @NotNull
+    @Column(name = "registration_deadline", nullable = false)
+    private Instant registrationDeadline;
+
+    @ColumnDefault("8")
     @Column(name = "total_lanes")
-    private Integer maxParticipants;
+    private Integer totalLanes;
 
-    // DB column is `prize_points` (INT type)
-    @Column(name = "prize_points")
-    private BigDecimal prizePool;
+    @ColumnDefault("0.00")
+    @Column(name = "prize_points", precision = 10, scale = 2)
+    private BigDecimal prizePoints;
 
-    // Additional DB columns that exist
-    @Column(name = "weather")
+    @Size(max = 50)
+    @Nationalized
+    @Column(name = "weather", length = 50)
     private String weather;
 
-    @Column(name = "location")
+    @Size(max = 150)
+    @Nationalized
+    @Column(name = "location", length = 150)
     private String location;
 
+    @Size(max = 30)
+    @Nationalized
+    @ColumnDefault("'DRAFT'")
+    @Column(name = "status", length = 30)
     private String status;
 
-    @Column(name = "referee_id")
-    private Long refereeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "referee_id")
+    private User referee;
 
+    @ColumnDefault("getdate()")
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
+    @ColumnDefault("getdate()")
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
-    @PrePersist
-    void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        createdAt = now;
-        updatedAt = now;
-        if (status == null) {
-            status = "REGISTRATION_OPEN";
-        }
-        if (type == null) {
-            type = "Sprint";
-        }
-        if (surface == null) {
-            surface = "Turf";
-        }
-        if (maxParticipants == null) {
-            maxParticipants = 8;
-        }
-        if (prizePool == null) {
-            prizePool = BigDecimal.ZERO;
-        }
-    }
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
-    @PreUpdate
-    void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+
 }

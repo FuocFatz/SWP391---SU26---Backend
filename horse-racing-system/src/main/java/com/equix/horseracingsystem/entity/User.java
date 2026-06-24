@@ -1,8 +1,8 @@
 package com.equix.horseracingsystem.entity;
-
+import com.equix.horseracingsystem.constant.UserRole;
+import com.equix.horseracingsystem.constant.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,23 +18,31 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String username;
 
-    private String password;
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String phone;
 
-    private String role;
+    // SỬ DỤNG ENUM STRING TẠI ĐÂY
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status;
 
     @Column(name = "reward_points")
     private Integer rewardPoints;
-
-    private Boolean enabled;
 
     @Column(name = "avatar_url")
     private String avatarUrl;

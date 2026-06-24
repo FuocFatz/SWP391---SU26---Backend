@@ -10,41 +10,50 @@ import org.hibernate.annotations.Nationalized;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "password_reset_tokens")
-public class PasswordResetToken {
+@Table(name = "jockey_profiles")
+public class JockeyProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Size(max = 200)
-    @NotNull
-    @Nationalized
-    @Column(name = "token_hash", nullable = false, length = 200)
-    private String tokenHash;
-
-    @NotNull
-    @Column(name = "expires_at", nullable = false)
-    private Instant expiresAt;
+    @ColumnDefault("0")
+    @Column(name = "total_races")
+    private Integer totalRaces;
 
     @ColumnDefault("0")
-    @Column(name = "is_used")
-    private Boolean isUsed;
+    @Column(name = "total_wins")
+    private Integer totalWins;
+
+    @ColumnDefault("0.00")
+    @Column(name = "win_rate", precision = 5, scale = 2)
+    private BigDecimal winRate;
+
+    @Size(max = 20)
+    @Nationalized
+    @ColumnDefault("'AVAILABLE'")
+    @Column(name = "availability_status", length = 20)
+    private String availabilityStatus;
 
     @ColumnDefault("getdate()")
     @Column(name = "created_at")
     private Instant createdAt;
+
+    @ColumnDefault("getdate()")
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
 
 }

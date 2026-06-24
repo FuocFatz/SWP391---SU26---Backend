@@ -1,56 +1,72 @@
 package com.equix.horseracingsystem.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Nationalized;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
-@Entity
-@Table(name = "audit_logs")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "audit_logs")
 public class AuditLog {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    private LocalDateTime timestamp;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "user_id")
-    private Long userId;
-
-    @Column(name = "user_role")
+    @Size(max = 50)
+    @Nationalized
+    @Column(name = "user_role", length = 50)
     private String userRole;
 
+    @Size(max = 100)
+    @NotNull
+    @Nationalized
+    @Column(name = "\"action\"", nullable = false, length = 100)
     private String action;
 
-    @Column(name = "entity_type")
+    @Size(max = 100)
+    @NotNull
+    @Nationalized
+    @Column(name = "entity_type", nullable = false, length = 100)
     private String entityType;
 
     @Column(name = "entity_id")
     private Long entityId;
 
-    // SQL Server doesn't support 'json' type; use NVARCHAR instead
-    @Column(name = "before_value", length = 2000)
+    @Nationalized
+    @Lob
+    @Column(name = "before_value")
     private String beforeValue;
 
-    @Column(name = "after_value", length = 2000)
+    @Nationalized
+    @Lob
+    @Column(name = "after_value")
     private String afterValue;
 
-    @Column(name = "ip_address")
+    @Size(max = 45)
+    @Nationalized
+    @Column(name = "ip_address", length = 45)
     private String ipAddress;
 
+    @Size(max = 255)
+    @Nationalized
     @Column(name = "user_agent")
     private String userAgent;
 
-    @PrePersist
-    void onCreate() {
-        if (timestamp == null) {
-            timestamp = LocalDateTime.now();
-        }
-    }
+    @ColumnDefault("getdate()")
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+
 }

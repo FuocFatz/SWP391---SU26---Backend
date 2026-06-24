@@ -1,21 +1,14 @@
 package com.equix.horseracingsystem.service;
 
-import com.equix.horseracingsystem.entity.Horse;
-import org.springframework.lang.NonNull;
+import com.equix.horseracingsystem.dto.ApiResponseWrapper;
+import com.equix.horseracingsystem.dto.HorseRequest;
+import com.equix.horseracingsystem.dto.HorseResponse;
 
 import java.util.List;
 
 public interface HorseService {
-
-    List<Horse> getAll();
-
-    List<Horse> getByOwner(@NonNull Long ownerId);
-
-    Horse getById(@NonNull Long id);
-
-    Horse create(@NonNull Horse horse);
-
-    Horse update(@NonNull Long id, Horse horse);
-
-    void delete(@NonNull Long id);
+    ApiResponseWrapper<HorseResponse> createHorse(HorseRequest request, String ownerEmail);
+    ApiResponseWrapper<List<HorseResponse>> getMyHorses(String ownerEmail);
+    ApiResponseWrapper<HorseResponse> getHorseById(Long id);
+    ApiResponseWrapper<HorseResponse> updateHorse(Long id, HorseRequest request, String currentUserEmail);
 }

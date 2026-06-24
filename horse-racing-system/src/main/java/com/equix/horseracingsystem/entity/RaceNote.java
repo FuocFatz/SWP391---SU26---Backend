@@ -13,8 +13,8 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "predictions")
-public class Prediction {
+@Table(name = "race_notes")
+public class RaceNote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -27,34 +27,42 @@ public class Prediction {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "spectator_id", nullable = false)
-    private User spectator;
+    @JoinColumn(name = "referee_id", nullable = false)
+    private User referee;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registration_id")
+    private RaceRegistration registration;
+
+    @Size(max = 30)
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "predicted_horse_id", nullable = false)
-    private Horse predictedHorse;
-
-    @ColumnDefault("0")
-    @Column(name = "wager_points")
-    private Integer wagerPoints;
+    @Nationalized
+    @Column(name = "note_category", nullable = false, length = 30)
+    private String noteCategory;
 
     @Size(max = 20)
     @Nationalized
-    @ColumnDefault("'ACTIVE'")
-    @Column(name = "status", length = 20)
-    private String status;
+    @ColumnDefault("'INFO'")
+    @Column(name = "severity", length = 20)
+    private String severity;
 
-    @ColumnDefault("0")
-    @Column(name = "reward_points")
-    private Integer rewardPoints;
+    @NotNull
+    @Nationalized
+    @Lob
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Size(max = 100)
+    @Nationalized
+    @Column(name = "action_taken", length = 100)
+    private String actionTaken;
+
+    @Column(name = "race_time_seconds")
+    private Integer raceTimeSeconds;
 
     @ColumnDefault("getdate()")
     @Column(name = "created_at")
     private Instant createdAt;
-
-    @Column(name = "settled_at")
-    private Instant settledAt;
 
 
 }

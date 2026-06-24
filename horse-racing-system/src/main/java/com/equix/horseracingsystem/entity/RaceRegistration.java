@@ -1,88 +1,96 @@
 package com.equix.horseracingsystem.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Nationalized;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
-@Entity
-@Table(name = "race_registrations")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "race_registrations")
 public class RaceRegistration {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "race_id")
-    private Long raceId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "race_id", nullable = false)
+    private Race race;
 
-    @Column(name = "horse_id")
-    private Long horseId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "horse_id", nullable = false)
+    private Horse horse;
 
-    @Column(name = "owner_id")
-    private Long ownerId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "jockey_id", nullable = false)
+    private User jockey;
 
-    @Column(name = "jockey_id")
-    private Long jockeyId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pairing_contract_id")
+    private PairingContract pairingContract;
 
     @Column(name = "lane_number")
     private Integer laneNumber;
 
+    @Size(max = 30)
+    @Nationalized
+    @ColumnDefault("'PENDING_ADMIN'")
+    @Column(name = "status", length = 30)
     private String status;
 
+    @ColumnDefault("0")
     @Column(name = "owner_confirmed")
     private Boolean ownerConfirmed;
 
+    @ColumnDefault("0")
     @Column(name = "jockey_confirmed")
     private Boolean jockeyConfirmed;
 
+    @ColumnDefault("0")
     @Column(name = "referee_approved")
     private Boolean refereeApproved;
 
-    @Column(name = "health_check_status")
+    @Size(max = 50)
+    @Nationalized
+    @ColumnDefault("'PENDING'")
+    @Column(name = "health_check_status", length = 50)
     private String healthCheckStatus;
 
-    @Column(name = "referee_notes", length = 1000)
+    @Nationalized
+    @Lob
+    @Column(name = "referee_notes")
     private String refereeNotes;
 
-    @Column(name = "withdraw_reason", length = 1000)
+    @Nationalized
+    @Lob
+    @Column(name = "withdraw_reason")
     private String withdrawReason;
 
+    @ColumnDefault("getdate()")
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
+    @ColumnDefault("getdate()")
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
-    @PrePersist
-    void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        createdAt = now;
-        updatedAt = now;
-        if (status == null) {
-            status = "PENDING_ADMIN";
-        }
-        if (ownerConfirmed == null) {
-            ownerConfirmed = false;
-        }
-        if (jockeyConfirmed == null) {
-            jockeyConfirmed = false;
-        }
-        if (refereeApproved == null) {
-            refereeApproved = false;
-        }
-        if (healthCheckStatus == null) {
-            healthCheckStatus = "PENDING";
-        }
-    }
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
-    @PreUpdate
-    void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+
 }

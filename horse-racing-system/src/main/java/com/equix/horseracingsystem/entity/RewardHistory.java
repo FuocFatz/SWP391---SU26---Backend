@@ -2,21 +2,18 @@ package com.equix.horseracingsystem.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "password_reset_tokens")
-public class PasswordResetToken {
+@Table(name = "reward_history")
+public class RewardHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -24,27 +21,26 @@ public class PasswordResetToken {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Size(max = 200)
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "reward_type_id", nullable = false)
+    private RewardType rewardType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "race_id")
+    private Race race;
+
     @Nationalized
-    @Column(name = "token_hash", nullable = false, length = 200)
-    private String tokenHash;
-
-    @NotNull
-    @Column(name = "expires_at", nullable = false)
-    private Instant expiresAt;
-
-    @ColumnDefault("0")
-    @Column(name = "is_used")
-    private Boolean isUsed;
+    @Lob
+    @Column(name = "description")
+    private String description;
 
     @ColumnDefault("getdate()")
-    @Column(name = "created_at")
-    private Instant createdAt;
+    @Column(name = "awarded_at")
+    private Instant awardedAt;
 
 
 }
