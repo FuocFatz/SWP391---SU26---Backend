@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -37,9 +37,6 @@ public class SystemSetting {
     @Column(name = "description")
     private String description;
 
-    @ColumnDefault("getdate()")
     @Column(name = "updated_at")
-    private Instant updatedAt;
-
-
+    private LocalDateTime updatedAt;
 }

@@ -5,10 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -64,9 +63,6 @@ public class AuditLog {
     @Column(name = "user_agent")
     private String userAgent;
 
-    @ColumnDefault("getdate()")
     @Column(name = "created_at")
-    private Instant createdAt;
-
-
+    private LocalDateTime createdAt;
 }

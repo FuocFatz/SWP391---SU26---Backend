@@ -4,8 +4,10 @@ import com.equix.horseracingsystem.constant.UserRole;
 import com.equix.horseracingsystem.constant.UserStatus;
 import com.equix.horseracingsystem.constant.HorseStatus;
 import com.equix.horseracingsystem.constant.HorseHealthStatus;
+import com.equix.horseracingsystem.entity.SystemSetting;
 import com.equix.horseracingsystem.entity.User;
 import com.equix.horseracingsystem.entity.Horse;
+import com.equix.horseracingsystem.repository.SystemSettingRepository;
 import com.equix.horseracingsystem.repository.UserRepository;
 import com.equix.horseracingsystem.repository.HorseRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +27,13 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final HorseRepository horseRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SystemSettingRepository settingRepository;
 
     @Override
     public void run(String... args) throws Exception {
         initializeAdminUser();
         initializeOtherUsersAndHorses();
+        initializeSystemSettings();
     }
 
     private void initializeAdminUser() {
@@ -134,6 +138,26 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
+    private void initializeSystemSettings() {
+        if (settingRepository.findBySettingKey("registration_deadline_minutes").isEmpty()) {
+            SystemSetting deadlineSetting = new SystemSetting();
+            deadlineSetting.setSettingKey("registration_deadline_minutes");
+            deadlineSetting.setSettingValue("60");
+            deadlineSetting.setDescription("Thời gian đóng cổng đăng ký (phút) trước khi trận đua bắt đầu.");
+            deadlineSetting.setUpdatedAt(LocalDateTime.now());
+            settingRepository.save(deadlineSetting);
+
+            SystemSetting taxSetting = new SystemSetting();
+            taxSetting.setSettingKey("reward_point_exchange_rate");
+            taxSetting.setSettingValue("1000");
+            taxSetting.setDescription("Số tiền quy đổi VNĐ ứng với mỗi điểm thưởng.");
+            taxSetting.setUpdatedAt(LocalDateTime.now());
+            settingRepository.save(taxSetting);
+
+            log.info("==> Khởi tạo danh mục Cấu hình hệ thống thành công!");
+        }
+    }
+
     // Hàm bổ trợ tạo nhanh dữ liệu ngựa đua theo đúng cấu trúc Entity mới của bạn
     private void createSampleHorse(User owner, String name, String regNum, String breed, int age, String color, int speed, int stamina) {
         Horse horse = new Horse();
@@ -173,4 +197,6 @@ public class DataInitializer implements CommandLineRunner {
 
         horseRepository.save(horse);
     }
+
+
 }
