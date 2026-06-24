@@ -1,9 +1,6 @@
 package com.equix.horseracingsystem.controller;
 
-import com.equix.horseracingsystem.dto.ApiResponseWrapper;
-import com.equix.horseracingsystem.dto.AuthResponse;
-import com.equix.horseracingsystem.dto.LoginRequest;
-import com.equix.horseracingsystem.dto.RegisterRequest;
+import com.equix.horseracingsystem.dto.*;
 import com.equix.horseracingsystem.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,5 +88,17 @@ public class AuthController {
             return ResponseEntity.status(401).body(response);
         }
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Gửi yêu cầu quên mật khẩu", description = "Quyền: Public. Hệ thống sinh mã token khôi phục và trả về (hoặc gửi qua mail).")
+    public ResponseEntity<ApiResponseWrapper<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        return ResponseEntity.ok(authService.forgotPassword(request));
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Thực hiện đặt lại mật khẩu mới", description = "Quyền: Public. Sử dụng mã Token hợp lệ để thiết lập mật khẩu mới.")
+    public ResponseEntity<ApiResponseWrapper<String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(authService.resetPassword(request));
     }
 }

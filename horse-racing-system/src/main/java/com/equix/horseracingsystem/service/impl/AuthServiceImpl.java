@@ -1,33 +1,37 @@
 package com.equix.horseracingsystem.service.impl;
 
 import com.equix.horseracingsystem.config.JwtUtil;
-import com.equix.horseracingsystem.dto.ApiResponseWrapper;
-import com.equix.horseracingsystem.dto.AuthResponse;
-import com.equix.horseracingsystem.dto.LoginRequest;
-import com.equix.horseracingsystem.dto.RegisterRequest;
+import com.equix.horseracingsystem.dto.*;
+import com.equix.horseracingsystem.entity.PasswordResetToken;
 import com.equix.horseracingsystem.entity.User;
 import com.equix.horseracingsystem.constant.UserRole;
 import com.equix.horseracingsystem.constant.UserStatus;
+import com.equix.horseracingsystem.repository.PasswordResetTokenRepository;
 import com.equix.horseracingsystem.repository.UserRepository;
 import com.equix.horseracingsystem.service.AuthService;
+import com.equix.horseracingsystem.service.EmailService; // 1. THÊM IMPORT NÀY
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
-
-    public AuthServiceImpl(UserRepository userRepository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final PasswordResetTokenRepository tokenRepository;
+    private final EmailService emailService; // 2. BỔ SUNG EMAIL SERVICE VÀO ĐÂY (Lombok tự inject qua @RequiredArgsConstructor)
 
     @Override
     @Transactional
@@ -46,7 +50,6 @@ public class AuthServiceImpl implements AuthService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
 
-        // 1. Chuẩn hóa và gán gía trị dựa theo cấu trúc Enum mới
         user.setRole(normalizeRole(request.getRole()));
         user.setStatus(UserStatus.PENDING);
 
@@ -67,7 +70,6 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email not found"));
 
-        // 2. Chuyển đổi so sánh từ chuỗi String sang kiểm tra Enum trực tiếp
         if (user.getStatus() != UserStatus.VERIFIED) {
             return ApiResponseWrapper.error("Access Denied: Your account status is " + user.getStatus() + ". Please wait for administrator verification.");
         }
@@ -81,7 +83,6 @@ public class AuthServiceImpl implements AuthService {
         return ApiResponseWrapper.success("Login successful", authResponse);
     }
 
-    // 3. Cập nhật kiểu trả về của hàm bổ trợ từ String thành UserRole Enum
     private UserRole normalizeRole(String role) {
         if (role == null || role.isBlank()) {
             return UserRole.HORSE_OWNER;
@@ -95,12 +96,64 @@ public class AuthServiceImpl implements AuthService {
         try {
             return UserRole.valueOf(upperRole);
         } catch (IllegalArgumentException e) {
-            // Trả về role mặc định an toàn nếu Frontend truyền sai text không có trong Enum định nghĩa
             return UserRole.SPECTATOR;
         }
     }
 
-    // 4. Đồng bộ hóa chuyển đổi Entity sang DTO dựa vào định dạng Enum
+    @Override
+    @Transactional
+    public ApiResponseWrapper<String> forgotPassword(ForgotPasswordRequest request) {
+        Optional<User> userOpt = userRepository.findByEmail(request.getEmail().trim());
+
+        if (userOpt.isEmpty()) {
+            return ApiResponseWrapper.success("Nếu Email tồn tại trên hệ thống, mã khôi phục đã được gửi đi.", null);
+        }
+
+        User user = userOpt.get();
+
+        tokenRepository.deleteByUserId(user.getId());
+
+        String rawToken = UUID.randomUUID().toString();
+        String tokenHash = DigestUtils.md5DigestAsHex(rawToken.getBytes(StandardCharsets.UTF_8));
+
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setUser(user);
+        resetToken.setTokenHash(tokenHash);
+        resetToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        resetToken.setIsUsed(false);
+        resetToken.setCreatedAt(LocalDateTime.now());
+
+        tokenRepository.save(resetToken);
+
+        // 3. SỬA TẠI ĐÂY: Gọi emailService thực tế để gửi đi thay vì chỉ in log
+        emailService.sendResetPasswordEmail(user.getEmail(), rawToken);
+
+        return ApiResponseWrapper.success("Yêu cầu thành công! Vui lòng kiểm tra hộp thư Email để lấy mã khôi phục.", rawToken);
+    }
+
+    @Override
+    @Transactional
+    public ApiResponseWrapper<String> resetPassword(ResetPasswordRequest request) {
+        String inputHash = DigestUtils.md5DigestAsHex(request.getToken().trim().getBytes(StandardCharsets.UTF_8));
+
+        PasswordResetToken resetToken = tokenRepository.findByTokenHashAndIsUsedFalse(inputHash)
+                .orElseThrow(() -> new RuntimeException("Mã Token khôi phục không chính xác, không tồn tại hoặc đã được sử dụng trước đó."));
+
+        if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            return ApiResponseWrapper.error("Mã khôi phục đã hết hạn. Vui lòng gửi lại yêu cầu quên mật khẩu mới.");
+        }
+
+        User user = resetToken.getUser();
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        resetToken.setIsUsed(true);
+        tokenRepository.save(resetToken);
+
+        return ApiResponseWrapper.success("Đặt lại mật khẩu thành công! Bạn có thể sử dụng mật khẩu mới để đăng nhập.", null);
+    }
+
     private AuthResponse toAuthResponse(String token, User user) {
         return new AuthResponse(
                 token,
@@ -109,7 +162,7 @@ public class AuthServiceImpl implements AuthService {
                 user.getUsername(),
                 user.getFullName(),
                 user.getEmail(),
-                user.getRole().name(), // Sử dụng .name() để biến Enum thành chuỗi String trả về JSON cho Client
+                user.getRole().name(),
                 user.getRewardPoints()
         );
     }
