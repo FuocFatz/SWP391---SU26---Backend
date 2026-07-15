@@ -1,21 +1,22 @@
 package com.equix.horseracingsystem.service;
 
-import com.equix.horseracingsystem.entity.Horse;
+import com.equix.horseracingsystem.dto.HorseCreateRequest;
+import com.equix.horseracingsystem.dto.HorseResponse;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
 
 public interface HorseService {
 
-    List<Horse> getAll();
+    List<HorseResponse> getAll();
 
-    List<Horse> getByOwner(@NonNull Long ownerId);
+    List<HorseResponse> getByOwner(@NonNull Long ownerId);
 
-    Horse getById(@NonNull Long id);
+    HorseResponse getById(@NonNull Long id);
 
-    Horse create(@NonNull Horse horse);
+    HorseResponse create(@NonNull HorseCreateRequest request);
 
-    Horse update(@NonNull Long id, Horse horse);
+    HorseResponse update(@NonNull Long id, @NonNull com.equix.horseracingsystem.dto.HorseUpdateRequest request);
 
     void delete(@NonNull Long id);
 }
