@@ -5,70 +5,28 @@ const AuthContext = createContext(null);
 
 const ROLES = {
   GUEST: 'GUEST',
-  OWNER: 'OWNER',
+  HORSE_OWNER: 'HORSE_OWNER',
   JOCKEY: 'JOCKEY',
   REFEREE: 'REFEREE',
   SPECTATOR: 'SPECTATOR',
   ADMIN: 'ADMIN',
 };
 
-const mockUsers = {
-  OWNER: {
-    id: 1,
-    name: 'EquiX Owner',
-    email: 'owner@equix.vn',
-    role: ROLES.OWNER,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-  JOCKEY: {
-    id: 2,
-    name: 'EquiX Jockey',
-    email: 'jockey@equix.vn',
-    role: ROLES.JOCKEY,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-  REFEREE: {
-    id: 3,
-    name: 'EquiX Referee',
-    email: 'referee@equix.vn',
-    role: ROLES.REFEREE,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-  SPECTATOR: {
-    id: 4,
-    name: 'EquiX Spectator',
-    email: 'spectator@equix.vn',
-    role: ROLES.SPECTATOR,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-  ADMIN: {
-    id: 5,
-    name: 'Admin EquiX',
-    email: 'admin@equix.vn',
-    role: ROLES.ADMIN,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-};
-
 function mapAuthUser(payload) {
+  // log thử ra console xem payload thực tế chứa gì để dễ kiểm soát dữ liệu
+  console.log("Dữ liệu User nhận từ API:", payload);
+
+  // Nếu payload truyền vào bị null/undefined hoặc là dữ liệu lồng trong .data
+  const data = payload?.data ? payload.data : payload;
+
   return {
-    id: payload.id,
-    username: payload.username,
-    name: payload.fullName || payload.username || payload.email,
-    fullName: payload.fullName,
-    email: payload.email,
-    role: payload.role,
-    rewardPoints: payload.rewardPoints || 0,
+    id: data?.id || null,
+    username: data?.username || "",
+    name: data?.fullName || data?.username || data?.email || "User",
+    fullName: data?.fullName || "",
+    email: data?.email || "",
+    role: data?.role || 'GUEST',
+    rewardPoints: data?.rewardPoints || 0,
     status: 'Active',
   };
 }
@@ -79,16 +37,8 @@ export function AuthProvider({ children }) {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const login = async (credentialsOrRole) => {
-    if (typeof credentialsOrRole === 'string') {
-      const mockUser = mockUsers[credentialsOrRole] || null;
-      setUser(mockUser);
-      localStorage.setItem('equix_user', JSON.stringify(mockUser));
-      localStorage.removeItem('equix_token');
-      return mockUser;
-    }
-
-    const response = await api.login(credentialsOrRole);
+  const login = async (credentials) => {
+    const response = await api.login(credentials);
     const nextUser = mapAuthUser(response);
     localStorage.setItem('equix_token', response.token);
     localStorage.setItem('equix_user', JSON.stringify(nextUser));
@@ -111,12 +61,8 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('equix_token');
   };
 
-  const switchRole = (role) => {
-    if (mockUsers[role]) {
-      setUser(mockUsers[role]);
-      localStorage.setItem('equix_user', JSON.stringify(mockUsers[role]));
-      localStorage.removeItem('equix_token');
-    }
+  const switchRole = () => {
+    console.warn('switchRole is deprecated in production. Please login with a real account.');
   };
 
   const isAuthenticated = !!user;

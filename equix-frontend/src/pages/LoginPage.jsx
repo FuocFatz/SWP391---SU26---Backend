@@ -128,7 +128,7 @@ function LoginPage() {
           <div className="auth-dev-panel">
             <span className="auth-dev-label">Quick Login</span>
             <div className="auth-dev-buttons">
-              {['OWNER', 'JOCKEY', 'SPECTATOR', 'REFEREE', 'ADMIN'].map((role) => (
+              {['HORSE_OWNER', 'JOCKEY', 'SPECTATOR', 'REFEREE', 'ADMIN'].map((role) => (
                 <button
                   key={role}
                   className="btn btn-ghost btn-sm"

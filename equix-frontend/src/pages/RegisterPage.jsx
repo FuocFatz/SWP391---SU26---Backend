@@ -6,7 +6,7 @@ import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-ico
 import './LoginPage.css';
 
 const roles = [
-  { id: 'OWNER', name: 'Horse Owner', desc: 'Manage horses and enter races' },
+  { id: 'HORSE_OWNER', name: 'Horse Owner', desc: 'Manage horses and enter races' },
   { id: 'JOCKEY', name: 'Jockey', desc: 'Accept ride invitations' },
   { id: 'SPECTATOR', name: 'Spectator', desc: 'Watch races and predict winners' },
 ];
@@ -18,7 +18,7 @@ function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState('OWNER');
+  const [selectedRole, setSelectedRole] = useState('HORSE_OWNER');
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState('');

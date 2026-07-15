@@ -1,16 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LeaderboardTable from '../components/LeaderboardTable/LeaderboardTable';
+import { api } from '../services/api';
 import './LeaderboardPage.css';
 
-const podiumData = [
-  { rank: 2, horse: 'Lightning Bolt', owner: 'Trần B', points: 2180, color: '#C0C0C0' },
-  { rank: 1, horse: 'Thunder Storm', owner: 'Nguyễn A', points: 2450, color: '#FFD700' },
-  { rank: 3, horse: 'Golden Arrow', owner: 'Lê C', points: 1920, color: '#CD7F32' },
-];
+const PODIUM_COLORS = { 1: '#FFD700', 2: '#C0C0C0', 3: '#CD7F32' };
 
 function LeaderboardPage() {
   const [period, setPeriod] = useState('all');
   const [raceType, setRaceType] = useState('all');
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true);
+        const data = await api.getHorseLeaderboard();
+        setLeaderboard(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Failed to fetch leaderboard:', err);
+        setLeaderboard([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLeaderboard();
+  }, [period, raceType]); // Re-fetch if backend supports filtering, otherwise it's just mock filtering for now, but we removed mock data so we just re-fetch.
+
+  // Extract top 3 for the podium
+  const top3 = leaderboard.slice(0, 3).map((item, index) => {
+    const rank = index + 1;
+    return {
+      rank,
+      horse: item.horseName || 'Unknown Horse',
+      owner: item.ownerName || 'Unknown Owner',
+      points: item.totalPoints || 0,
+      color: PODIUM_COLORS[rank],
+    };
+  });
+
+  // Reorder for display: 2nd, 1st, 3rd
+  const podiumDisplay = top3.length === 3 ? [top3[1], top3[0], top3[2]] : top3;
 
   return (
     <div className="leaderboard-page" id="leaderboard-page">
@@ -23,22 +53,24 @@ function LeaderboardPage() {
         </div>
 
         {/* Podium */}
-        <div className="podium">
-          {podiumData.map((item) => (
-            <div key={item.rank} className={`podium-place podium-${item.rank}`}>
-              <div className="podium-avatar" style={{ borderColor: item.color }}>
-                🐎
+        {!loading && podiumDisplay.length > 0 && (
+          <div className="podium">
+            {podiumDisplay.map((item) => (
+              <div key={item.rank} className={`podium-place podium-${item.rank}`}>
+                <div className="podium-avatar" style={{ borderColor: item.color }}>
+                  🐎
+                </div>
+                <span className="podium-medal">
+                  {item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}
+                </span>
+                <h3 className="podium-horse">{item.horse}</h3>
+                <span className="podium-owner">{item.owner}</span>
+                <span className="podium-points">{item.points.toLocaleString()} pts</span>
+                <div className="podium-bar" style={{ backgroundColor: item.color + '30', borderColor: item.color }} />
               </div>
-              <span className="podium-medal">
-                {item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}
-              </span>
-              <h3 className="podium-horse">{item.horse}</h3>
-              <span className="podium-owner">{item.owner}</span>
-              <span className="podium-points">{item.points.toLocaleString()} pts</span>
-              <div className="podium-bar" style={{ backgroundColor: item.color + '30', borderColor: item.color }} />
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Filters */}
         <div className="leaderboard-filters">
@@ -77,7 +109,11 @@ function LeaderboardPage() {
           </div>
         </div>
 
-        <LeaderboardTable />
+        {loading ? (
+          <div className="text-center py-8 text-gray-500">Loading leaderboard...</div>
+        ) : (
+          <LeaderboardTable data={leaderboard} />
+        )}
       </div>
     </div>
   );

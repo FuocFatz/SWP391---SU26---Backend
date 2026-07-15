@@ -1,16 +1,12 @@
-import { Link } from 'react-router-dom';
-import { FiArrowRight, FiPlay, FiUsers, FiAward, FiFlag, FiTrendingUp } from 'react-icons/fi';
-import { GiHorseHead, GiTrophy } from 'react-icons/gi';
-import RaceCard from '../components/RaceCard/RaceCard';
-import LeaderboardTable from '../components/LeaderboardTable/LeaderboardTable';
-import './HomePage.css';
-
-const featuredRaces = [
-  { id: 1, name: 'Summer Thunder Cup', type: 'Sprint', distance: 1200, date: '2026-07-20', time: '14:00', participants: 10, maxParticipants: 12, prizePool: 75000, status: 'Registration Open' },
-  { id: 2, name: 'Golden Mile Classic', type: 'Mile', distance: 1600, date: '2026-07-22', time: '15:30', participants: 8, maxParticipants: 12, prizePool: 120000, status: 'Registration Open' },
-  { id: 3, name: 'Emerald Stakes', type: 'Medium', distance: 2200, date: '2026-07-25', time: '14:00', participants: 12, maxParticipants: 14, prizePool: 95000, status: 'Registration Closed' },
-  { id: 4, name: 'Royal Long Distance', type: 'Long', distance: 3000, date: '2026-07-28', time: '13:00', participants: 6, maxParticipants: 10, prizePool: 150000, status: 'Registration Open' },
-];
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FiArrowRight, FiPlay, FiUsers, FiAward, FiFlag, FiTrendingUp } from "react-icons/fi";
+import { GiHorseHead, GiTrophy } from "react-icons/gi";
+import RaceCard from "../components/RaceCard/RaceCard";
+import LeaderboardTable from "../components/LeaderboardTable/LeaderboardTable";
+import { api } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
+import "./HomePage.css";
 
 const steps = [
   { icon: <FiUsers />, title: 'Register', desc: 'Create your account as an Owner, Jockey, or Spectator' },
@@ -19,14 +15,43 @@ const steps = [
   { icon: <GiTrophy />, title: 'Win Glory', desc: 'Compete for prizes and climb the leaderboard' },
 ];
 
-const stats = [
-  { icon: <GiHorseHead />, value: '248', label: 'Registered Horses' },
-  { icon: <FiUsers />, value: '156', label: 'Active Jockeys' },
-  { icon: <FiFlag />, value: '89', label: 'Races Completed' },
-  { icon: <FiTrendingUp />, value: '$2.4M', label: 'Total Prize Pool' },
-];
-
 function HomePage() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [races, setRaces] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [racesData, leaderboardData] = await Promise.all([
+          api.getRaces().catch(() => []),
+          api.getHorseLeaderboard().catch(() => [])
+        ]);
+        setRaces(Array.isArray(racesData) ? racesData : []);
+        setLeaderboard(Array.isArray(leaderboardData) ? leaderboardData : []);
+      } catch (err) {
+        console.error('Failed to fetch home data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const liveRace = races.find(r => r.status === 'IN_PROGRESS');
+  const featuredRaces = races.filter(r => r.status === 'REGISTRATION_OPEN' || r.status === 'STANDBY').slice(0, 4);
+
   return (
     <div className="home-page" id="home-page">
       {/* Hero Section */}
@@ -63,22 +88,12 @@ function HomePage() {
           </p>
 
           <div className="hero-actions animate-fadeInUp delay-3">
-            <Link to="/register" className="btn btn-primary btn-lg">
+            <button onClick={handleGetStarted} className="btn btn-primary btn-lg" id="get-started-btn">
               Get Started <FiArrowRight />
-            </Link>
+            </button>
             <Link to="/races" className="btn btn-outline btn-lg">
               <FiPlay /> View Races
             </Link>
-          </div>
-
-          <div className="hero-stats animate-fadeInUp delay-4">
-            {stats.map((stat, i) => (
-              <div key={i} className="hero-stat">
-                <span className="hero-stat-icon">{stat.icon}</span>
-                <span className="hero-stat-value">{stat.value}</span>
-                <span className="hero-stat-label">{stat.label}</span>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -88,20 +103,22 @@ function HomePage() {
       </section>
 
       {/* Live Race Banner */}
-      <section className="live-banner" id="live-banner">
-        <div className="container">
-          <div className="live-banner-content">
-            <div className="live-banner-left">
-              <span className="live-banner-dot status-dot status-dot-live" />
-              <span className="live-banner-label">RACE IN PROGRESS</span>
-              <span className="live-banner-name">Summer Thunder Cup — Sprint 1200m</span>
+      {liveRace && (
+        <section className="live-banner" id="live-banner">
+          <div className="container">
+            <div className="live-banner-content">
+              <div className="live-banner-left">
+                <span className="live-banner-dot status-dot status-dot-live" />
+                <span className="live-banner-label">RACE IN PROGRESS</span>
+                <span className="live-banner-name">{liveRace.name} — {liveRace.type} {liveRace.distanceM}m</span>
+              </div>
+              <Link to={`/races/${liveRace.id}`} className="btn btn-primary btn-sm">
+                Watch Live <FiArrowRight />
+              </Link>
             </div>
-            <Link to="/races/1" className="btn btn-primary btn-sm">
-              Watch Live <FiArrowRight />
-            </Link>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Featured Races */}
       <section className="section" id="featured-races">
@@ -111,11 +128,19 @@ function HomePage() {
             Browse upcoming tournaments and register your horse-jockey pairs for exciting competitions
           </p>
 
-          <div className="races-grid">
-            {featuredRaces.map((race) => (
-              <RaceCard key={race.id} race={race} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-8 text-gray-500">Loading races...</div>
+          ) : featuredRaces.length > 0 ? (
+            <div className="races-grid">
+              {featuredRaces.map((race) => (
+                <RaceCard key={race.id} race={race} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500 bg-gray-50 rounded shadow-sm border border-gray-100">
+              No upcoming featured races available at the moment. Check back soon!
+            </div>
+          )}
 
           <div className="text-center" style={{ marginTop: 'var(--space-10)' }}>
             <Link to="/races" className="btn btn-outline btn-lg">
@@ -154,7 +179,15 @@ function HomePage() {
             The highest-ranked horses and their owners across all race types
           </p>
 
-          <LeaderboardTable compact />
+          {loading ? (
+            <div className="text-center py-8 text-gray-500">Loading leaderboard...</div>
+          ) : leaderboard.length > 0 ? (
+            <LeaderboardTable data={leaderboard.slice(0, 5)} compact />
+          ) : (
+            <div className="text-center py-8 text-gray-500 bg-gray-50 rounded shadow-sm border border-gray-100">
+              Leaderboard is currently empty. Start racing to make your mark!
+            </div>
+          )}
 
           <div className="text-center" style={{ marginTop: 'var(--space-8)' }}>
             <Link to="/leaderboard" className="btn btn-outline">
@@ -174,9 +207,9 @@ function HomePage() {
               Join thousands of horse racing enthusiasts. Create your account and start building your legacy today.
             </p>
             <div className="cta-actions">
-              <Link to="/register" className="btn btn-primary btn-lg">
-                Create Account <FiArrowRight />
-              </Link>
+              <button onClick={handleGetStarted} className="btn btn-primary btn-lg" id="cta-get-started-btn">
+                {isAuthenticated ? "Go to Dashboard" : "Create Account"} <FiArrowRight />
+              </button>
               <Link to="/about" className="btn btn-ghost btn-lg">
                 Learn More
               </Link>
