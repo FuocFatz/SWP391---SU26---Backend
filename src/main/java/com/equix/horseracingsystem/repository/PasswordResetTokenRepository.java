@@ -7,6 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
-    List<PasswordResetToken> findByUsedFalseAndExpiresAtAfter(LocalDateTime now);
-    List<PasswordResetToken> findByUserIdAndUsedFalseAndExpiresAtAfter(Long userId, LocalDateTime now);
+    List<PasswordResetToken> findByIsUsedFalseAndExpiresAtAfter(LocalDateTime now);
+    List<PasswordResetToken> findByUserIdAndIsUsedFalseAndExpiresAtAfter(Long userId, LocalDateTime now);
 }
