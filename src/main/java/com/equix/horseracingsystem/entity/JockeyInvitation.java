@@ -1,44 +1,46 @@
 package com.equix.horseracingsystem.entity;
 
+import com.equix.horseracingsystem.enums.InvitationStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "jockey_invitations")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class JockeyInvitation {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "race_id")
-    private Long raceId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "race_id")
+    private Race race;
 
-    @Column(name = "horse_id")
-    private Long horseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "horse_id", nullable = false)
+    private Horse horse;
 
-    @Column(name = "owner_id")
-    private Long ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
-    @Column(name = "jockey_id")
-    private Long jockeyId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jockey_id", nullable = false)
+    private User jockey;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private InvitationStatus status;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "NVARCHAR(MAX)")
     private String message;
 
-    @Column(name = "response_note", length = 1000)
+    @Column(name = "response_note", columnDefinition = "NVARCHAR(MAX)")
     private String responseNote;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "responded_at")
@@ -46,9 +48,7 @@ public class JockeyInvitation {
 
     @PrePersist
     void onCreate() {
-        createdAt = LocalDateTime.now();
-        if (status == null) {
-            status = "PENDING";
-        }
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (status == null) status = InvitationStatus.PENDING;
     }
 }
