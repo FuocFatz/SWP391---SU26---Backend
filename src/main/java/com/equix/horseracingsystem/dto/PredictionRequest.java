@@ -7,6 +7,9 @@ import lombok.Data;
 @Schema(description = "Spectator prediction request for a race")
 public class PredictionRequest {
 
+    @Schema(description = "Race ID", example = "10")
+    private Long raceId;
+
     @Schema(description = "Spectator user ID", example = "5")
     private Long spectatorId;
 

@@ -1,43 +1,41 @@
 package com.equix.horseracingsystem.entity;
 
+import com.equix.horseracingsystem.enums.PredictionStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "predictions", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_prediction_spectator_race", columnNames = {"spectator_id", "race_id"})
-})
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name = "predictions")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Prediction {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "race_id")
-    private Long raceId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "race_id", nullable = false)
+    private Race race;
 
-    @Column(name = "spectator_id")
-    private Long spectatorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "spectator_id", nullable = false)
+    private User spectator;
 
-    @Column(name = "predicted_horse_id")
-    private Long predictedHorseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "predicted_horse_id", nullable = false)
+    private Horse predictedHorse;
 
     @Column(name = "wager_points")
     private Integer wagerPoints;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private PredictionStatus status;
 
     @Column(name = "reward_points")
     private Integer rewardPoints;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "settled_at")
@@ -45,15 +43,9 @@ public class Prediction {
 
     @PrePersist
     void onCreate() {
-        createdAt = LocalDateTime.now();
-        if (status == null) {
-            status = "ACTIVE"; // ACTIVE until locked/settled
-        }
-        if (rewardPoints == null) {
-            rewardPoints = 0;
-        }
-        if (wagerPoints == null) {
-            wagerPoints = 0;
-        }
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (wagerPoints == null) wagerPoints = 0;
+        if (rewardPoints == null) rewardPoints = 0;
+        if (status == null) status = PredictionStatus.ACTIVE;
     }
 }
