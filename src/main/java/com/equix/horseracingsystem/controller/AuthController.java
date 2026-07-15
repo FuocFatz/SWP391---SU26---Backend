@@ -6,6 +6,14 @@ import com.equix.horseracingsystem.dto.LoginRequest;
 import com.equix.horseracingsystem.dto.RegisterRequest;
 import com.equix.horseracingsystem.entity.User;
 import com.equix.horseracingsystem.repository.UserRepository;
+import com.equix.horseracingsystem.repository.PasswordResetTokenRepository;
+import com.equix.horseracingsystem.service.EmailService;
+import com.equix.horseracingsystem.entity.PasswordResetToken;
+import com.equix.horseracingsystem.dto.PasswordResetConfirmRequest;
+import com.equix.horseracingsystem.dto.PasswordResetRequest;
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,22 +27,29 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @CrossOrigin("*")
 @Tag(name = "Authentication", description = "User registration and login endpoints")
+@SuppressWarnings("null")
 public class AuthController {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final EmailService emailService;
 
     public AuthController(
             UserRepository userRepository,
             JwtUtil jwtUtil,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            PasswordResetTokenRepository tokenRepository,
+            EmailService emailService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
+        this.tokenRepository = tokenRepository;
+        this.emailService = emailService;
     }
 
     @Operation(summary = "Register a new user",
@@ -60,9 +75,14 @@ public class AuthController {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
-        user.setRole(normalizeRole(request.getRole()));
+        com.equix.horseracingsystem.enums.Role normalizedRole = normalizeRole(request.getRole());
+        user.setRole(normalizedRole);
 
-        user.setEnabled(true);
+        if (normalizedRole == com.equix.horseracingsystem.enums.Role.SPECTATOR) {
+            user.setStatus(com.equix.horseracingsystem.enums.UserStatus.VERIFIED);
+        } else {
+            user.setStatus(com.equix.horseracingsystem.enums.UserStatus.PENDING);
+        }
         user.setRewardPoints(0);
 
         user.setCreatedAt(LocalDateTime.now());
@@ -99,11 +119,15 @@ public class AuthController {
         return toAuthResponse(token, user);
     }
 
-    private String normalizeRole(String role) {
+    private com.equix.horseracingsystem.enums.Role normalizeRole(String role) {
         if (role == null || role.isBlank()) {
-            return "OWNER";
+            return com.equix.horseracingsystem.enums.Role.HORSE_OWNER;
         }
-        return role.toUpperCase();
+        try {
+            return com.equix.horseracingsystem.enums.Role.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return com.equix.horseracingsystem.enums.Role.SPECTATOR;
+        }
     }
 
     private AuthResponse toAuthResponse(String token, User user) {
@@ -113,8 +137,74 @@ public class AuthController {
                 user.getUsername(),
                 user.getFullName(),
                 user.getEmail(),
-                user.getRole(),
+                user.getRole().name(),
                 user.getRewardPoints()
         );
+    }
+
+    @PostMapping("/forgot-password")
+    public String forgotPassword(@RequestBody PasswordResetRequest req) {
+        String generic = "If an account with that email exists, a reset link has been sent.";
+        if (req.getEmail() == null || req.getEmail().isBlank()) return generic;
+
+        userRepository.findByEmail(req.getEmail()).ifPresent(user -> {
+            String token = generateSecureToken();
+            String hashed = passwordEncoder.encode(token);
+
+            PasswordResetToken prt = PasswordResetToken.builder()
+                    .user(user)
+                    .tokenHash(hashed)
+                    .expiresAt(LocalDateTime.now().plusMinutes(30))
+                    .build();
+            tokenRepository.save(prt);
+
+            String resetLink = String.format("%s/reset-password?token=%s", "https://example.com", token);
+            emailService.sendPasswordReset(user.getEmail(), resetLink);
+        });
+        return generic;
+    }
+
+    @PostMapping("/reset-password")
+    public String resetPassword(@RequestBody PasswordResetConfirmRequest req) {
+        if (req.getToken() == null || req.getToken().isBlank()) throw new IllegalArgumentException("Invalid token");
+        if (!isValidPassword(req.getNewPassword())) throw new IllegalArgumentException("Password does not meet policy");
+
+        List<PasswordResetToken> candidates = tokenRepository.findByIsUsedFalseAndExpiresAtAfter(LocalDateTime.now());
+        PasswordResetToken matched = null;
+        User user = null;
+        for (PasswordResetToken t : candidates) {
+            if (passwordEncoder.matches(req.getToken(), t.getTokenHash())) {
+                matched = t;
+                user = t.getUser();
+                break;
+            }
+        }
+        if (matched == null || user == null) throw new IllegalArgumentException("Invalid or expired token");
+
+        user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        matched.setIsUsed(true);
+        tokenRepository.save(matched);
+
+        emailService.sendPasswordChanged(user.getEmail());
+        return "Password updated";
+    }
+
+    private boolean isValidPassword(String p) {
+        if (p == null || p.length() < 8) return false;
+        boolean hasLetter = false, hasDigit = false;
+        for (char c : p.toCharArray()) {
+            if (Character.isLetter(c)) hasLetter = true;
+            if (Character.isDigit(c)) hasDigit = true;
+        }
+        return hasLetter && hasDigit;
+    }
+
+    private String generateSecureToken() {
+        byte[] b = new byte[32];
+        new SecureRandom().nextBytes(b);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(b);
     }
 }
