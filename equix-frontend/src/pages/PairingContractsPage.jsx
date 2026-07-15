@@ -18,7 +18,11 @@ function PairingContractsPage() {
       const data = await api.getPairingContracts();
       setContracts(data);
     } catch (err) {
-      setError(err.message);
+      if (err.message === 'Request failed' || err.message.includes('403')) {
+        setError('Access Denied: You do not have permission to view all pairing contracts.');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -36,11 +40,16 @@ function PairingContractsPage() {
   };
 
   if (loading) return <div className="p-8 text-center text-gray-500">Loading pairing contracts...</div>;
-  if (error) return <div className="p-8 text-center text-red-500">Error: {error}</div>;
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Pairing Contracts</h1>
+      
+      {error && (
+        <div className="mb-6 p-4 rounded bg-red-100 text-red-700 border border-red-300">
+          {error}
+        </div>
+      )}
       
       {contracts.length === 0 ? (
         <div className="text-gray-500 bg-white p-6 rounded shadow">No pairing contracts found.</div>

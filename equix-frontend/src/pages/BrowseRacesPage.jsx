@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiSearch, FiFilter, FiExternalLink } from "react-icons/fi";
 import { api } from "../services/api";
@@ -36,7 +36,11 @@ function BrowseRacesPage() {
         setError("");
       } catch (err) {
         console.error("Failed to fetch races:", err);
-        setError("Failed to load races. Please try again.");
+        if (err.message === 'Request failed' || err.message.includes('403')) {
+          setError("Access Denied: You do not have permission to view races.");
+        } else {
+          setError("Failed to load races. Please try again.");
+        }
         setRaces([]);
       } finally {
         setLoading(false);

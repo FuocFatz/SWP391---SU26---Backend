@@ -1364,10 +1364,29 @@ function CreateRaceForm({ onCreateRace }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const success = await onCreateRace({
-      ...formData,
-      status: 'REGISTRATION_OPEN',
-    });
+
+    let datePart = null;
+    let timePart = null;
+    if (formData.raceDate) {
+      const parts = formData.raceDate.split('T');
+      datePart = parts[0];
+      timePart = parts[1] ? parts[1] + ':00' : '00:00:00';
+    }
+
+    const payload = {
+      raceName: formData.name,
+      raceDate: datePart,
+      raceTime: timePart,
+      registrationDeadline: formData.registrationDeadline ? formData.registrationDeadline + ':00' : null,
+      prizePoints: formData.prizePool,
+      raceDistance: formData.distance,
+      totalLanes: formData.maxLanes,
+      tournamentId: 1,
+      raceType: 'FLAT',
+      status: 'REGISTRATION_OPEN'
+    };
+
+    const success = await onCreateRace(payload);
     setLoading(false);
     if (success) {
       setFormData({ name: '', raceDate: '', registrationDeadline: '', prizePool: 0, distance: 1000, maxLanes: 8 });
@@ -1387,11 +1406,11 @@ function CreateRaceForm({ onCreateRace }) {
         </div>
         <div>
           <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Start Time</label>
-          <input className="form-input" type="datetime-local" value={formData.raceDate} onChange={e => setFormData({...formData, raceDate: e.target.value})} required disabled={loading} style={{ background: '#1e1e1e', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
+          <input className="form-input" type="datetime-local" value={formData.raceDate} onChange={e => setFormData({...formData, raceDate: e.target.value})} required disabled={loading} style={{ colorScheme: 'dark' }} />
         </div>
         <div>
           <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Registration Deadline</label>
-          <input className="form-input" type="datetime-local" value={formData.registrationDeadline} onChange={e => setFormData({...formData, registrationDeadline: e.target.value})} required disabled={loading} style={{ background: '#1e1e1e', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
+          <input className="form-input" type="datetime-local" value={formData.registrationDeadline} onChange={e => setFormData({...formData, registrationDeadline: e.target.value})} required disabled={loading} style={{ colorScheme: 'dark' }} />
         </div>
         <div>
           <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Prize Pool (Points)</label>
