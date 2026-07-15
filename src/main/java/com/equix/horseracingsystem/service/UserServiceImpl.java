@@ -27,8 +27,8 @@ public class UserServiceImpl implements UserService {
         if (user.getRewardPoints() == null) {
             user.setRewardPoints(0);
         }
-        if (user.getEnabled() == null) {
-            user.setEnabled(true);
+        if (user.getStatus() == null) {
+            user.setStatus(com.equix.horseracingsystem.enums.UserStatus.VERIFIED);
         }
         return userRepository.save(user);
     }
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getByRole(String role) {
-        return userRepository.findByRole(role.toUpperCase());
+        return userRepository.findByRole(com.equix.horseracingsystem.enums.Role.valueOf(role.toUpperCase()));
     }
 
     @Override
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
         existing.setPassword(user.getPassword());
         existing.setPhone(user.getPhone());
         existing.setRole(user.getRole());
-        existing.setEnabled(user.getEnabled());
+        existing.setStatus(user.getStatus());
         existing.setRewardPoints(user.getRewardPoints());
         existing.setAvatarUrl(user.getAvatarUrl());
         existing.setUpdatedAt(java.time.LocalDateTime.now());
