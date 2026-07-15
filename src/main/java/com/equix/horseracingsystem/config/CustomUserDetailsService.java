@@ -27,9 +27,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                user.getEnabled() != null && user.getEnabled(),
+                user.getStatus() == com.equix.horseracingsystem.enums.UserStatus.VERIFIED,
                 true, true, true,
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
     }
 }
