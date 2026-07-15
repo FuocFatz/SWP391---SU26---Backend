@@ -9,6 +9,9 @@ import java.util.List;
 @Schema(description = "Confirm race results wrapper containing a list of individual results")
 public class ConfirmRaceResultsRequest {
 
+    @Schema(description = "Race ID", example = "5")
+    private Long raceId;
+
     @Schema(description = "List of race result entries")
     private List<RaceResultRequest> results;
 }
