@@ -1,0 +1,124 @@
+/* ---- TermsPage ---- */
+.terms-page {
+  padding: var(--space-24) 0 var(--space-16);
+}
+
+.terms-header {
+  margin-bottom: var(--space-12);
+}
+
+.terms-title {
+  font-size: var(--fs-4xl);
+  font-weight: var(--fw-black);
+  margin-bottom: var(--space-2);
+}
+
+.terms-updated {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.terms-content {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: var(--space-10);
+  align-items: start;
+}
+
+.terms-toc {
+  position: sticky;
+  top: calc(var(--navbar-height) + var(--space-8));
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.terms-toc-title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.terms-toc-link {
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.terms-toc-link:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass-light);
+}
+
+.terms-body {
+  max-width: 800px;
+}
+
+.terms-section {
+  margin-bottom: var(--space-10);
+}
+
+.terms-section h2 {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  margin-bottom: var(--space-4);
+  padding-top: var(--space-4);
+}
+
+.terms-section p {
+  font-size: var(--fs-base);
+  line-height: var(--lh-relaxed);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+.terms-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.terms-list li {
+  padding-left: var(--space-6);
+  position: relative;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+}
+
+.terms-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+  border-radius: 50%;
+}
+
+.terms-list li strong {
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .terms-content {
+    grid-template-columns: 1fr;
+  }
+
+  .terms-toc {
+    position: static;
+  }
+}
