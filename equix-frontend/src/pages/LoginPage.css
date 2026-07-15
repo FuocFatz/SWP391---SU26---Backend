@@ -292,3 +292,62 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---- Register Page — Terms Checkbox ---- */
+.register-terms-checkbox {
+  align-items: flex-start !important;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  cursor: pointer;
+  line-height: var(--lh-relaxed);
+}
+
+.register-terms-checkbox:hover {
+  border-color: rgba(192, 57, 43, 0.35);
+  background: rgba(192, 57, 43, 0.04);
+}
+
+.register-terms-checkbox input[type="checkbox"] {
+  margin-top: 3px;
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--color-primary-light);
+  cursor: pointer;
+}
+
+.register-terms-checkbox span {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+}
+
+.terms-highlight {
+  color: var(--color-accent-light);
+  font-style: italic;
+}
+
+.terms-hint {
+  font-size: var(--fs-xs);
+  color: var(--color-accent);
+  padding: var(--space-2) var(--space-3);
+  background: rgba(243, 156, 18, 0.08);
+  border: 1px solid rgba(243, 156, 18, 0.2);
+  border-radius: var(--radius-sm);
+  animation: fadeIn 0.2s ease;
+}
+
+.btn-disabled-terms {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(20%);
+  box-shadow: none !important;
+}
+
+.btn-disabled-terms:hover {
+  transform: none !important;
+}

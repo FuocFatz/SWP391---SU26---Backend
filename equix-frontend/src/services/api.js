@@ -54,9 +54,11 @@ export const api = {
     method: 'POST',
     body: JSON.stringify(payload),
   }),
-  updateRaceStatus: (raceId, status) => request(`/v1/races/${raceId}/status?status=${status}`, {
-    method: 'PUT',
-  }),
+  updateRaceStatus: (raceId, status, reason) => {
+    let url = `/v1/races/${raceId}/status?status=${status}`;
+    if (reason) url += `&reason=${encodeURIComponent(reason)}`;
+    return request(url, { method: 'PUT' });
+  },
   getRaceRegistrations: (raceId) => request(`/v1/races/${raceId}/registrations`),
   registerHorse: (payload) => request('/v1/race-registrations', {
     method: 'POST',

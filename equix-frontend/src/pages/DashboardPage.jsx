@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import {
   FiActivity,
+  FiAlertTriangle,
   FiAward,
   FiCheckCircle,
   FiFlag,
@@ -11,6 +12,10 @@ import {
   FiShield,
   FiUsers,
   FiXCircle,
+  FiX,
+  FiZap,
+  FiAlertOctagon,
+  FiSend,
 } from 'react-icons/fi';
 import { GiHorseHead, GiHorseshoe } from 'react-icons/gi';
 import StatCard from '../components/StatCard/StatCard';
@@ -243,10 +248,10 @@ function DashboardPage() {
     );
   };
 
-  const handleUpdateRaceStatus = (raceId, newStatus) => {
+  const handleUpdateRaceStatus = (raceId, newStatus, reason) => {
     execute(
       'Update race status',
-      () => api.updateRaceStatus(raceId, newStatus)
+      () => api.updateRaceStatus(raceId, newStatus, reason)
     );
   };
 
@@ -616,11 +621,109 @@ function OwnerDashboard({
   );
 }
 
+// ─── Cancel Race Modal ──────────────────────────────────────────────────────
+function CancelRaceModal({ race, onClose, onConfirm }) {
+  const [reason, setReason] = useState('');
+  const isValid = reason.trim().length >= 15;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!isValid) return;
+    onConfirm(race.id, reason.trim());
+  };
+
+  // Close on ESC
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
+    <div className="modal-overlay" id="cancel-race-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal-container cancel-race-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-race-title">
+        <div className="modal-header">
+          <div className="modal-header-content">
+            <div className="modal-header-icon danger">
+              <FiAlertTriangle />
+            </div>
+            <div>
+              <h3 id="cancel-race-title" className="modal-title">Hủy Giải Đấu</h3>
+              <p className="modal-subtitle">Hành động này không thể hoàn tác.</p>
+            </div>
+          </div>
+          <button className="modal-close-btn" onClick={onClose} aria-label="Đóng">
+            <FiX />
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <div className="cancel-race-info">
+            <span className="cancel-race-name">{race?.name}</span>
+            <span className="cancel-race-date">{race?.raceDate}</span>
+          </div>
+
+          <form onSubmit={handleSubmit} id="cancel-race-form">
+            <div className="modal-field">
+              <label className="modal-label" htmlFor="cancel-reason">
+                Lý do hủy giải đấu <span className="required-star">*</span>
+              </label>
+              <textarea
+                id="cancel-reason"
+                className={`modal-textarea ${reason.trim().length > 0 && !isValid ? 'input-error' : ''}`}
+                rows={4}
+                placeholder="Nhập lý do hủy giải đấu chi tiết... (tối thiểu 15 ký tự)"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                autoFocus
+              />
+              <div className="modal-char-count">
+                <span className={reason.trim().length > 0 && !isValid ? 'char-count-error' : reason.trim().length >= 15 ? 'char-count-ok' : ''}>
+                  {reason.trim().length} / 15 ký tự tối thiểu
+                </span>
+                {reason.trim().length > 0 && !isValid && (
+                  <span className="char-count-error"> — Cần ít nhất 15 ký tự</span>
+                )}
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button type="button" className="btn btn-ghost" onClick={onClose}>Hủy bỏ</button>
+              <button
+                type="submit"
+                className="btn btn-danger"
+                disabled={!isValid}
+                id="btn-confirm-cancel-race"
+              >
+                <FiAlertOctagon /> Xác nhận hủy giải
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminDashboard({ data, pendingAdminRegistrations, onCreateRace, onApprove, onUpdateRaceStatus }) {
   const [selectedStatuses, setSelectedStatuses] = useState({});
+  const [cancelModal, setCancelModal] = useState(null); // { race }
+
+  const handleCancelRace = async (raceId, reason) => {
+    await onUpdateRaceStatus(raceId, 'CANCELLED', reason);
+    setCancelModal(null);
+  };
 
   return (
     <>
+      {cancelModal && (
+        <CancelRaceModal
+          race={cancelModal.race}
+          onClose={() => setCancelModal(null)}
+          onConfirm={handleCancelRace}
+        />
+      )}
+
       <div className="dash-stats-grid">
         <StatCard icon={<FiUsers />} label="Accounts" value={data.users.length} color="red" />
         <StatCard icon={<FiFlag />} label="Races" value={data.races.length} color="green" />
@@ -663,7 +766,7 @@ function AdminDashboard({ data, pendingAdminRegistrations, onCreateRace, onAppro
                         onChange={(e) => setSelectedStatuses({ ...selectedStatuses, [race.id]: e.target.value })}
                       >
                         <option value="" disabled>Change Status</option>
-                        {RACE_STATUSES.filter(s => s !== race.status).map(status => (
+                        {RACE_STATUSES.filter(s => s !== race.status && s !== 'CANCELLED').map(status => (
                           <option key={status} value={status}>{statusLabel(status)}</option>
                         ))}
                       </select>
@@ -677,6 +780,16 @@ function AdminDashboard({ data, pendingAdminRegistrations, onCreateRace, onAppro
                       >
                         Update
                       </button>
+                      {race.status !== 'CANCELLED' && race.status !== 'COMPLETED' && (
+                        <button
+                          className="btn btn-danger btn-sm"
+                          id={`btn-cancel-race-${race.id}`}
+                          onClick={() => setCancelModal({ race })}
+                          title="Hủy giải đấu này"
+                        >
+                          <FiXCircle /> Cancel Race
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -725,6 +838,7 @@ function AdminDashboard({ data, pendingAdminRegistrations, onCreateRace, onAppro
     </>
   );
 }
+
 
 function JockeyDashboard({ data, invitations, assignments, onDecision }) {
   return (
@@ -793,6 +907,181 @@ function JockeyDashboard({ data, invitations, assignments, onDecision }) {
   );
 }
 
+// ─── Referee Quick-Action Panel ─────────────────────────────────────────────
+const QUICK_ACTIONS = [
+  { id: 'stumble',      label: 'Stumble',       icon: '🐎', category: 'Movement',    severity: 'Medium',   color: '#F39C12', desc: 'Horse stumbled during race' },
+  { id: 'interference', label: 'Interference',  icon: '⚡', category: 'Conduct',     severity: 'High',     color: '#E74C3C', desc: 'Interference with another horse' },
+  { id: 'false_start', label: 'False Start',   icon: '🚫', category: 'Start',       severity: 'Critical', color: '#C0392B', desc: 'Horse false started at gate' },
+  { id: 'injury',      label: 'Injury Observed', icon: '🏥', category: 'Health',    severity: 'Critical', color: '#8E44AD', desc: 'Injury observed on horse or jockey' },
+];
+
+function RefereeQuickActionPanel({ raceId, registrations, horses, users, onNoteSaved }) {
+  const [noteForm, setNoteForm] = useState({ category: '', severity: '', description: '', registrationId: '', activeQuickAction: null });
+  const [saving, setSaving] = useState(false);
+  const [savedMsg, setSavedMsg] = useState('');
+
+  const isDescValid = noteForm.description.trim().length >= 10;
+  const canSave = noteForm.category && noteForm.severity && isDescValid;
+
+  const handleQuickAction = (action) => {
+    setNoteForm((prev) => ({
+      ...prev,
+      category: action.category,
+      severity: action.severity,
+      description: action.desc,
+      activeQuickAction: action.id,
+    }));
+  };
+
+  const handleSaveNote = async (e) => {
+    e.preventDefault();
+    if (!canSave || !raceId) return;
+    setSaving(true);
+    try {
+      await api.createRaceNote({
+        raceId,
+        registrationId: noteForm.registrationId ? Number(noteForm.registrationId) : null,
+        category: noteForm.category,
+        severity: noteForm.severity,
+        description: noteForm.description.trim(),
+      });
+      setSavedMsg('✅ Ghi chú đã được lưu!');
+      setNoteForm({ category: '', severity: '', description: '', registrationId: '', activeQuickAction: null });
+      onNoteSaved?.();
+      setTimeout(() => setSavedMsg(''), 3000);
+    } catch (err) {
+      setSavedMsg(`❌ Lỗi: ${err.message || 'Không thể lưu ghi chú'}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <section className="workflow-panel referee-quick-panel" id="referee-quick-action-panel">
+      <div className="workflow-panel-heading">
+        <h3><FiZap style={{ marginRight: 6 }} />Quick Actions</h3>
+        <span className="referee-panel-badge">Referee Tools</span>
+      </div>
+
+      {/* Quick Action Buttons */}
+      <div className="quick-actions-grid">
+        {QUICK_ACTIONS.map((action) => (
+          <button
+            key={action.id}
+            id={`qa-btn-${action.id}`}
+            className={`quick-action-btn ${noteForm.activeQuickAction === action.id ? 'active' : ''}`}
+            style={{ '--qa-color': action.color }}
+            onClick={() => handleQuickAction(action)}
+            title={`Category: ${action.category} | Severity: ${action.severity}`}
+          >
+            <span className="qa-icon">{action.icon}</span>
+            <span className="qa-label">{action.label}</span>
+            <span className="qa-meta">
+              <span className="qa-category">{action.category}</span>
+              <span className={`qa-severity qa-severity-${action.severity.toLowerCase()}`}>{action.severity}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Note Form */}
+      <form className="referee-note-form" onSubmit={handleSaveNote} id="referee-note-form">
+        <div className="referee-note-row">
+          <div className="referee-note-field">
+            <label className="modal-label" htmlFor="note-registration">Đối tượng (Registration)</label>
+            <select
+              id="note-registration"
+              className="form-select"
+              value={noteForm.registrationId}
+              onChange={(e) => setNoteForm({ ...noteForm, registrationId: e.target.value })}
+            >
+              <option value="">— Tất cả (Race level) —</option>
+              {registrations.map((reg) => (
+                <option key={reg.id} value={reg.id}>
+                  {horses.find(h => Number(h.id) === Number(reg.horseId))?.horseName || `Horse #${reg.horseId}`}
+                  {' / '}
+                  {users.find(u => Number(u.id) === Number(reg.jockeyId))?.fullName || 'Unassigned'}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="referee-note-field">
+            <label className="modal-label" htmlFor="note-category">Category <span className="required-star">*</span></label>
+            <select
+              id="note-category"
+              className="form-select"
+              value={noteForm.category}
+              onChange={(e) => setNoteForm({ ...noteForm, category: e.target.value, activeQuickAction: null })}
+            >
+              <option value="">— Chọn Category —</option>
+              {['Movement', 'Conduct', 'Start', 'Health', 'Equipment', 'Other'].map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="referee-note-field">
+            <label className="modal-label" htmlFor="note-severity">Severity <span className="required-star">*</span></label>
+            <select
+              id="note-severity"
+              className="form-select"
+              value={noteForm.severity}
+              onChange={(e) => setNoteForm({ ...noteForm, severity: e.target.value, activeQuickAction: null })}
+            >
+              <option value="">— Chọn Severity —</option>
+              {['Low', 'Medium', 'High', 'Critical'].map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="referee-note-field">
+          <label className="modal-label" htmlFor="note-description">
+            Mô tả <span className="required-star">*</span>
+            <span className={`char-hint ${noteForm.description.trim().length > 0 && !isDescValid ? 'char-count-error' : noteForm.description.trim().length >= 10 ? 'char-count-ok' : ''}`}>
+              {noteForm.description.trim().length}/10 ký tự tối thiểu
+            </span>
+          </label>
+          <textarea
+            id="note-description"
+            className={`modal-textarea ${noteForm.description.trim().length > 0 && !isDescValid ? 'input-error' : ''}`}
+            rows={3}
+            placeholder="Mô tả chi tiết sự cố... (tối thiểu 10 ký tự)"
+            value={noteForm.description}
+            onChange={(e) => setNoteForm({ ...noteForm, description: e.target.value })}
+          />
+        </div>
+
+        {savedMsg && (
+          <div className={`referee-note-msg ${savedMsg.startsWith('✅') ? 'success' : 'error'}`}>
+            {savedMsg}
+          </div>
+        )}
+
+        <div className="referee-note-actions">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => setNoteForm({ category: '', severity: '', description: '', registrationId: '', activeQuickAction: null })}
+          >
+            Xóa form
+          </button>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={!canSave || saving}
+            id="btn-save-race-note"
+          >
+            <FiSend /> {saving ? 'Đang lưu...' : 'Lưu ghi chú'}
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}
+
 function RefereeDashboard({
   data,
   selectedRace,
@@ -842,6 +1131,15 @@ function RefereeDashboard({
           )}
         </section>
       </div>
+
+      {/* Quick-Action Panel */}
+      <RefereeQuickActionPanel
+        raceId={selectedRace?.id}
+        registrations={selectedRaceRegistrations}
+        horses={data.horses}
+        users={data.users}
+        onNoteSaved={() => {}}
+      />
 
       {selectedRaceRegistrations.length > 0 && (
         <section className="workflow-panel">
@@ -905,6 +1203,7 @@ function RefereeDashboard({
     </>
   );
 }
+
 
 function SpectatorDashboard({ data, predictionForm, setPredictionForm, onPrediction }) {
   const raceHorses = data.registrations

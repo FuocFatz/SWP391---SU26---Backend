@@ -1,9 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { FiMenu, FiX, FiChevronDown, FiLogOut, FiUser, FiSettings } from 'react-icons/fi';
+import { FiMenu, FiX, FiChevronDown, FiLogOut, FiUser, FiSettings, FiZap } from 'react-icons/fi';
 import { GiHorseshoe } from 'react-icons/gi';
+import { api } from '../../services/api';
 import './Navbar.css';
+
+function DemoModeBadge() {
+  const [isDemoMode, setIsDemoMode] = useState(false);
+
+  useEffect(() => {
+    api.getSystemSetting('isDemoMode')
+      .then((res) => {
+        // API may return { key, value } or { settingValue } or plain boolean/string
+        const raw = res?.value ?? res?.settingValue ?? res;
+        setIsDemoMode(raw === true || raw === 'true' || raw === 1);
+      })
+      .catch(() => setIsDemoMode(false));
+  }, []);
+
+  if (!isDemoMode) return null;
+
+  return (
+    <div className="demo-mode-badge" id="demo-mode-badge" title="Time is compressed in Demo Mode">
+      <FiZap className="demo-mode-badge-icon" />
+      <span>DEMO MODE</span>
+    </div>
+  );
+}
 
 const publicLinks = [
   { path: '/', label: 'Home' },
@@ -31,6 +55,8 @@ function Navbar() {
           <GiHorseshoe className="navbar-logo-icon" />
           <span className="navbar-logo-text">Equi<span className="navbar-logo-accent">X</span></span>
         </Link>
+
+        <DemoModeBadge />
 
         <ul className="navbar-links" id="navbar-links">
           {publicLinks.map((link) => (

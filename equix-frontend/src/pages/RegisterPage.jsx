@@ -179,21 +179,33 @@ function RegisterPage() {
               </div>
             </div>
 
-            <label className="form-checkbox" htmlFor="accept-terms">
+            <label className="form-checkbox register-terms-checkbox" htmlFor="accept-terms">
               <input
                 type="checkbox"
                 id="accept-terms"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
               />
-              <span>I accept the <Link to="/terms" className="auth-switch-link">Terms of Service</Link></span>
+              <span>
+                Tôi đồng ý với{' '}
+                <Link to="/terms" className="auth-switch-link">Điều khoản dịch vụ</Link>
+                {' '}và xác nhận EquiX là nền tảng mô phỏng dự đoán{' '}
+                <strong className="terms-highlight">phi lợi nhuận</strong>.
+              </span>
             </label>
+
+            {!acceptTerms && (
+              <p className="terms-hint" id="terms-hint">
+                ⚠️ Vui lòng đồng ý với Điều khoản dịch vụ để tiếp tục đăng ký.
+              </p>
+            )}
 
             <button
               type="submit"
-              className={`btn btn-primary btn-lg auth-submit ${loading ? 'loading' : ''}`}
-              disabled={loading}
+              className={`btn btn-primary btn-lg auth-submit ${loading ? 'loading' : ''} ${!acceptTerms ? 'btn-disabled-terms' : ''}`}
+              disabled={loading || !acceptTerms}
               id="btn-register-submit"
+              title={!acceptTerms ? 'Vui lòng đồng ý với Điều khoản dịch vụ trước' : ''}
             >
               {loading ? <span className="spinner" /> : <>Create Account <FiArrowRight /></>}
             </button>
