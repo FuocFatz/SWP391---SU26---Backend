@@ -7,6 +7,7 @@ function UsersManagementPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -34,20 +35,21 @@ function UsersManagementPage() {
   };
 
   const filteredUsers = users.filter(u => {
-    if (!searchTerm) return true;
-    const q = searchTerm.toLowerCase();
-    return (
-      (u.fullName || '').toLowerCase().includes(q) ||
-      (u.email || '').toLowerCase().includes(q) ||
-      (u.role || '').toLowerCase().includes(q)
+    const matchSearch = !searchTerm || (
+      (u.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (u.role || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
+    const matchRole = !roleFilter || u.role === roleFilter;
+    return matchSearch && matchRole;
   });
 
   const statusBadgeClass = (status) => {
     switch (status) {
       case 'VERIFIED': return 'badge-green';
       case 'PENDING': return 'badge-yellow';
-      default: return 'badge-red';
+      case 'BANNED': return 'badge-red';
+      default: return 'badge-gray';
     }
   };
 
@@ -71,15 +73,30 @@ function UsersManagementPage() {
             {users.length} total account{users.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <div style={{ position: 'relative', minWidth: 250 }}>
-          <FiSearch style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input
-            className="form-input"
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ paddingLeft: 36 }}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <select
+            className="form-select"
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            style={{ minWidth: 150 }}
+          >
+            <option value="">All Roles</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="HORSE_OWNER">HORSE_OWNER</option>
+            <option value="JOCKEY">JOCKEY</option>
+            <option value="REFEREE">REFEREE</option>
+            <option value="SPECTATOR">SPECTATOR</option>
+          </select>
+          <div style={{ position: 'relative', minWidth: 250 }}>
+            <FiSearch style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input
+              className="form-input"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ paddingLeft: 36 }}
+            />
+          </div>
         </div>
       </div>
       
@@ -135,17 +152,15 @@ function UsersManagementPage() {
                       </span>
                     </td>
                     <td style={{ padding: 'var(--space-4) var(--space-5)' }}>
-                      <select
-                        className="form-select"
-                        value={user.status}
-                        onChange={(e) => handleStatusChange(user.id, e.target.value)}
-                        style={{ width: 'auto', minWidth: 140, padding: 'var(--space-2) var(--space-8) var(--space-2) var(--space-3)', fontSize: 'var(--fs-sm)' }}
-                      >
-                        <option value="PENDING">PENDING</option>
-                        <option value="VERIFIED">VERIFIED</option>
-                        <option value="SUSPENDED">SUSPENDED</option>
-                        <option value="TERMINATED">TERMINATED</option>
-                      </select>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <button className="btn btn-outline btn-sm" style={{ padding: '4px 8px', fontSize: '12px' }}>Edit</button>
+                        {user.status === 'PENDING' && (
+                          <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', fontSize: '12px' }} onClick={() => handleStatusChange(user.id, 'VERIFIED')}>Approve</button>
+                        )}
+                        {user.status === 'VERIFIED' && (
+                          <button className="btn btn-danger btn-sm" style={{ padding: '4px 8px', fontSize: '12px' }} onClick={() => handleStatusChange(user.id, 'BANNED')}>Ban</button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

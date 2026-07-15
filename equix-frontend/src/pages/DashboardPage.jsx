@@ -1354,8 +1354,10 @@ function CreateRaceForm({ onCreateRace }) {
   const [formData, setFormData] = useState({
     name: '',
     raceDate: '',
+    registrationDeadline: '',
     prizePool: 0,
     distance: 1000,
+    maxLanes: 8,
   });
   const [loading, setLoading] = useState(false);
 
@@ -1368,7 +1370,7 @@ function CreateRaceForm({ onCreateRace }) {
     });
     setLoading(false);
     if (success) {
-      setFormData({ name: '', raceDate: '', prizePool: 0, distance: 1000 });
+      setFormData({ name: '', raceDate: '', registrationDeadline: '', prizePool: 0, distance: 1000, maxLanes: 8 });
     }
   };
 
@@ -1384,21 +1386,35 @@ function CreateRaceForm({ onCreateRace }) {
           <input className="form-input" type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required placeholder="Enter race name" disabled={loading} />
         </div>
         <div>
-          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Date & Time</label>
-          <input className="form-input" type="datetime-local" value={formData.raceDate} onChange={e => setFormData({...formData, raceDate: e.target.value})} required disabled={loading} />
+          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Start Time</label>
+          <input className="form-input" type="datetime-local" value={formData.raceDate} onChange={e => setFormData({...formData, raceDate: e.target.value})} required disabled={loading} style={{ background: '#1e1e1e', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
+        </div>
+        <div>
+          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Registration Deadline</label>
+          <input className="form-input" type="datetime-local" value={formData.registrationDeadline} onChange={e => setFormData({...formData, registrationDeadline: e.target.value})} required disabled={loading} style={{ background: '#1e1e1e', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
         </div>
         <div>
           <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Prize Pool (Points)</label>
           <input className="form-input" type="number" min="0" value={formData.prizePool} onChange={e => setFormData({...formData, prizePool: Number(e.target.value)})} required placeholder="e.g. 50000" disabled={loading} />
         </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Distance</label>
-          <select className="form-select" value={formData.distance} onChange={e => setFormData({...formData, distance: Number(e.target.value)})} required disabled={loading}>
-            <option value={1000}>1000m</option>
-            <option value={1200}>1200m</option>
-            <option value={1400}>1400m</option>
-            <option value={1600}>1600m</option>
-          </select>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Distance</label>
+            <select className="form-select" value={formData.distance} onChange={e => setFormData({...formData, distance: Number(e.target.value)})} required disabled={loading}>
+              <option value={1000}>1000m</option>
+              <option value={1200}>1200m</option>
+              <option value={1400}>1400m</option>
+              <option value={1600}>1600m</option>
+            </select>
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Max Lanes</label>
+            <select className="form-select" value={formData.maxLanes} onChange={e => setFormData({...formData, maxLanes: Number(e.target.value)})} required disabled={loading}>
+              <option value={6}>6</option>
+              <option value={8}>8</option>
+              <option value={12}>12</option>
+            </select>
+          </div>
         </div>
         <button className="btn btn-primary" type="submit" disabled={loading}>
           {loading ? 'Creating...' : 'Create Race'}
