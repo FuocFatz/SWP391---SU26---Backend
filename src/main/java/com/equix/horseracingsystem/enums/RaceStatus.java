@@ -1,0 +1,5 @@
+package com.equix.horseracingsystem.enums;
+
+public enum RaceStatus {
+    DRAFT, REGISTRATION_OPEN, REGISTRATION_CLOSED, STANDBY, IN_PROGRESS, COMPLETED, REPORT_READY, OFFICIAL, CANCELLED
+}

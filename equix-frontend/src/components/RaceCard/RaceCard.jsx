@@ -71,7 +71,7 @@ function RaceCard({ race }) {
         <div className="race-card-prize">
           <span className="race-card-prize-label">Prize Pool</span>
           <span className="race-card-prize-value">
-            {prizePool > 0 ? `$${Number(prizePool).toLocaleString()}` : 'TBD'}
+            {prizePool > 0 ? `${Number(prizePool).toLocaleString()} Points` : 'TBD'}
           </span>
         </div>
         <span className="race-card-arrow">View</span>

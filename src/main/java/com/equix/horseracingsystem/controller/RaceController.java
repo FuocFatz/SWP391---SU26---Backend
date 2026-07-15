@@ -3,6 +3,7 @@ package com.equix.horseracingsystem.controller;
 import com.equix.horseracingsystem.dto.*;
 import com.equix.horseracingsystem.entity.*;
 import com.equix.horseracingsystem.repository.*;
+import com.equix.horseracingsystem.service.RaceService;
 import com.equix.horseracingsystem.service.RaceWorkflowService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,156 +13,138 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/races")
+@RequestMapping("/api/v1/races")
 @CrossOrigin("*")
 @SuppressWarnings("null")
 @Tag(name = "Races", description = "Race management, workflow, results, and leaderboards")
 public class RaceController {
 
-    private final RaceRepository raceRepository;
+    private final RaceService raceService;
+    private final RaceWorkflowService workflowService;
     private final RaceRegistrationRepository registrationRepository;
     private final RaceResultRepository resultRepository;
+    private final RaceNoteRepository raceNoteRepository;
     private final PredictionRepository predictionRepository;
-    private final RaceWorkflowService workflowService;
 
     public RaceController(
-            RaceRepository raceRepository,
+            RaceService raceService,
+            RaceWorkflowService workflowService,
             RaceRegistrationRepository registrationRepository,
             RaceResultRepository resultRepository,
-            PredictionRepository predictionRepository,
-            RaceWorkflowService workflowService) {
-        this.raceRepository = raceRepository;
+            RaceNoteRepository raceNoteRepository,
+            PredictionRepository predictionRepository) {
+        this.raceService = raceService;
+        this.workflowService = workflowService;
         this.registrationRepository = registrationRepository;
         this.resultRepository = resultRepository;
+        this.raceNoteRepository = raceNoteRepository;
         this.predictionRepository = predictionRepository;
-        this.workflowService = workflowService;
     }
 
     @Operation(summary = "Get all races",
             description = "Retrieves races. Optionally filter by tournamentId, refereeId, or status.")
     @ApiResponse(responseCode = "200", description = "List of races",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Race.class))))
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = RaceResponse.class))))
     @GetMapping
-    public List<Race> getAll(
+    public List<RaceResponse> getAll(
             @Parameter(description = "Filter by tournament ID") @RequestParam(required = false) Long tournamentId,
             @Parameter(description = "Filter by referee ID") @RequestParam(required = false) Long refereeId,
             @Parameter(description = "Filter by status") @RequestParam(required = false) String status) {
-        if (tournamentId != null) {
-            return raceRepository.findByTournamentId(tournamentId);
-        }
-        if (refereeId != null) {
-            return raceRepository.findByRefereeId(refereeId);
-        }
-        if (status != null && !status.isBlank()) {
-            return raceRepository.findByStatus(status);
-        }
-        return raceRepository.findAll();
+        return raceService.getAllRaces(tournamentId, refereeId, status);
     }
 
     @Operation(summary = "Get race by ID", description = "Retrieves a single race by its ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Race found",
-                    content = @Content(schema = @Schema(implementation = Race.class))),
+                    content = @Content(schema = @Schema(implementation = RaceResponse.class))),
             @ApiResponse(responseCode = "400", description = "Race not found", content = @Content)
     })
     @GetMapping("/{id}")
-    public Race getById(@Parameter(description = "Race ID") @PathVariable Long id) {
-        return raceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Race not found: " + id));
+    public RaceResponse getById(@Parameter(description = "Race ID") @PathVariable Long id) {
+        return raceService.getRaceById(id);
     }
 
     @Operation(summary = "Create a new race", description = "Creates a new race record")
     @ApiResponse(responseCode = "200", description = "Race created successfully",
-            content = @Content(schema = @Schema(implementation = Race.class)))
+            content = @Content(schema = @Schema(implementation = RaceResponse.class)))
     @PostMapping
-    public Race create(@RequestBody Race race) {
-        return raceRepository.save(race);
+    @PreAuthorize("hasRole('ADMIN')")
+    public RaceResponse create(@jakarta.validation.Valid @RequestBody RaceRequest request) {
+        return raceService.createRace(request);
     }
 
     @Operation(summary = "Update a race", description = "Updates an existing race by ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Race updated successfully",
-                    content = @Content(schema = @Schema(implementation = Race.class))),
+                    content = @Content(schema = @Schema(implementation = RaceResponse.class))),
             @ApiResponse(responseCode = "400", description = "Race not found", content = @Content)
     })
     @PutMapping("/{id}")
-    public Race update(@Parameter(description = "Race ID") @PathVariable Long id,
-                       @RequestBody Race race) {
-        Race existing = getById(id);
-        existing.setTournamentId(race.getTournamentId());
-        existing.setName(race.getName());
-        existing.setType(race.getType());
-        existing.setDistanceM(race.getDistanceM());
-        existing.setSurface(race.getSurface());
-        existing.setRaceDate(race.getRaceDate());
-        existing.setRaceTime(race.getRaceTime());
-        existing.setMaxParticipants(race.getMaxParticipants());
-        existing.setPrizePool(race.getPrizePool());
-        existing.setRefereeId(race.getRefereeId());
-        existing.setStatus(race.getStatus());
-        return raceRepository.save(existing);
+    @PreAuthorize("hasRole('ADMIN')")
+    public RaceResponse update(@Parameter(description = "Race ID") @PathVariable Long id,
+                       @RequestBody RaceRequest request) {
+        return raceService.updateRace(id, request);
     }
 
     @Operation(summary = "Update race status", description = "Patches only the status field of a race")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Status updated",
-                    content = @Content(schema = @Schema(implementation = Race.class))),
+                    content = @Content(schema = @Schema(implementation = RaceResponse.class))),
             @ApiResponse(responseCode = "400", description = "Race not found", content = @Content)
     })
-    @PatchMapping("/{id}/status")
-    public Race updateStatus(
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public RaceResponse updateStatus(
             @Parameter(description = "Race ID") @PathVariable Long id,
             @Parameter(description = "New status value") @RequestParam String status) {
-        Race race = getById(id);
-        race.setStatus(status);
-        return raceRepository.save(race);
+        return raceService.updateStatus(id, status);
     }
 
     @Operation(summary = "Get race registrations",
             description = "Retrieves all registrations for a specific race")
     @ApiResponse(responseCode = "200", description = "List of registrations",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = RaceRegistration.class))))
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = RaceRegistrationResponse.class))))
     @GetMapping("/{id}/registrations")
-    public List<RaceRegistration> getRegistrations(
+    public List<RaceRegistrationResponse> getRegistrations(
             @Parameter(description = "Race ID") @PathVariable Long id) {
-        return registrationRepository.findByRaceId(id);
-    }
-
-    @Operation(summary = "Register a horse for a race",
-            description = "Registers a horse into a race via the race workflow")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Horse registered successfully",
-                    content = @Content(schema = @Schema(implementation = RaceRegistration.class))),
-            @ApiResponse(responseCode = "400", description = "Registration failed", content = @Content)
-    })
-    @PostMapping("/{id}/registrations")
-    public RaceRegistration registerHorse(
-            @Parameter(description = "Race ID") @PathVariable Long id,
-            @RequestBody RaceRegistrationRequest request) {
-        return workflowService.registerHorse(id, request);
+        return registrationRepository.findByRaceId(id).stream()
+                .map(reg -> RaceRegistrationResponse.builder()
+                        .id(reg.getId())
+                        .raceId(reg.getRace().getId())
+                        .horseId(reg.getHorse().getId())
+                        .jockeyId(reg.getJockey().getId())
+                        .ownerId(reg.getOwner().getId())
+                        .status(reg.getStatus().name())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Operation(summary = "Start a race", description = "Transitions a race to IN_PROGRESS status")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Race started",
-                    content = @Content(schema = @Schema(implementation = Race.class))),
+                    content = @Content(schema = @Schema(implementation = RaceResponse.class))),
             @ApiResponse(responseCode = "400", description = "Race cannot be started", content = @Content)
     })
     @PostMapping("/{id}/start")
-    public Race startRace(@Parameter(description = "Race ID") @PathVariable Long id) {
-        return workflowService.startRace(id);
+    @PreAuthorize("hasRole('ADMIN')")
+    public RaceResponse startRace(@Parameter(description = "Race ID") @PathVariable Long id) {
+        Race race = workflowService.startRace(id);
+        return raceService.mapToResponse(race);
     }
 
     @Operation(summary = "Simulate a race",
             description = "Runs a simulation for the race, optionally for a given duration")
     @ApiResponse(responseCode = "200", description = "Simulation results")
     @GetMapping("/{id}/simulate")
+    @PreAuthorize("hasRole('ADMIN')")
     public Map<String, Object> simulateRace(
             @Parameter(description = "Race ID") @PathVariable Long id,
             @Parameter(description = "Simulation duration in seconds") @RequestParam(required = false) Integer durationSeconds) {
@@ -178,42 +161,55 @@ public class RaceController {
         return resultRepository.findByRaceIdOrderByFinishPositionAsc(id);
     }
 
-    @Operation(summary = "Confirm race results",
-            description = "Referee confirms and records the official race results")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Results confirmed",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = RaceResult.class)))),
-            @ApiResponse(responseCode = "400", description = "Invalid results data", content = @Content)
-    })
-    @PostMapping("/{id}/results")
-    public List<RaceResult> confirmResults(
-            @Parameter(description = "Race ID") @PathVariable Long id,
-            @RequestBody ConfirmRaceResultsRequest request) {
-        return workflowService.confirmResults(id, request);
+    @Operation(summary = "Get race notes",
+            description = "Retrieves notes for a completed race")
+    @ApiResponse(responseCode = "200", description = "List of race notes",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = RaceNote.class))))
+    @GetMapping("/{id}/notes")
+    public List<RaceNote> getNotes(
+            @Parameter(description = "Race ID") @PathVariable Long id) {
+        return raceNoteRepository.findByRaceId(id);
     }
 
     @Operation(summary = "Get predictions for a race",
             description = "Retrieves all spectator predictions for a specific race")
     @ApiResponse(responseCode = "200", description = "List of predictions",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Prediction.class))))
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PredictionResponse.class))))
     @GetMapping("/{id}/predictions")
-    public List<Prediction> getPredictions(
+    public List<PredictionResponse> getPredictions(
             @Parameter(description = "Race ID") @PathVariable Long id) {
-        return predictionRepository.findByRaceId(id);
+        return predictionRepository.findByRaceId(id).stream()
+                .map(p -> PredictionResponse.builder()
+                        .id(p.getId())
+                        .raceId(p.getRace().getId())
+                        .spectatorId(p.getSpectator().getId())
+                        .predictedHorseId(p.getPredictedHorse().getId())
+                        .wagerPoints(p.getWagerPoints())
+                        .status(p.getStatus() != null ? p.getStatus().name() : null)
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Operation(summary = "Create a prediction for a race",
             description = "Places a spectator prediction on a race via the race workflow")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Prediction placed successfully",
-                    content = @Content(schema = @Schema(implementation = Prediction.class))),
+                    content = @Content(schema = @Schema(implementation = PredictionResponse.class))),
             @ApiResponse(responseCode = "400", description = "Prediction failed", content = @Content)
     })
     @PostMapping("/{id}/predictions")
-    public Prediction createPrediction(
+    public PredictionResponse createPrediction(
             @Parameter(description = "Race ID") @PathVariable Long id,
             @RequestBody PredictionRequest request) {
-        return workflowService.createPrediction(id, request);
+        Prediction p = workflowService.createPrediction(id, request);
+        return PredictionResponse.builder()
+                        .id(p.getId())
+                        .raceId(p.getRace().getId())
+                        .spectatorId(p.getSpectator().getId())
+                        .predictedHorseId(p.getPredictedHorse().getId())
+                        .wagerPoints(p.getWagerPoints())
+                        .status(p.getStatus() != null ? p.getStatus().name() : null)
+                        .build();
     }
 
     @Operation(summary = "Horse leaderboard",

@@ -1,39 +1,51 @@
 package com.equix.horseracingsystem.entity;
 
+import com.equix.horseracingsystem.enums.RegistrationStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "race_registrations")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@SQLDelete(sql = "UPDATE race_registrations SET deleted_at = GETDATE() WHERE id=?")
+@SQLRestriction("deleted_at IS NULL")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class RaceRegistration {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "race_id")
-    private Long raceId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "race_id", nullable = false)
+    private Race race;
 
-    @Column(name = "horse_id")
-    private Long horseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "horse_id", nullable = false)
+    private Horse horse;
 
-    @Column(name = "owner_id")
-    private Long ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jockey_id", nullable = false)
+    private User jockey;
 
-    @Column(name = "jockey_id")
-    private Long jockeyId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pairing_contract_id")
+    private PairingContract pairingContract;
 
     @Column(name = "lane_number")
     private Integer laneNumber;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private RegistrationStatus status;
 
     @Column(name = "owner_confirmed")
     private Boolean ownerConfirmed;
@@ -44,41 +56,34 @@ public class RaceRegistration {
     @Column(name = "referee_approved")
     private Boolean refereeApproved;
 
-    @Column(name = "health_check_status")
+    @Column(name = "health_check_status", length = 50)
     private String healthCheckStatus;
 
-    @Column(name = "referee_notes", length = 1000)
+    @Column(name = "referee_notes", columnDefinition = "NVARCHAR(MAX)")
     private String refereeNotes;
 
-    @Column(name = "withdraw_reason", length = 1000)
+    @Column(name = "withdraw_reason", columnDefinition = "NVARCHAR(MAX)")
     private String withdrawReason;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @PrePersist
     void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
-        if (status == null) {
-            status = "PENDING_ADMIN";
-        }
-        if (ownerConfirmed == null) {
-            ownerConfirmed = false;
-        }
-        if (jockeyConfirmed == null) {
-            jockeyConfirmed = false;
-        }
-        if (refereeApproved == null) {
-            refereeApproved = false;
-        }
-        if (healthCheckStatus == null) {
-            healthCheckStatus = "PENDING";
-        }
+        if (status == null) status = RegistrationStatus.PENDING_ADMIN;
+        if (ownerConfirmed == null) ownerConfirmed = false;
+        if (jockeyConfirmed == null) jockeyConfirmed = false;
+        if (refereeApproved == null) refereeApproved = false;
+        if (healthCheckStatus == null) healthCheckStatus = "PENDING";
     }
 
     @PreUpdate

@@ -14,9 +14,14 @@ function RaceDetailPage() {
   const [error, setError] = useState('');
   const [registrations, setRegistrations] = useState([]);
   const [predictions, setPredictions] = useState([]);
+  const [notes, setNotes] = useState([]);
   const [selectedHorseId, setSelectedHorseId] = useState('');
+  const [wagerPoints, setWagerPoints] = useState(10);
   const [placingPrediction, setPlacingPrediction] = useState(false);
   const [predictionMessage, setPredictionMessage] = useState('');
+
+  const [noteContent, setNoteContent] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,13 +31,31 @@ function RaceDetailPage() {
         const raceData = await api.getRaceById(id);
         setRace(raceData);
 
-        // Fetch race registrations
-        const regsData = await api.getRaceRegistrations(id);
-        setRegistrations(Array.isArray(regsData) ? regsData : []);
+        // Fetch race registrations, users, and horses to map references
+        const [regsData, users, horses] = await Promise.all([
+          api.getRaceRegistrations(id).catch(() => []),
+          api.getUsers().catch(() => []),
+          api.getHorses().catch(() => [])
+        ]);
+        
+        const mappedRegs = (Array.isArray(regsData) ? regsData : []).map(reg => ({
+          ...reg,
+          horse: horses.find(h => h.id === reg.horseId),
+          jockey: users.find(u => u.id === reg.jockeyId),
+          owner: users.find(u => u.id === reg.ownerId)
+        }));
+
+        setRegistrations(mappedRegs);
 
         // Fetch predictions for this race
         const predsData = await api.getPredictions({ raceId: id });
         setPredictions(Array.isArray(predsData) ? predsData : []);
+
+        // Fetch notes
+        if (raceData.status === 'COMPLETED' || raceData.status === 'OFFICIAL' || user?.role === 'REFEREE') {
+          const notesData = await api.getRaceNotes(id).catch(() => []);
+          setNotes(Array.isArray(notesData) ? notesData : []);
+        }
 
         setError('');
       } catch (err) {
@@ -58,6 +81,11 @@ function RaceDetailPage() {
       return;
     }
 
+    if (wagerPoints <= 0) {
+      setPredictionMessage('Wager points must be greater than 0');
+      return;
+    }
+
     try {
       setPlacingPrediction(true);
       setPredictionMessage('');
@@ -66,6 +94,7 @@ function RaceDetailPage() {
         raceId: parseInt(id),
         spectatorId: user.id,
         predictedHorseId: parseInt(selectedHorseId),
+        wagerPoints: parseInt(wagerPoints),
       };
 
       await api.placePrediction(prediction);
@@ -79,6 +108,27 @@ function RaceDetailPage() {
       setPredictionMessage(`✗ ${err.message || 'Failed to place prediction'}`);
     } finally {
       setPlacingPrediction(false);
+    }
+  };
+
+  const handlePostNote = async (e) => {
+    e.preventDefault();
+    if (!noteContent) return;
+    try {
+      setSavingNote(true);
+      await api.createRaceNote({
+        race: { id: parseInt(id) },
+        referee: { id: user.id },
+        content: noteContent
+      });
+      setNoteContent('');
+      const notesData = await api.getRaceNotes(id).catch(() => []);
+      setNotes(Array.isArray(notesData) ? notesData : []);
+      alert('Note added successfully');
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSavingNote(false);
     }
   };
 
@@ -131,7 +181,7 @@ function RaceDetailPage() {
           </div>
           <div className="race-detail-prize-box">
             <span className="race-detail-prize-label">Prize Pool</span>
-            <span className="race-detail-prize-value">{race.prizePool?.toLocaleString() || '0'} VND</span>
+            <span className="race-detail-prize-value">{race.prizePool?.toLocaleString() || '0'} Points</span>
             <div className="race-detail-prize-split">
               <span> 60% ·  30% ·  10%</span>
             </div>
@@ -200,23 +250,43 @@ function RaceDetailPage() {
                       {reg.horse?.name || `Horse ${reg.horseId}`} (Jockey: {reg.jockey?.fullName || 'Unknown'})
                     </option>
                   ))}
-                </select>
-              </div>
-              <button
-                type="submit"
-                disabled={placingPrediction || !selectedHorseId}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: '#C0392B',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '0.25rem',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  fontWeight: 'bold',
-                  opacity: (placingPrediction || !selectedHorseId) ? 0.5 : 1,
-                }}
-              >
+                  </select>
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                    Wager Points:
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={wagerPoints}
+                    onChange={(e) => setWagerPoints(e.target.value)}
+                    disabled={placingPrediction}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: '1px solid #ccc',
+                      borderRadius: '0.25rem',
+                      fontSize: '1rem',
+                    }}
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={placingPrediction || !selectedHorseId || wagerPoints <= 0}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: '#C0392B',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.25rem',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                    opacity: (placingPrediction || !selectedHorseId || wagerPoints <= 0) ? 0.5 : 1,
+                  }}
+                >
                 {placingPrediction ? 'Placing...' : 'Place Prediction'}
               </button>
             </form>
@@ -282,6 +352,46 @@ function RaceDetailPage() {
             <h3>Predictions: {predictions.length} spectators have placed guesses</h3>
           </div>
         )}
+
+        {/* Race Notes */}
+        <div style={{ marginTop: '3rem', padding: '1.5rem', backgroundColor: '#fff', borderRadius: '0.5rem', border: '1px solid #eee' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Race Notes</h2>
+          {notes.length === 0 ? (
+            <p style={{ color: '#666' }}>No notes have been added to this race.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+              {notes.map(note => (
+                <div key={note.id} style={{ padding: '1rem', backgroundColor: '#f9f9f9', borderRadius: '0.25rem', borderLeft: '4px solid #4f46e5' }}>
+                  <p style={{ margin: 0, color: '#333' }}>{note.content}</p>
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#666' }}>
+                    By Referee {note.referee?.fullName || 'Unknown'} on {new Date(note.createdAt).toLocaleString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {user?.role === 'REFEREE' && (
+            <form onSubmit={handlePostNote} style={{ marginTop: '1.5rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Add Note</label>
+              <textarea 
+                value={noteContent}
+                onChange={e => setNoteContent(e.target.value)}
+                required
+                rows={3}
+                style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '0.25rem', marginBottom: '1rem' }}
+                placeholder="Enter official race notes, infractions, or incidents..."
+              />
+              <button 
+                type="submit" 
+                disabled={savingNote}
+                style={{ padding: '0.5rem 1rem', backgroundColor: '#4f46e5', color: '#fff', border: 'none', borderRadius: '0.25rem', cursor: 'pointer' }}
+              >
+                {savingNote ? 'Saving...' : 'Post Note'}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
