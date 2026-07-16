@@ -27,6 +27,7 @@
 }
 
 .race-detail-name {
+  font-family: 'Inter', sans-serif;
   font-size: var(--fs-4xl);
   font-weight: var(--fw-black);
   margin: var(--space-3) 0;

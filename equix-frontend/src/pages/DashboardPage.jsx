@@ -540,34 +540,35 @@ function OwnerDashboard({
               {data.races.map((race) => {
                 const registeredJockeyIds = data.registrations.filter(r => Number(r.raceId) === Number(race.id) && r.status !== 'WITHDRAWN' && r.status !== 'REJECTED_BY_REFEREE').map(r => Number(r.jockeyId));
                 const availableJockeys = data.jockeys.filter(j => !registeredJockeyIds.includes(Number(j.id)));
-                
+
                 const registeredHorseIds = data.registrations.filter(r => Number(r.raceId) === Number(race.id) && r.status !== 'WITHDRAWN' && r.status !== 'REJECTED_BY_REFEREE').map(r => Number(r.horseId));
                 const availableHorses = ownerHorses.filter(h => !registeredHorseIds.includes(Number(h.id)));
 
                 return (
-                <tr key={race.id}>
-                  <td>{race.name}<span className="workflow-muted">{statusLabel(race.status)}</span></td>
-                  <td>{race.raceDate} {shortTime(race.raceTime)}</td>
-                  <td>{money(race.prizePool)} Points</td>
-                  <td>
-                    <div className="workflow-form-row">
-                      <select className="form-select compact" value={selectedHorseByRace[race.id] || availableHorses[0]?.id || ''} onChange={(e) => setSelectedHorseByRace({ ...selectedHorseByRace, [race.id]: e.target.value })}>
-                        {availableHorses.map((horse) => <option key={horse.id} value={horse.id}>{horse.horseName}</option>)}
-                        {availableHorses.length === 0 && <option value="" disabled>No available horses</option>}
-                      </select>
-                      <select className="form-select compact" value={selectedJockeyByRaceRegistration[race.id] || availableJockeys[0]?.id || ''} onChange={(e) => setSelectedJockeyByRaceRegistration({ ...selectedJockeyByRaceRegistration, [race.id]: e.target.value })}>
-                        {availableJockeys.map((jockey) => <option key={jockey.id} value={jockey.id}>{jockey.fullName || jockey.username || jockey.email}</option>)}
-                        {availableJockeys.length === 0 && <option value="" disabled>No available jockeys</option>}
-                      </select>
-                    </div>
-                  </td>
-                  <td>
-                    <button className="btn btn-secondary btn-sm" onClick={() => onRegisterHorse(race.id, availableHorses[0]?.id, availableJockeys[0]?.id)} disabled={race.status !== 'REGISTRATION_OPEN' || !availableHorses.length || !availableJockeys.length}>
-                      Register
-                    </button>
-                  </td>
-                </tr>
-              )})}
+                  <tr key={race.id}>
+                    <td>{race.name}<span className="workflow-muted">{statusLabel(race.status)}</span></td>
+                    <td>{race.raceDate} {shortTime(race.raceTime)}</td>
+                    <td>{money(race.prizePool)} Points</td>
+                    <td>
+                      <div className="workflow-form-row">
+                        <select className="form-select compact" value={selectedHorseByRace[race.id] || availableHorses[0]?.id || ''} onChange={(e) => setSelectedHorseByRace({ ...selectedHorseByRace, [race.id]: e.target.value })}>
+                          {availableHorses.map((horse) => <option key={horse.id} value={horse.id}>{horse.horseName}</option>)}
+                          {availableHorses.length === 0 && <option value="" disabled>No available horses</option>}
+                        </select>
+                        <select className="form-select compact" value={selectedJockeyByRaceRegistration[race.id] || availableJockeys[0]?.id || ''} onChange={(e) => setSelectedJockeyByRaceRegistration({ ...selectedJockeyByRaceRegistration, [race.id]: e.target.value })}>
+                          {availableJockeys.map((jockey) => <option key={jockey.id} value={jockey.id}>{jockey.fullName || jockey.username || jockey.email}</option>)}
+                          {availableJockeys.length === 0 && <option value="" disabled>No available jockeys</option>}
+                        </select>
+                      </div>
+                    </td>
+                    <td>
+                      <button className="btn btn-secondary btn-sm" onClick={() => onRegisterHorse(race.id, availableHorses[0]?.id, availableJockeys[0]?.id)} disabled={race.status !== 'REGISTRATION_OPEN' || !availableHorses.length || !availableJockeys.length}>
+                        Register
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -760,9 +761,9 @@ function AdminDashboard({ data, pendingAdminRegistrations, onCreateRace, onAppro
                     <td>{`${race.distanceM || '-'}m`}</td>
                     <td><RaceStatusBadge status={race.status} /></td>
                     <td className="workflow-actions">
-                      <select 
-                        className="form-select compact" 
-                        value={selectedStatuses[race.id] || ''} 
+                      <select
+                        className="form-select compact"
+                        value={selectedStatuses[race.id] || ''}
                         onChange={(e) => setSelectedStatuses({ ...selectedStatuses, [race.id]: e.target.value })}
                       >
                         <option value="" disabled>Change Status</option>
@@ -770,8 +771,8 @@ function AdminDashboard({ data, pendingAdminRegistrations, onCreateRace, onAppro
                           <option key={status} value={status}>{statusLabel(status)}</option>
                         ))}
                       </select>
-                      <button 
-                        className="btn btn-primary btn-sm" 
+                      <button
+                        className="btn btn-primary btn-sm"
                         disabled={!selectedStatuses[race.id]}
                         onClick={() => {
                           onUpdateRaceStatus(race.id, selectedStatuses[race.id]);
@@ -909,10 +910,10 @@ function JockeyDashboard({ data, invitations, assignments, onDecision }) {
 
 // ─── Referee Quick-Action Panel ─────────────────────────────────────────────
 const QUICK_ACTIONS = [
-  { id: 'stumble',      label: 'Stumble',       icon: '🐎', category: 'Movement',    severity: 'Medium',   color: '#F39C12', desc: 'Horse stumbled during race' },
-  { id: 'interference', label: 'Interference',  icon: '⚡', category: 'Conduct',     severity: 'High',     color: '#E74C3C', desc: 'Interference with another horse' },
-  { id: 'false_start', label: 'False Start',   icon: '🚫', category: 'Start',       severity: 'Critical', color: '#C0392B', desc: 'Horse false started at gate' },
-  { id: 'injury',      label: 'Injury Observed', icon: '🏥', category: 'Health',    severity: 'Critical', color: '#8E44AD', desc: 'Injury observed on horse or jockey' },
+  { id: 'stumble', label: 'Stumble', icon: '🐎', category: 'Movement', severity: 'Medium', color: '#F39C12', desc: 'Horse stumbled during race' },
+  { id: 'interference', label: 'Interference', icon: '⚡', category: 'Conduct', severity: 'High', color: '#E74C3C', desc: 'Interference with another horse' },
+  { id: 'false_start', label: 'False Start', icon: '🚫', category: 'Start', severity: 'Critical', color: '#C0392B', desc: 'Horse false started at gate' },
+  { id: 'injury', label: 'Injury Observed', icon: '🏥', category: 'Health', severity: 'Critical', color: '#8E44AD', desc: 'Injury observed on horse or jockey' },
 ];
 
 function RefereeQuickActionPanel({ raceId, registrations, horses, users, onNoteSaved }) {
@@ -1138,7 +1139,7 @@ function RefereeDashboard({
         registrations={selectedRaceRegistrations}
         horses={data.horses}
         users={data.users}
-        onNoteSaved={() => {}}
+        onNoteSaved={() => { }}
       />
 
       {selectedRaceRegistrations.length > 0 && (
@@ -1303,7 +1304,7 @@ function RaceStatusBadge({ status }) {
 
 function RegistrationStatusBadge({ registration }) {
   if (!registration) return <StatusBadge status="UNKNOWN" />;
-  
+
   if (registration.status === 'REJECTED' || registration.status === 'WITHDRAWN') {
     return <StatusBadge status={registration.status} />;
   }
@@ -1324,7 +1325,7 @@ function RegistrationStatusBadge({ registration }) {
     }
     return <span className="badge badge-green">Ready to Race</span>;
   }
-  
+
   return <StatusBadge status={registration.status} />;
 }
 
@@ -1402,24 +1403,24 @@ function CreateRaceForm({ onCreateRace }) {
       <form className="workflow-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div>
           <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Race Name</label>
-          <input className="form-input" type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required placeholder="Enter race name" disabled={loading} />
+          <input className="form-input" type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required placeholder="Enter race name" disabled={loading} />
         </div>
         <div>
           <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Start Time</label>
-          <input className="form-input" type="datetime-local" value={formData.raceDate} onChange={e => setFormData({...formData, raceDate: e.target.value})} required disabled={loading} style={{ colorScheme: 'dark' }} />
+          <input className="form-input" type="datetime-local" value={formData.raceDate} onChange={e => setFormData({ ...formData, raceDate: e.target.value })} required disabled={loading} style={{ colorScheme: 'dark' }} />
         </div>
         <div>
           <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Registration Deadline</label>
-          <input className="form-input" type="datetime-local" value={formData.registrationDeadline} onChange={e => setFormData({...formData, registrationDeadline: e.target.value})} required disabled={loading} style={{ colorScheme: 'dark' }} />
+          <input className="form-input" type="datetime-local" value={formData.registrationDeadline} onChange={e => setFormData({ ...formData, registrationDeadline: e.target.value })} required disabled={loading} style={{ colorScheme: 'dark' }} />
         </div>
         <div>
           <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Prize Pool (Points)</label>
-          <input className="form-input" type="number" min="0" value={formData.prizePool} onChange={e => setFormData({...formData, prizePool: Number(e.target.value)})} required placeholder="e.g. 50000" disabled={loading} />
+          <input className="form-input" type="number" min="0" value={formData.prizePool} onChange={e => setFormData({ ...formData, prizePool: Number(e.target.value) })} required placeholder="e.g. 50000" disabled={loading} />
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Distance</label>
-            <select className="form-select" value={formData.distance} onChange={e => setFormData({...formData, distance: Number(e.target.value)})} required disabled={loading}>
+            <select className="form-select" value={formData.distance} onChange={e => setFormData({ ...formData, distance: Number(e.target.value) })} required disabled={loading}>
               <option value={1000}>1000m</option>
               <option value={1200}>1200m</option>
               <option value={1400}>1400m</option>
@@ -1428,7 +1429,7 @@ function CreateRaceForm({ onCreateRace }) {
           </div>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold' }}>Max Lanes</label>
-            <select className="form-select" value={formData.maxLanes} onChange={e => setFormData({...formData, maxLanes: Number(e.target.value)})} required disabled={loading}>
+            <select className="form-select" value={formData.maxLanes} onChange={e => setFormData({ ...formData, maxLanes: Number(e.target.value) })} required disabled={loading}>
               <option value={6}>6</option>
               <option value={8}>8</option>
               <option value={12}>12</option>

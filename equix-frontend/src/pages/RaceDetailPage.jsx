@@ -194,7 +194,7 @@ function RaceDetailPage() {
             <RaceTrack
               horses={registrations.map(reg => ({
                 id: reg.horseId,
-                name: reg.horse?.name || `Horse ${reg.horseId}`,
+                name: reg.horse?.name || reg.horseProfile?.name || reg.horseName || `Horse ${reg.horseId}`,
                 jockey: reg.jockey?.fullName || 'Unknown',
                 color: ['#E74C3C', '#3498DB', '#F39C12', '#2ECC71', '#9B59B6', '#1ABC9C'][
                   registrations.indexOf(reg) % 6
@@ -209,19 +209,20 @@ function RaceDetailPage() {
         {/* Prediction Form for Spectators */}
         {['REGISTRATION_OPEN', 'REGISTRATION_CLOSED', 'DRAFT'].includes(race.status) && user?.role === 'SPECTATOR' && (
           <div style={{
-            backgroundColor: '#f9f9f9',
-            border: '1px solid #ddd',
+            backgroundColor: '#141414',
+            border: '1px solid #2d2d2d',
             borderRadius: '0.5rem',
             padding: '1.5rem',
             marginBottom: '2rem',
+            color: '#fff',
           }}>
             <h2 style={{ marginBottom: '1rem' }}>Place Your Prediction</h2>
             {predictionMessage && (
               <div style={{
                 padding: '1rem',
                 marginBottom: '1rem',
-                backgroundColor: predictionMessage.includes('✓') ? '#efe' : '#fee',
-                color: predictionMessage.includes('✓') ? '#070' : '#c00',
+                backgroundColor: predictionMessage.includes('✓') ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)',
+                color: predictionMessage.includes('✓') ? '#4ade80' : '#f87171',
                 borderRadius: '0.25rem',
               }}>
                 {predictionMessage}
@@ -238,16 +239,18 @@ function RaceDetailPage() {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ccc',
+                    border: '1px solid #2d2d2d',
                     borderRadius: '0.25rem',
                     fontSize: '1rem',
+                    backgroundColor: '#1e1e1e',
+                    color: '#fff',
                   }}
                   disabled={placingPrediction}
                 >
                   <option value="">-- Select a horse --</option>
                   {registrations.map(reg => (
                     <option key={reg.id} value={reg.horseId}>
-                      {reg.horse?.name || `Horse ${reg.horseId}`} (Jockey: {reg.jockey?.fullName || 'Unknown'})
+                      {reg.horse?.name || reg.horseProfile?.name || reg.horseName || `Horse ${reg.horseId}`} (Jockey: {reg.jockey?.fullName || 'Unknown'})
                     </option>
                   ))}
                   </select>
@@ -265,9 +268,11 @@ function RaceDetailPage() {
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '1px solid #ccc',
+                      border: '1px solid #2d2d2d',
                       borderRadius: '0.25rem',
                       fontSize: '1rem',
+                      backgroundColor: '#1e1e1e',
+                      color: '#fff',
                     }}
                     required
                   />
@@ -295,13 +300,14 @@ function RaceDetailPage() {
 
         {['STANDBY', 'IN_PROGRESS', 'COMPLETED', 'OFFICIAL'].includes(race.status) && user?.role === 'SPECTATOR' && (
           <div style={{
-            backgroundColor: '#f9f9f9',
-            border: '1px solid #ddd',
+            backgroundColor: '#141414',
+            border: '1px solid #2d2d2d',
             borderRadius: '0.5rem',
             padding: '1.5rem',
             marginBottom: '2rem',
+            color: '#fff',
           }}>
-            <h2 style={{ marginBottom: '1rem', color: '#666' }}>
+            <h2 style={{ marginBottom: '1rem', color: '#a0a0a0' }}>
               ℹ️ Predictions are locked for this race (Status: {race.status})
             </h2>
           </div>
@@ -335,7 +341,7 @@ function RaceDetailPage() {
                       />
                       {i + 1}
                     </td>
-                    <td><span className="leaderboard-horse-name">{reg.horse?.name || 'Unknown'}</span></td>
+                    <td><span className="leaderboard-horse-name">{reg.horse?.name || reg.horseProfile?.name || reg.horseName || 'Unknown'}</span></td>
                     <td>{reg.jockey?.fullName || 'Unknown'}</td>
                     <td>{reg.owner?.fullName || 'Unknown'}</td>
                     <td><span className="badge badge-green">{reg.status || 'Confirmed'}</span></td>
@@ -348,22 +354,22 @@ function RaceDetailPage() {
 
         {/* Predictions Stats */}
         {predictions.length > 0 && (
-          <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f0f8ff', borderRadius: '0.5rem' }}>
-            <h3>Predictions: {predictions.length} spectators have placed guesses</h3>
+          <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#141414', border: '1px solid #2d2d2d', borderRadius: '0.5rem' }}>
+            <h3 style={{ color: '#fff' }}>Predictions: {predictions.length} spectators have placed guesses</h3>
           </div>
         )}
 
         {/* Race Notes */}
-        <div style={{ marginTop: '3rem', padding: '1.5rem', backgroundColor: '#fff', borderRadius: '0.5rem', border: '1px solid #eee' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Race Notes</h2>
+        <div style={{ marginTop: '3rem', padding: '1.5rem', backgroundColor: '#141414', borderRadius: '0.5rem', border: '1px solid #2d2d2d' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', color: '#fff' }}>Race Notes</h2>
           {notes.length === 0 ? (
-            <p style={{ color: '#666' }}>No notes have been added to this race.</p>
+            <p style={{ color: '#a0a0a0' }}>No notes have been added to this race.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
               {notes.map(note => (
-                <div key={note.id} style={{ padding: '1rem', backgroundColor: '#f9f9f9', borderRadius: '0.25rem', borderLeft: '4px solid #4f46e5' }}>
-                  <p style={{ margin: 0, color: '#333' }}>{note.content}</p>
-                  <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#666' }}>
+                <div key={note.id} style={{ padding: '1rem', backgroundColor: '#1e1e1e', borderRadius: '0.25rem', borderLeft: '4px solid #4f46e5' }}>
+                  <p style={{ margin: 0, color: '#e0e0e0' }}>{note.content}</p>
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#a0a0a0' }}>
                     By Referee {note.referee?.fullName || 'Unknown'} on {new Date(note.createdAt).toLocaleString()}
                   </div>
                 </div>
@@ -372,14 +378,14 @@ function RaceDetailPage() {
           )}
 
           {user?.role === 'REFEREE' && (
-            <form onSubmit={handlePostNote} style={{ marginTop: '1.5rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Add Note</label>
+            <form onSubmit={handlePostNote} style={{ marginTop: '1.5rem', borderTop: '1px solid #2d2d2d', paddingTop: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#fff' }}>Add Note</label>
               <textarea 
                 value={noteContent}
                 onChange={e => setNoteContent(e.target.value)}
                 required
                 rows={3}
-                style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '0.25rem', marginBottom: '1rem' }}
+                style={{ width: '100%', padding: '0.5rem', border: '1px solid #2d2d2d', borderRadius: '0.25rem', marginBottom: '1rem', backgroundColor: '#1e1e1e', color: '#fff' }}
                 placeholder="Enter official race notes, infractions, or incidents..."
               />
               <button 

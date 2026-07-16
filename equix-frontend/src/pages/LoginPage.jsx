@@ -128,15 +128,39 @@ function LoginPage() {
           <div className="auth-dev-panel">
             <span className="auth-dev-label">Quick Login</span>
             <div className="auth-dev-buttons">
-              {['HORSE_OWNER', 'JOCKEY', 'SPECTATOR', 'REFEREE', 'ADMIN'].map((role) => (
-                <button
-                  key={role}
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => { login(role); navigate('/dashboard'); }}
-                >
-                  {role}
-                </button>
-              ))}
+              {['HORSE_OWNER', 'JOCKEY', 'SPECTATOR', 'REFEREE', 'ADMIN'].map((role) => {
+                const getEmailForRole = (r) => {
+                  switch (r) {
+                    case 'ADMIN': return 'phuoc@equix.com';
+                    case 'REFEREE': return 'nobi@equix.com';
+                    case 'SPECTATOR': return 'raiden@equix.com';
+                    case 'HORSE_OWNER': return 'hayate@equix.com';
+                    case 'JOCKEY': return 'kage@equix.com';
+                    default: return '';
+                  }
+                };
+                
+                return (
+                  <button
+                    key={role}
+                    className="btn btn-ghost btn-sm"
+                    onClick={async () => { 
+                      try {
+                        setError('');
+                        setLoading(true);
+                        await login({ email: getEmailForRole(role), password: '123456' });
+                        navigate('/dashboard'); 
+                      } catch (err) {
+                        setError('Quick login failed: ' + (err.message || 'Unknown error'));
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                  >
+                    {role}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
