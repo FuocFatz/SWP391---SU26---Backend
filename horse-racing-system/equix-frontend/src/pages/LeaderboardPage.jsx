@@ -1,83 +1,53 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LeaderboardTable from '../components/LeaderboardTable/LeaderboardTable';
+import { api } from '../services/api';
 import './LeaderboardPage.css';
 
-const podiumData = [
-  { rank: 2, horse: 'Lightning Bolt', owner: 'Trần B', points: 2180, color: '#C0C0C0' },
-  { rank: 1, horse: 'Thunder Storm', owner: 'Nguyễn A', points: 2450, color: '#FFD700' },
-  { rank: 3, horse: 'Golden Arrow', owner: 'Lê C', points: 1920, color: '#CD7F32' },
-];
+const podiumColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
 
 function LeaderboardPage() {
-  const [period, setPeriod] = useState('all');
-  const [raceType, setRaceType] = useState('all');
+  const [leaders, setLeaders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    api.getHorseLeaderboard()
+      .then((rows) => setLeaders(Array.isArray(rows) ? rows : []))
+      .catch((err) => setError(err.message || 'Unable to load leaderboard'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const podium = leaders.slice(0, 3).map((item, index) => ({ ...item, rank: index + 1 }));
 
   return (
     <div className="leaderboard-page" id="leaderboard-page">
       <div className="container">
         <div className="leaderboard-page-header">
           <h1 className="leaderboard-page-title">Leaderboard</h1>
-          <p className="leaderboard-page-subtitle">
-            Top performing horses and their owners across all competitions
-          </p>
+          <p className="leaderboard-page-subtitle">Official horse performance from the current EquiX database</p>
         </div>
 
-        {/* Podium */}
-        <div className="podium">
-          {podiumData.map((item) => (
-            <div key={item.rank} className={`podium-place podium-${item.rank}`}>
-              <div className="podium-avatar" style={{ borderColor: item.color }}>
-                🐎
+        {loading && <div className="page-state">Loading leaderboard...</div>}
+        {error && <div className="page-state error">{error}</div>}
+        {!loading && !error && (
+          <>
+            {podium.length > 0 && (
+              <div className="podium">
+                {podium.map((item) => (
+                  <div key={item.horseId} className={`podium-place podium-${item.rank}`}>
+                    <div className="podium-avatar" style={{ borderColor: podiumColors[item.rank - 1] }}>♞</div>
+                    <span className="podium-medal">{item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}</span>
+                    <h3 className="podium-horse">{item.horseName}</h3>
+                    <span className="podium-owner">{item.ownerName}</span>
+                    <span className="podium-points">{Number(item.totalPoints || 0).toLocaleString()} pts</span>
+                    <div className="podium-bar" style={{ backgroundColor: `${podiumColors[item.rank - 1]}30`, borderColor: podiumColors[item.rank - 1] }} />
+                  </div>
+                ))}
               </div>
-              <span className="podium-medal">
-                {item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}
-              </span>
-              <h3 className="podium-horse">{item.horse}</h3>
-              <span className="podium-owner">{item.owner}</span>
-              <span className="podium-points">{item.points.toLocaleString()} pts</span>
-              <div className="podium-bar" style={{ backgroundColor: item.color + '30', borderColor: item.color }} />
-            </div>
-          ))}
-        </div>
-
-        {/* Filters */}
-        <div className="leaderboard-filters">
-          <div className="leaderboard-filter-tabs">
-            {[
-              { key: 'all', label: 'All Time' },
-              { key: 'season', label: 'This Season' },
-              { key: 'month', label: 'This Month' },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                className={`leaderboard-tab ${period === tab.key ? 'active' : ''}`}
-                onClick={() => setPeriod(tab.key)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="leaderboard-filter-tabs">
-            {[
-              { key: 'all', label: 'All Types' },
-              { key: 'sprint', label: 'Sprint' },
-              { key: 'mile', label: 'Mile' },
-              { key: 'medium', label: 'Medium' },
-              { key: 'long', label: 'Long' },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                className={`leaderboard-tab ${raceType === tab.key ? 'active' : ''}`}
-                onClick={() => setRaceType(tab.key)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <LeaderboardTable />
+            )}
+            <LeaderboardTable data={leaders} />
+          </>
+        )}
       </div>
     </div>
   );

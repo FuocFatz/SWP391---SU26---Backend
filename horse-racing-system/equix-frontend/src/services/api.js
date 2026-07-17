@@ -1,7 +1,8 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090/api';
 
 async function request(path, options = {}) {
-  const token = localStorage.getItem('equix_token');
+  const { skipAuth = false, ...fetchOptions } = options;
+  const token = skipAuth ? null : localStorage.getItem('equix_token');
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -9,31 +10,69 @@ async function request(path, options = {}) {
   };
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
+    ...fetchOptions,
     headers,
   });
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+  let data = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { message: text };
+    }
+  }
 
   if (!response.ok) {
-    throw new Error(data?.message || data?.error || 'Request failed');
+    const sessionExpired = response.status === 401 && Boolean(token);
+    if (sessionExpired) {
+      localStorage.removeItem('equix_user');
+      localStorage.removeItem('equix_token');
+      if (window.location.pathname !== '/login') {
+        window.location.replace('/login?reason=session-expired');
+      }
+    }
+
+    const error = new Error(sessionExpired
+      ? 'Your session expired. Please sign in again.'
+      : data?.message || data?.error || `Request failed (${response.status})`);
+    error.status = response.status;
+    throw error;
   }
 
   return data;
 }
 
 export const api = {
-  login: (payload) => request('/auth/login', {
+  login: (payload) => request('/v1/auth/login', {
     method: 'POST',
     body: JSON.stringify(payload),
+    skipAuth: true,
   }),
-  register: (payload) => request('/auth/register', {
+  register: (payload) => request('/v1/auth/register', {
     method: 'POST',
+    body: JSON.stringify(payload),
+    skipAuth: true,
+  }),
+  getMe: () => request('/v1/auth/me'),
+  updateProfile: (payload) => request('/v1/auth/me', {
+    method: 'PATCH',
     body: JSON.stringify(payload),
   }),
   getUsers: () => request('/v1/users'),
   getUsersByRole: (role) => request(`/v1/users/role/${role}`),
+  updateUserStatus: (userId, payload) => request(`/v1/users/${userId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  }),
+  deleteUser: (userId) => request(`/v1/users/${userId}`, {
+    method: 'DELETE',
+  }),
+  createReferee: (payload) => request('/v1/users/referees', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
   getHorses: () => request('/horses'),
   getHorsesByOwner: (ownerId) => request(`/horses/owner/${ownerId}`),
   createHorse: (payload) => request('/horses', {
@@ -47,6 +86,10 @@ export const api = {
   getTournaments: () => request('/tournaments'),
   createTournament: (payload) => request('/tournaments', {
     method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+  updateTournament: (tournamentId, payload) => request(`/tournaments/${tournamentId}`, {
+    method: 'PUT',
     body: JSON.stringify(payload),
   }),
   getRaces: () => request('/races'),
@@ -64,6 +107,13 @@ export const api = {
   }),
   startRace: (raceId) => request(`/races/${raceId}/start`, {
     method: 'POST',
+  }),
+  completeRace: (raceId) => request(`/races/${raceId}/complete`, {
+    method: 'POST',
+  }),
+  submitRaceReport: (raceId, payload) => request(`/races/${raceId}/report`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
   }),
   simulateRace: (raceId, durationSeconds = 60) => request(`/races/${raceId}/simulate?durationSeconds=${durationSeconds}`),
   confirmResults: (raceId, payload) => request(`/races/${raceId}/results`, {
@@ -112,18 +162,24 @@ export const api = {
   getHorseLeaderboard: () => request('/races/leaderboard/horses'),
   getJockeyLeaderboard: () => request('/races/leaderboard/jockeys'),
   // Notifications
-  getNotifications: (userId) => request(`/notifications?userId=${userId}`),
+  getNotifications: () => request('/notifications'),
+  getUnreadNotificationCount: () => request('/notifications/unread-count'),
   markNotificationRead: (notificationId) => request(`/notifications/${notificationId}/read`, {
+    method: 'PATCH',
+  }),
+  markAllNotificationsRead: () => request('/notifications/read-all', {
     method: 'PATCH',
   }),
   // Password Reset
   requestPasswordReset: (email) => request('/auth/password-reset/request', {
     method: 'POST',
     body: JSON.stringify({ email }),
+    skipAuth: true,
   }),
   confirmPasswordReset: (token, newPassword) => request('/auth/password-reset/confirm', {
     method: 'POST',
     body: JSON.stringify({ token, newPassword }),
+    skipAuth: true,
   }),
   // Predictions (enhanced)
   placePrediction: (payload) => request('/predictions', {

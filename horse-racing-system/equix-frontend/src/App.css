@@ -182,3 +182,16 @@
     border-right-color: var(--border);
   }
 }
+.page-state {
+  padding: var(--space-8);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.page-state.error {
+  border-color: rgba(231, 76, 60, 0.45);
+  color: var(--color-primary-light);
+}

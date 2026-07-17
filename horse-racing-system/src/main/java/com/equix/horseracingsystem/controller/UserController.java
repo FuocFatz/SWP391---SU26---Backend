@@ -1,15 +1,17 @@
 package com.equix.horseracingsystem.controller;
 
-import com.equix.horseracingsystem.entity.User;
+import com.equix.horseracingsystem.dto.AccountStatusRequest;
+import com.equix.horseracingsystem.dto.CreateRefereeRequest;
+import com.equix.horseracingsystem.dto.UserResponse;
 import com.equix.horseracingsystem.service.UserService;
-import org.springframework.lang.NonNull;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@CrossOrigin("*")
 public class UserController {
 
     private final UserService userService;
@@ -18,34 +20,35 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public User create(@RequestBody @NonNull User user) {
-        return userService.create(user);
+    @PostMapping("/referees")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse createReferee(@Valid @RequestBody CreateRefereeRequest request) {
+        return UserResponse.from(userService.createReferee(request));
     }
 
     @GetMapping
-    public List<User> getAll() {
-        return userService.getAll();
+    public List<UserResponse> getAll() {
+        return userService.getAll().stream().map(UserResponse::from).toList();
     }
 
     @GetMapping("/role/{role}")
-    public List<User> getByRole(@PathVariable String role) {
-        return userService.getByRole(role);
+    public List<UserResponse> getByRole(@PathVariable String role) {
+        return userService.getByRole(role).stream().map(UserResponse::from).toList();
     }
 
     @GetMapping("/{id}")
-    public User getById(@PathVariable @NonNull Long id) {
-        return userService.getById(id);
+    public UserResponse getById(@PathVariable Long id) {
+        return UserResponse.from(userService.getById(id));
     }
 
-    @PutMapping("/{id}")
-    public User update(@PathVariable @NonNull Long id,
-                       @RequestBody User user) {
-        return userService.update(id, user);
+    @PatchMapping("/{id}/status")
+    public UserResponse updateStatus(@PathVariable Long id, @Valid @RequestBody AccountStatusRequest request) {
+        return UserResponse.from(userService.updateStatus(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable @NonNull Long id) {
-        userService.delete(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        userService.softDelete(id);
     }
 }

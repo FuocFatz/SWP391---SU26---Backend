@@ -1,64 +1,7 @@
-import { createContext, useContext, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from '../services/api';
-
-const AuthContext = createContext(null);
-
-const ROLES = {
-  GUEST: 'GUEST',
-  OWNER: 'OWNER',
-  JOCKEY: 'JOCKEY',
-  REFEREE: 'REFEREE',
-  SPECTATOR: 'SPECTATOR',
-  ADMIN: 'ADMIN',
-};
-
-const mockUsers = {
-  OWNER: {
-    id: 1,
-    name: 'EquiX Owner',
-    email: 'owner@equix.vn',
-    role: ROLES.OWNER,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-  JOCKEY: {
-    id: 2,
-    name: 'EquiX Jockey',
-    email: 'jockey@equix.vn',
-    role: ROLES.JOCKEY,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-  REFEREE: {
-    id: 3,
-    name: 'EquiX Referee',
-    email: 'referee@equix.vn',
-    role: ROLES.REFEREE,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-  SPECTATOR: {
-    id: 4,
-    name: 'EquiX Spectator',
-    email: 'spectator@equix.vn',
-    role: ROLES.SPECTATOR,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-  ADMIN: {
-    id: 5,
-    name: 'Admin EquiX',
-    email: 'admin@equix.vn',
-    role: ROLES.ADMIN,
-    avatar: null,
-    status: 'Active',
-    rewardPoints: 100,
-  },
-};
+import { ROLES } from './authRoles';
+import AuthContext from './auth-context';
 
 function mapAuthUser(payload) {
   return {
@@ -67,59 +10,105 @@ function mapAuthUser(payload) {
     name: payload.fullName || payload.username || payload.email,
     fullName: payload.fullName,
     email: payload.email,
+    phone: payload.phone || '',
     role: payload.role,
     rewardPoints: payload.rewardPoints || 0,
-    status: 'Active',
+    status: payload.status,
+    avatar: payload.avatarUrl || null,
   };
 }
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
+function readSavedUser() {
+  if (!localStorage.getItem('equix_token')) return null;
+  try {
     const saved = localStorage.getItem('equix_user');
     return saved ? JSON.parse(saved) : null;
-  });
+  } catch {
+    return null;
+  }
+}
 
-  const login = async (credentialsOrRole) => {
-    if (typeof credentialsOrRole === 'string') {
-      const mockUser = mockUsers[credentialsOrRole] || null;
-      setUser(mockUser);
-      localStorage.setItem('equix_user', JSON.stringify(mockUser));
-      localStorage.removeItem('equix_token');
-      return mockUser;
-    }
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(readSavedUser);
+  const [sessionLoading, setSessionLoading] = useState(Boolean(localStorage.getItem('equix_token')));
+  const [unreadCount, setUnreadCount] = useState(0);
 
-    const response = await api.login(credentialsOrRole);
+  const clearSession = useCallback(() => {
+    localStorage.removeItem('equix_user');
+    localStorage.removeItem('equix_token');
+    setUser(null);
+    setUnreadCount(0);
+  }, []);
+
+  const persistSession = useCallback((response) => {
     const nextUser = mapAuthUser(response);
     localStorage.setItem('equix_token', response.token);
     localStorage.setItem('equix_user', JSON.stringify(nextUser));
     setUser(nextUser);
     return nextUser;
-  };
+  }, []);
+
+  const refreshUnreadCount = useCallback(async () => {
+    if (!localStorage.getItem('equix_token')) {
+      setUnreadCount(0);
+      return 0;
+    }
+    const response = await api.getUnreadNotificationCount();
+    const nextCount = Number(response?.unreadCount || 0);
+    setUnreadCount(nextCount);
+    return nextCount;
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const restore = async () => {
+      const token = localStorage.getItem('equix_token');
+      if (!token) {
+        setSessionLoading(false);
+        return;
+      }
+      try {
+        const response = await api.getMe();
+        if (!active) return;
+        const nextUser = mapAuthUser(response);
+        localStorage.setItem('equix_user', JSON.stringify(nextUser));
+        setUser(nextUser);
+      } catch {
+        if (active) clearSession();
+      } finally {
+        if (active) setSessionLoading(false);
+      }
+    };
+    restore();
+    return () => { active = false; };
+  }, [clearSession]);
+
+  useEffect(() => {
+    if (!user) return;
+    const timeout = window.setTimeout(() => {
+      refreshUnreadCount().catch(() => setUnreadCount(0));
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [user, refreshUnreadCount]);
+
+  const login = async (credentials) => persistSession(await api.login(credentials));
 
   const register = async (payload) => {
     const response = await api.register(payload);
+    if (response.token) persistSession(response);
+    return { user: mapAuthUser(response), pending: !response.token };
+  };
+
+  const updateProfile = async (payload) => {
+    const response = await api.updateProfile(payload);
     const nextUser = mapAuthUser(response);
-    localStorage.setItem('equix_token', response.token);
     localStorage.setItem('equix_user', JSON.stringify(nextUser));
     setUser(nextUser);
     return nextUser;
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('equix_user');
-    localStorage.removeItem('equix_token');
-  };
-
-  const switchRole = (role) => {
-    if (mockUsers[role]) {
-      setUser(mockUsers[role]);
-      localStorage.setItem('equix_user', JSON.stringify(mockUsers[role]));
-      localStorage.removeItem('equix_token');
-    }
-  };
-
-  const isAuthenticated = !!user;
+  const logout = () => clearSession();
+  const isAuthenticated = Boolean(user && localStorage.getItem('equix_token'));
   const currentRole = user?.role || ROLES.GUEST;
 
   return (
@@ -127,10 +116,14 @@ export function AuthProvider({ children }) {
       user,
       isAuthenticated,
       currentRole,
+      sessionLoading,
+      unreadCount,
+      setUnreadCount,
+      refreshUnreadCount,
       login,
       register,
+      updateProfile,
       logout,
-      switchRole,
       ROLES,
     }}>
       {children}
@@ -138,13 +131,4 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-}
-
-export { ROLES };
-export default AuthContext;
+export default AuthProvider;

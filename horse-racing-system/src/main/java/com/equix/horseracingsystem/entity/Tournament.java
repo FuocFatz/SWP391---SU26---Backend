@@ -26,6 +26,9 @@ public class Tournament {
 
     private String location;
 
+    @Column(name = "grace_period_hours")
+    private Integer gracePeriodHours;
+
     @Column(name = "start_date")
     private LocalDate startDate;
 
@@ -40,6 +43,9 @@ public class Tournament {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @PrePersist
     void onCreate() {
         LocalDateTime now = LocalDateTime.now();
@@ -47,6 +53,9 @@ public class Tournament {
         updatedAt = now;
         if (status == null) {
             status = "OPEN";
+        }
+        if (gracePeriodHours == null) {
+            gracePeriodHours = 120;
         }
     }
 

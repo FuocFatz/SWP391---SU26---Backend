@@ -28,8 +28,7 @@ public class Race {
     @Column(name = "race_name")
     private String name;
 
-    // `type` column not present in current DB schema; keeping as transient
-    @Transient
+    @Column(name = "race_type")
     private String type;
 
     // map to DB column `race_distance`
@@ -43,9 +42,11 @@ public class Race {
     @Column(name = "race_date")
     private LocalDate raceDate;
 
-    // `race_time` column not present in current DB; keeping as transient
-    @Transient
+    @Column(name = "race_time")
     private LocalTime raceTime;
+
+    @Column(name = "registration_deadline")
+    private LocalDateTime registrationDeadline;
 
     // DB uses `total_lanes` instead of `max_participants`
     @Column(name = "total_lanes")
@@ -72,6 +73,9 @@ public class Race {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @PrePersist
     void onCreate() {

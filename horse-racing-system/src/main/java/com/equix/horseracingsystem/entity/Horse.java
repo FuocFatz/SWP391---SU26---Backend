@@ -57,6 +57,8 @@ public class Horse {
     @Column(name = "health_status")
     private String healthStatus;
 
+    private String status;
+
     @Column(name = "injury_notes")
     private String injuryNotes;
 
@@ -87,6 +89,9 @@ public class Horse {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @PrePersist
     void onCreate() {
         LocalDateTime now = LocalDateTime.now();
@@ -94,6 +99,9 @@ public class Horse {
         updatedAt = now;
         if (healthStatus == null) {
             healthStatus = "HEALTHY";
+        }
+        if (status == null) {
+            status = "AVAILABLE";
         }
         if (totalRaces == null) {
             totalRaces = 0;

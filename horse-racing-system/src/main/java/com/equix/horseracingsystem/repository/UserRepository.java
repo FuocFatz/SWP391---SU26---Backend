@@ -10,6 +10,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByEmailIgnoreCaseAndDeletedAtIsNull(String email);
+
     Optional<User> findByUsername(String username);
 
     boolean existsByEmail(String email);
@@ -17,4 +19,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
 
     List<User> findByRole(String role);
+
+    List<User> findAllByDeletedAtIsNull();
+
+    List<User> findByRoleAndDeletedAtIsNull(String role);
+
+    Optional<User> findByIdAndDeletedAtIsNull(Long id);
 }

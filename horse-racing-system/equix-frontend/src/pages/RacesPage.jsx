@@ -5,7 +5,7 @@ import RaceCard from '../components/RaceCard/RaceCard';
 import './RacesPage.css';
 
 const statusFilters = ['All', 'DRAFT', 'REGISTRATION_OPEN', 'REGISTRATION_CLOSED', 'STANDBY', 'IN_PROGRESS', 'COMPLETED', 'REPORT_READY', 'OFFICIAL', 'CANCELLED'];
-const typeFilters = ['All', 'Sprint', 'Mile', 'Medium', 'Long'];
+const typeFilters = ['All', 'SPRINT', 'MILE', 'MEDIUM', 'LONG'];
 
 function RacesPage() {
   const [races, setRaces] = useState([]);
@@ -35,9 +35,9 @@ function RacesPage() {
   }, []);
 
   const filtered = races.filter((race) => {
-    const matchSearch = race.name.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === 'All' || race.status === statusFilter;
-    const matchType = typeFilter === 'All' || race.type === typeFilter;
+    const matchSearch = String(race.name || '').toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === 'All' || String(race.status || '').toUpperCase() === statusFilter;
+    const matchType = typeFilter === 'All' || String(race.type || '').toUpperCase() === typeFilter;
     return matchSearch && matchStatus && matchType;
   });
 
@@ -50,7 +50,7 @@ function RacesPage() {
         </div>
 
         {error && (
-          <div className="races-error" style={{ padding: '1rem', backgroundColor: '#fee', borderRadius: '0.5rem', color: '#c00', marginBottom: '1rem' }}>
+          <div className="races-error page-state error">
             {error}
           </div>
         )}
@@ -95,7 +95,7 @@ function RacesPage() {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>Loading races...</div>
+          <div className="page-state">Loading races...</div>
         ) : (
           <>
             <div className="races-results-count">

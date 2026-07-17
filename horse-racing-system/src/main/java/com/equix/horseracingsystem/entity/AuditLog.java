@@ -18,6 +18,7 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "created_at")
     private LocalDateTime timestamp;
 
     @Column(name = "user_id")

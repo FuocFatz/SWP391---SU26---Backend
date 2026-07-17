@@ -9,14 +9,16 @@ import RegisterPage from "../pages/RegisterPage";
 import PasswordResetPage from "../pages/PasswordResetPage";
 import AboutPage from "../pages/AboutPage";
 import TermsPage from "../pages/TermsPage";
+import FaqPage from "../pages/FaqPage";
 import RacesPage from "../pages/RacesPage";
 import RaceDetailPage from "../pages/RaceDetailPage";
 import LeaderboardPage from "../pages/LeaderboardPage";
 import NotificationsPage from "../pages/NotificationsPage";
-import TestEndpointsPage from "../pages/TestEndpointsPage";
 import DashboardPage from "../pages/DashboardPage";
+import DashboardSubroute from "./DashboardSubroute";
 import ProfilePage from "../pages/ProfilePage";
 import NotFoundPage from "../pages/NotFoundPage";
+import ProtectedRoute from "./ProtectedRoute";
 
 function AppRoutes() {
     return (
@@ -30,7 +32,7 @@ function AppRoutes() {
                     <Route path="/leaderboard" element={<LeaderboardPage />} />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/terms" element={<TermsPage />} />
-                    <Route path="/test" element={<TestEndpointsPage />} />
+                    <Route path="/faq" element={<FaqPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Route>
 
@@ -39,12 +41,14 @@ function AppRoutes() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/reset-password" element={<PasswordResetPage />} />
 
-                {/* Dashboard Routes with Navbar + Sidebar */}
-                <Route element={<DashboardLayout />}>
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/dashboard/*" element={<DashboardPage />} />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/notifications" element={<NotificationsPage />} />
+                {/* Authenticated dashboard routes */}
+                <Route element={<ProtectedRoute />}>
+                    <Route element={<DashboardLayout />}>
+                        <Route path="/dashboard" element={<DashboardPage />} />
+                        <Route path="/dashboard/:section" element={<DashboardSubroute />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/notifications" element={<NotificationsPage />} />
+                    </Route>
                 </Route>
             </Routes>
         </BrowserRouter>

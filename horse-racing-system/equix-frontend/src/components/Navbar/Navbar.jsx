@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { FiMenu, FiX, FiChevronDown, FiLogOut, FiUser, FiSettings } from 'react-icons/fi';
+import { useAuth } from '../../contexts/useAuth';
+import { FiBell, FiMenu, FiX, FiChevronDown, FiLogOut, FiUser, FiSettings } from 'react-icons/fi';
 import { GiHorseshoe } from 'react-icons/gi';
 import './Navbar.css';
 
@@ -10,14 +10,35 @@ const publicLinks = [
   { path: '/races', label: 'Races' },
   { path: '/leaderboard', label: 'Leaderboard' },
   { path: '/about', label: 'About' },
+  { path: '/faq', label: 'FAQ' },
 ];
 
+const roleLinks = {
+  HORSE_OWNER: [
+    ['/dashboard/horses', 'My Horses'], ['/dashboard/jockeys', 'Hire Jockey'],
+    ['/dashboard/pairings', 'Pairings'], ['/dashboard/races', 'Races'], ['/dashboard/leaderboard', 'Leaderboard'],
+  ],
+  JOCKEY: [
+    ['/dashboard/invitations', 'Invitations'], ['/dashboard/horse', 'My Horse'],
+    ['/dashboard/races', 'Races'], ['/dashboard/achievements', 'Achievements'],
+  ],
+  REFEREE: [
+    ['/dashboard/assigned-races', 'Assigned Races'], ['/dashboard/monitor', 'Race Monitor'], ['/dashboard/reports', 'Reports'],
+  ],
+  SPECTATOR: [
+    ['/dashboard/races', 'Browse Races'], ['/dashboard/guesses', 'My Guesses'], ['/dashboard/leaderboard', 'Leaderboard'],
+  ],
+  ADMIN: [
+    ['/dashboard/accounts', 'Accounts'], ['/dashboard/tournaments', 'Tournaments'], ['/dashboard/horses', 'Horses'],
+    ['/dashboard/jockeys', 'Jockeys'], ['/dashboard/referees', 'Referees'], ['/dashboard/results', 'Results'], ['/dashboard/guesses', 'Guesses'],
+  ],
+};
+
 function Navbar() {
-  const { user, isAuthenticated, logout, switchRole, ROLES } = useAuth();
+  const { user, isAuthenticated, logout, unreadCount } = useAuth();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [devPanelOpen, setDevPanelOpen] = useState(false);
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
@@ -46,38 +67,6 @@ function Navbar() {
         </ul>
 
         <div className="navbar-actions">
-          <div className="dev-switcher">
-            <button
-              className="btn btn-ghost dev-switcher-btn"
-              onClick={() => setDevPanelOpen(!devPanelOpen)}
-              title="Dev: Switch Role"
-            >
-              <FiSettings />
-            </button>
-            {devPanelOpen && (
-              <div className="dev-switcher-panel">
-                <span className="dev-switcher-label">Switch Role (Dev)</span>
-                {Object.keys(ROLES).filter((role) => role !== 'GUEST').map((role) => (
-                  <button
-                    key={role}
-                    className={`dev-switcher-role ${user?.role === role ? 'active' : ''}`}
-                    onClick={() => { switchRole(role); setDevPanelOpen(false); }}
-                  >
-                    {role}
-                  </button>
-                ))}
-                {isAuthenticated && (
-                  <button
-                    className="dev-switcher-role logout"
-                    onClick={() => { logout(); setDevPanelOpen(false); }}
-                  >
-                    Logout
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-
           {!isAuthenticated ? (
             <div className="navbar-auth-buttons">
               <Link to="/login" className="btn btn-ghost" id="btn-login">
@@ -88,14 +77,20 @@ function Navbar() {
               </Link>
             </div>
           ) : (
-            <div className="navbar-user">
+            <div className="navbar-user-wrap">
+              <Link to="/notifications" className="navbar-notification-button"
+                aria-label={`${unreadCount} unread notifications`} title="Notifications">
+                <FiBell />
+                {unreadCount > 0 && <span className="navbar-notification-count">{unreadCount > 99 ? '99+' : unreadCount}</span>}
+              </Link>
+              <div className="navbar-user">
               <button
                 className="navbar-user-btn"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 id="btn-user-menu"
               >
                 <div className="navbar-avatar">
-                  {user.name.charAt(0)}
+                  {(user.name || user.email || 'U').charAt(0)}
                 </div>
                 <span className="navbar-user-name">{user.name}</span>
                 <FiChevronDown className={`navbar-chevron ${dropdownOpen ? 'open' : ''}`} />
@@ -131,6 +126,7 @@ function Navbar() {
                   </button>
                 </div>
               )}
+              </div>
             </div>
           )}
 
@@ -138,6 +134,7 @@ function Navbar() {
             className="navbar-mobile-toggle"
             onClick={() => setMobileOpen(!mobileOpen)}
             id="btn-mobile-menu"
+            aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
           >
             {mobileOpen ? <FiX /> : <FiMenu />}
           </button>
@@ -156,6 +153,16 @@ function Navbar() {
               {link.label}
             </Link>
           ))}
+          {isAuthenticated && (
+            <>
+              <div className="navbar-mobile-divider" />
+              <Link to="/dashboard" className={`navbar-mobile-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>Dashboard</Link>
+              {(roleLinks[user?.role] || []).map(([path, label]) => <Link key={path} to={path} className={`navbar-mobile-link ${isActive(path) ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>{label}</Link>)}
+              <Link to="/notifications" className={`navbar-mobile-link ${isActive('/notifications') ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>Notifications {unreadCount > 0 ? `(${unreadCount})` : ''}</Link>
+              <Link to="/profile" className={`navbar-mobile-link ${isActive('/profile') ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>Profile</Link>
+              <button className="navbar-mobile-link navbar-mobile-logout" onClick={() => { logout(); setMobileOpen(false); }}>Logout</button>
+            </>
+          )}
           {!isAuthenticated && (
             <div className="navbar-mobile-auth">
               <Link to="/login" className="btn btn-outline" onClick={() => setMobileOpen(false)}>Login</Link>

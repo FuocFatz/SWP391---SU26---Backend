@@ -27,6 +27,9 @@ public class RaceRegistration {
     @Column(name = "owner_id")
     private Long ownerId;
 
+    @Column(name = "pairing_contract_id")
+    private Long pairingContractId;
+
     @Column(name = "jockey_id")
     private Long jockeyId;
 
@@ -58,6 +61,9 @@ public class RaceRegistration {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @PrePersist
     void onCreate() {

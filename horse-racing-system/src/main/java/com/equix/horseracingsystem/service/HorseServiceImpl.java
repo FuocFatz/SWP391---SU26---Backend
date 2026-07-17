@@ -6,6 +6,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class HorseServiceImpl implements HorseService {
@@ -18,22 +20,26 @@ public class HorseServiceImpl implements HorseService {
 
     @Override
     public List<Horse> getAll() {
-        return repo.findAll();
+        return repo.findByDeletedAtIsNull();
     }
 
     @Override
     public List<Horse> getByOwner(@NonNull Long ownerId) {
-        return repo.findByOwnerId(ownerId);
+        return repo.findByOwnerIdAndDeletedAtIsNull(ownerId);
     }
 
     @Override
     public Horse getById(@NonNull Long id) {
-        return repo.findById(id)
+        return repo.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Horse not found: " + id));
     }
 
     @Override
     public Horse create(@NonNull Horse horse) {
+        if (horse.getRegistrationNumber() == null || horse.getRegistrationNumber().isBlank()) {
+            horse.setRegistrationNumber("EQX-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase());
+        }
+        if (horse.getGender() == null || horse.getGender().isBlank()) horse.setGender("UNKNOWN");
         return repo.save(horse);
     }
 
@@ -57,12 +63,23 @@ public class HorseServiceImpl implements HorseService {
         h.setAgility(horse.getAgility());
         h.setPaceStyle(horse.getPaceStyle());
         h.setHealthStatus(horse.getHealthStatus());
+        h.setInjuryNotes(horse.getInjuryNotes());
+        if (horse.getStatus() != null && !horse.getStatus().equals(h.getStatus())) {
+            if ("REGISTERED".equalsIgnoreCase(h.getStatus())) {
+                throw new RuntimeException("A registered horse must be withdrawn through the race workflow");
+            }
+            h.setStatus(horse.getStatus().toUpperCase());
+        }
+        h.setImageUrl(horse.getImageUrl());
+        h.setDescription(horse.getDescription());
 
         return repo.save(h);
     }
 
     @Override
     public void delete(@NonNull Long id) {
-        repo.deleteById(id);
+        Horse horse = getById(id);
+        horse.setDeletedAt(LocalDateTime.now());
+        repo.save(horse);
     }
 }

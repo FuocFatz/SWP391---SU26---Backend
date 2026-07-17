@@ -12,15 +12,9 @@ const defaultHorses = [
 ];
 
 function RaceTrack({ horses = defaultHorses, duration = 67, isLive = true }) {
-  const [positions, setPositions] = useState(horses.map(() => Math.random() * 5));
+  const [positions, setPositions] = useState(() => horses.map((_, index) => (index * 7) % 11));
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(isLive);
-
-  useEffect(() => {
-    setPositions(horses.map(() => Math.random() * 5));
-    setTimeLeft(duration);
-    setIsRunning(isLive);
-  }, [horses, duration, isLive]);
 
   useEffect(() => {
     if (!isRunning) return undefined;

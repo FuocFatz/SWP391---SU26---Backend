@@ -43,6 +43,10 @@ public class RaceResult {
     @Column(name = "points_awarded")
     private Integer pointsAwarded;
 
+    private Boolean dnf;
+
+    private Boolean disqualified;
+
     @Column(name = "violation_notes", length = 1000)
     private String violationNotes;
 

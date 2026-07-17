@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { GiHorseshoe, GiHorseHead, GiTrophy } from 'react-icons/gi';
+import { GiHorseHead, GiTrophy } from 'react-icons/gi';
 import { FiCode, FiDatabase, FiShield, FiUsers } from 'react-icons/fi';
 import './AboutPage.css';
 
 const techStack = [
   { icon: <FiCode />, name: 'ReactJS', desc: 'Component-based frontend framework' },
   { icon: <FiShield />, name: 'Spring Boot + JWT', desc: 'Secure backend with token authentication' },
-  { icon: <FiDatabase />, name: 'MySQL', desc: 'Relational database with ACID compliance' },
+  { icon: <FiDatabase />, name: 'SQL Server', desc: 'Relational database with ACID compliance' },
 ];
 
 const features = [
@@ -80,6 +80,18 @@ function AboutPage() {
           </p>
           <Link to="/register" className="btn btn-primary btn-lg" style={{ marginTop: 'var(--space-6)' }}>
             Join EquiX Today
+          </Link>
+        </div>
+      </section>
+
+      <section className="section about-tech-section" id="contact">
+        <div className="container text-center">
+          <h2 className="section-title">Contact & Support</h2>
+          <p className="section-subtitle">
+            For this academic deployment, contact the project administrator through your course team and include your account email, role, and the affected race ID.
+          </p>
+          <Link to="/faq" className="btn btn-outline" style={{ marginTop: 'var(--space-6)' }}>
+            Read Frequently Asked Questions
           </Link>
         </div>
       </section>

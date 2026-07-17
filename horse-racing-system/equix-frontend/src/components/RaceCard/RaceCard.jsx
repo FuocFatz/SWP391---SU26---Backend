@@ -2,77 +2,42 @@ import { Link } from 'react-router-dom';
 import { FiClock, FiUsers, FiAward } from 'react-icons/fi';
 import './RaceCard.css';
 
-const typeColors = {
-  Sprint: 'sprint',
-  Mile: 'mile',
-  Medium: 'medium',
-  Long: 'long',
-};
-
 const statusConfig = {
-  'Registration Open': { className: 'status-open', label: 'Registration Open' },
+  DRAFT: { className: 'status-closed', label: 'Draft' },
   REGISTRATION_OPEN: { className: 'status-open', label: 'Registration Open' },
-  'Registration Closed': { className: 'status-closed', label: 'Closed' },
-  Standby: { className: 'status-standby', label: 'Standby' },
-  'In Progress': { className: 'status-live', label: 'LIVE' },
-  IN_PROGRESS: { className: 'status-live', label: 'LIVE' },
-  Completed: { className: 'status-completed', label: 'Completed' },
-  'Report Ready': { className: 'status-report', label: 'Report Ready' },
-  Official: { className: 'status-official', label: 'Official' },
+  REGISTRATION_CLOSED: { className: 'status-closed', label: 'Registration Closed' },
+  STANDBY: { className: 'status-standby', label: 'Standby' },
+  IN_PROGRESS: { className: 'status-live', label: 'Live' },
+  COMPLETED: { className: 'status-completed', label: 'Completed' },
+  REPORT_READY: { className: 'status-report', label: 'Report Ready' },
   OFFICIAL: { className: 'status-official', label: 'Official' },
+  CANCELLED: { className: 'status-closed', label: 'Cancelled' },
 };
 
 function RaceCard({ race }) {
-  const {
-    id = 1,
-    name = 'Spring Cup',
-    type = 'Sprint',
-    distance = race?.distanceM || 1200,
-    date = race?.raceDate || '2026-07-15',
-    time = race?.raceTime || '14:00',
-    participants = 8,
-    maxParticipants = race?.maxParticipants || 12,
-    prizePool = 50000,
-    status = 'Registration Open',
-  } = race || {};
-
-  const typeClass = typeColors[type] || 'sprint';
-  const statusCfg = statusConfig[status] || statusConfig['Registration Open'];
+  if (!race?.id) return null;
+  const type = String(race.type || 'Race').toUpperCase();
+  const typeClass = ['SPRINT', 'MILE', 'MEDIUM', 'LONG'].includes(type) ? type.toLowerCase() : 'sprint';
+  const status = String(race.status || 'DRAFT').toUpperCase().replaceAll(' ', '_');
+  const statusCfg = statusConfig[status] || { className: 'status-closed', label: status.replaceAll('_', ' ') };
 
   return (
-    <Link to={`/races/${id}`} className="race-card" id={`race-card-${id}`}>
+    <Link to={`/races/${race.id}`} className="race-card" id={`race-card-${race.id}`}>
       <div className={`race-card-type-strip type-${typeClass}`} />
-
       <div className="race-card-header">
         <span className={`race-card-type-badge type-${typeClass}`}>{type}</span>
-        <span className={`race-card-status ${statusCfg.className}`}>
-          {statusCfg.label}
-        </span>
+        <span className={`race-card-status ${statusCfg.className}`}>{statusCfg.label}</span>
       </div>
-
-      <h3 className="race-card-name">{name}</h3>
-
+      <h3 className="race-card-name">{race.name || `Race #${race.id}`}</h3>
       <div className="race-card-details">
-        <div className="race-card-detail">
-          <FiClock />
-          <span>{date} - {String(time).slice(0, 5)}</span>
-        </div>
-        <div className="race-card-detail">
-          <FiUsers />
-          <span>{participants}/{maxParticipants} pairs</span>
-        </div>
-        <div className="race-card-detail">
-          <FiAward />
-          <span>{distance}m</span>
-        </div>
+        <div className="race-card-detail"><FiClock /><span>{race.raceDate || 'Date TBD'} - {race.raceTime ? String(race.raceTime).slice(0, 5) : 'Time TBD'}</span></div>
+        <div className="race-card-detail"><FiUsers /><span>Up to {race.maxParticipants || 18} pairs</span></div>
+        <div className="race-card-detail"><FiAward /><span>{race.distanceM ? `${race.distanceM}m` : 'Distance TBD'}</span></div>
       </div>
-
       <div className="race-card-footer">
         <div className="race-card-prize">
           <span className="race-card-prize-label">Prize Pool</span>
-          <span className="race-card-prize-value">
-            {prizePool > 0 ? `$${Number(prizePool).toLocaleString()}` : 'TBD'}
-          </span>
+          <span className="race-card-prize-value">{Number(race.prizePool || 0).toLocaleString()} VND</span>
         </div>
         <span className="race-card-arrow">View</span>
       </div>

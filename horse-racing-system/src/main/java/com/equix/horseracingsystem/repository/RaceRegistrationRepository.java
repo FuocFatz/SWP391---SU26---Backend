@@ -13,4 +13,5 @@ public interface RaceRegistrationRepository extends JpaRepository<RaceRegistrati
     List<RaceRegistration> findByStatus(String status);
     Optional<RaceRegistration> findByRaceIdAndHorseId(Long raceId, Long horseId);
     boolean existsByRaceIdAndHorseId(Long raceId, Long horseId);
+    Optional<RaceRegistration> findByIdAndDeletedAtIsNull(Long id);
 }

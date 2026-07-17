@@ -116,6 +116,16 @@
   margin-bottom: var(--space-6);
 }
 
+.auth-notice {
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-6);
+  color: var(--color-secondary-light);
+  background: rgba(39, 174, 96, 0.1);
+  border: 1px solid rgba(39, 174, 96, 0.35);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+}
+
 /* Form */
 .auth-form {
   display: flex;
@@ -211,10 +221,66 @@
 }
 
 .auth-dev-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.quick-login-heading {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.quick-login-heading .auth-dev-label {
+  margin: 0;
+  color: var(--text-secondary);
+  font-weight: var(--fw-semibold);
+}
+
+.quick-login-button {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
   gap: var(--space-2);
-  justify-content: center;
+  padding: var(--space-3);
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--fs-sm);
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.quick-login-button:hover:not(:disabled),
+.quick-login-button:focus-visible {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-red, var(--color-primary));
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring, var(--color-primary-glow));
+  transform: translateY(-1px);
+}
+
+.quick-login-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.quick-login-icon {
+  display: grid;
+  place-items: center;
+  color: var(--color-primary-light);
+  font-size: 1.1rem;
+}
+
+.quick-login-button .spinner {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
 }
 
 /* Role Cards (Register) */
@@ -289,6 +355,10 @@
 
 @media (max-width: 768px) {
   .role-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-dev-buttons {
     grid-template-columns: 1fr;
   }
 }

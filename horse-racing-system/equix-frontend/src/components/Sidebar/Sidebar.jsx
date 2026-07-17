@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import {
   FiHome, FiFlag, FiAward, FiUsers, FiSettings,
   FiUser, FiMail, FiEye, FiStar, FiGrid,
@@ -9,7 +9,7 @@ import { GiHorseHead, GiHorseshoe } from 'react-icons/gi';
 import './Sidebar.css';
 
 const menuConfig = {
-  OWNER: [
+  HORSE_OWNER: [
     { path: '/dashboard', icon: <FiHome />, label: 'Dashboard' },
     { path: '/dashboard/horses', icon: <GiHorseHead />, label: 'My Horses' },
     { path: '/dashboard/jockeys', icon: <GiHorseshoe />, label: 'Hire Jockey' },
@@ -70,7 +70,7 @@ function Sidebar() {
     <aside className="sidebar" id="dashboard-sidebar">
       <div className="sidebar-header">
         <div className="sidebar-avatar">
-          {user.name.charAt(0)}
+          {(user.name || user.email || 'U').charAt(0)}
         </div>
         <div className="sidebar-user-info">
           <span className="sidebar-user-name">{user.name}</span>

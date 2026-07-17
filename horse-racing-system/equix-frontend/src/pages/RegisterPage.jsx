@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import { GiHorseshoe } from 'react-icons/gi';
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
 import './LoginPage.css';
 
 const roles = [
-  { id: 'OWNER', name: 'Horse Owner', desc: 'Manage horses and enter races' },
+  { id: 'HORSE_OWNER', name: 'Horse Owner', desc: 'Manage horses and enter races' },
   { id: 'JOCKEY', name: 'Jockey', desc: 'Accept ride invitations' },
   { id: 'SPECTATOR', name: 'Spectator', desc: 'Watch races and predict winners' },
 ];
@@ -18,7 +18,7 @@ function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState('OWNER');
+  const [selectedRole, setSelectedRole] = useState('HORSE_OWNER');
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState('');
@@ -43,7 +43,7 @@ function RegisterPage() {
 
     setLoading(true);
     try {
-      await register({
+      const result = await register({
         username: email.split('@')[0],
         fullName,
         email,
@@ -51,7 +51,11 @@ function RegisterPage() {
         phone: '',
         role: selectedRole,
       });
-      navigate('/dashboard');
+      if (result.pending) {
+        navigate('/login', { state: { message: 'Registration received. Your account is pending Admin confirmation.' } });
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err.message || 'Registration failed');
     } finally {

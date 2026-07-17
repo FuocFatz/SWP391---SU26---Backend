@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAuth } from '../contexts/useAuth';
 import {
   FiActivity,
   FiAward,
@@ -19,32 +19,7 @@ import { api } from '../services/api';
 import './DashboardPage.css';
 
 const colors = ['#E74C3C', '#3498DB', '#F39C12', '#2ECC71', '#9B59B6', '#1ABC9C', '#E67E22', '#95A5A6'];
-
-const demoUsers = [
-  { id: 1, fullName: 'EquiX Owner', email: 'owner@equix.vn', role: 'OWNER', rewardPoints: 100 },
-  { id: 2, fullName: 'EquiX Jockey', email: 'jockey@equix.vn', role: 'JOCKEY', rewardPoints: 100 },
-  { id: 3, fullName: 'EquiX Referee', email: 'referee@equix.vn', role: 'REFEREE', rewardPoints: 100 },
-  { id: 4, fullName: 'EquiX Spectator', email: 'spectator@equix.vn', role: 'SPECTATOR', rewardPoints: 100 },
-  { id: 5, fullName: 'Admin EquiX', email: 'admin@equix.vn', role: 'ADMIN', rewardPoints: 100 },
-];
-
-const demoHorses = [
-  { id: 1, horseName: 'Thunder Storm', breed: 'Thoroughbred', age: 4, speed: 88, stamina: 82, healthStatus: 'HEALTHY', ownerId: 1, totalWins: 1, totalPoints: 120, totalRaces: 2, totalTop3: 2 },
-  { id: 2, horseName: 'Golden Arrow', breed: 'Arabian', age: 5, speed: 83, stamina: 90, healthStatus: 'HEALTHY', ownerId: 1, totalWins: 0, totalPoints: 60, totalRaces: 1, totalTop3: 1 },
-];
-
-const demoRaces = [
-  { id: 1, name: 'Summer Thunder Sprint', type: 'Sprint', distanceM: 1200, surface: 'Turf', raceDate: '2026-07-20', raceTime: '14:00:00', maxParticipants: 8, prizePool: 75000, status: 'REGISTRATION_OPEN', refereeId: 3 },
-  { id: 2, name: 'Golden Mile Classic', type: 'Mile', distanceM: 1600, surface: 'Dirt', raceDate: '2026-07-22', raceTime: '15:30:00', maxParticipants: 10, prizePool: 120000, status: 'REGISTRATION_OPEN', refereeId: 3 },
-];
-
-const demoRegistrations = [
-  { id: 1, raceId: 1, horseId: 1, ownerId: 1, jockeyId: 2, laneNumber: 1, status: 'READY_FOR_CHECK', ownerConfirmed: true, jockeyConfirmed: true, refereeApproved: false, healthCheckStatus: 'PENDING' },
-];
-
-const demoInvitations = [
-  { id: 1, raceId: 1, horseId: 1, ownerId: 1, jockeyId: 2, status: 'ACCEPTED', message: 'Ride Thunder Storm in Summer Thunder Sprint' },
-];
+const DEFAULT_RACE_DATE = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
 
 function statusLabel(status) {
   const labels = {
@@ -84,104 +59,115 @@ function nameOf(items, id, key, fallback) {
   return byId(items, id)?.[key] || fallback;
 }
 
-function defaultData() {
+function emptyData() {
   return {
-    users: demoUsers,
-    jockeys: demoUsers.filter((user) => user.role === 'JOCKEY'),
-    races: demoRaces,
-    horses: demoHorses,
-    registrations: demoRegistrations,
-    invitations: demoInvitations,
+    users: [],
+    jockeys: [],
+    referees: [],
+    tournaments: [],
+    races: [],
+    horses: [],
+    registrations: [],
+    invitations: [],
     predictions: [],
-    horseLeaderboard: demoHorses.map((horse) => ({
-      horseId: horse.id,
-      horseName: horse.horseName,
-      ownerId: horse.ownerId,
-      totalRaces: horse.totalRaces,
-      totalWins: horse.totalWins,
-      totalTop3: horse.totalTop3,
-      totalPoints: horse.totalPoints,
-    })),
-    jockeyLeaderboard: [{ jockeyId: 2, jockeyName: 'EquiX Jockey', totalRaces: 2, totalPoints: 140 }],
+    horseLeaderboard: [],
+    jockeyLeaderboard: [],
   };
 }
 
-function DashboardPage() {
+function DashboardPage({ section = '' }) {
   const { user, currentRole } = useAuth();
-  const [data, setData] = useState(defaultData);
+  const [data, setData] = useState(emptyData);
   const [loading, setLoading] = useState(false);
   const [offline, setOffline] = useState(false);
   const [message, setMessage] = useState('');
   const [selectedRaceId, setSelectedRaceId] = useState(1);
   const [selectedHorseByRace, setSelectedHorseByRace] = useState({});
-  const [selectedJockeyByRegistration, setSelectedJockeyByRegistration] = useState({});
+  const [selectedJockeyByRace, setSelectedJockeyByRace] = useState({});
   const [simulation, setSimulation] = useState(null);
   const [horseForm, setHorseForm] = useState({ horseName: '', breed: 'Thoroughbred', age: 4, speed: 80, stamina: 80 });
   const [raceForm, setRaceForm] = useState({
     name: '',
     type: 'Sprint',
     distanceM: 1200,
-    raceDate: '2026-07-20',
+    raceDate: DEFAULT_RACE_DATE,
     raceTime: '14:00',
     maxParticipants: 8,
     prizePool: 75000,
+    tournamentId: '',
+    refereeId: '',
   });
-  const [predictionForm, setPredictionForm] = useState({ raceId: 1, predictedHorseId: 1, wagerPoints: 10 });
+  const [predictionForm, setPredictionForm] = useState({ raceId: 1, predictedHorseId: 1 });
 
-  const userId = user?.id || 1;
+  const userId = user?.id;
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
+    if (!userId) return;
     setLoading(true);
-    try {
-      const [
-        users,
-        jockeys,
-        races,
-        horses,
-        registrations,
-        invitations,
-        predictions,
-        horseLeaderboard,
-        jockeyLeaderboard,
-      ] = await Promise.all([
-        api.getUsers(),
-        api.getUsersByRole('JOCKEY'),
-        api.getRaces(),
-        api.getHorses(),
-        api.getRegistrations(),
-        api.getInvitations(),
-        api.getPredictions(user?.role === 'SPECTATOR' ? { spectatorId: userId } : {}),
-        api.getHorseLeaderboard(),
-        api.getJockeyLeaderboard(),
-      ]);
+    const requests = {
+      races: api.getRaces(),
+      horses: currentRole === 'HORSE_OWNER' ? api.getHorsesByOwner(userId) : api.getHorses(),
+      horseLeaderboard: api.getHorseLeaderboard(),
+    };
 
-      setData({
-        users,
-        jockeys,
-        races,
-        horses,
-        registrations,
-        invitations,
-        predictions,
-        horseLeaderboard,
-        jockeyLeaderboard,
+    if (currentRole === 'ADMIN') {
+      Object.assign(requests, {
+        users: api.getUsers(),
+        jockeys: api.getUsersByRole('JOCKEY'),
+        registrations: api.getRegistrations(),
+        invitations: api.getInvitations(),
+        referees: api.getUsersByRole('REFEREE'),
+        tournaments: api.getTournaments(),
       });
-      setOffline(false);
-      if (races.length && !races.some((race) => Number(race.id) === Number(selectedRaceId))) {
-        setSelectedRaceId(races[0].id);
-        setPredictionForm((form) => ({ ...form, raceId: races[0].id }));
-      }
-    } catch (err) {
-      setData(defaultData());
-      setOffline(true);
-    } finally {
-      setLoading(false);
+    } else if (currentRole === 'HORSE_OWNER') {
+      Object.assign(requests, {
+        jockeys: api.getUsersByRole('JOCKEY'),
+        registrations: api.getRegistrations({ ownerId: userId }),
+        invitations: api.getInvitations({ ownerId: userId }),
+      });
+    } else if (currentRole === 'JOCKEY') {
+      Object.assign(requests, {
+        registrations: api.getRegistrations({ jockeyId: userId }),
+        invitations: api.getInvitations({ jockeyId: userId }),
+        jockeyLeaderboard: api.getJockeyLeaderboard(),
+      });
+    } else if (currentRole === 'REFEREE') {
+      Object.assign(requests, {
+        registrations: api.getRegistrations(),
+        jockeyLeaderboard: api.getJockeyLeaderboard(),
+      });
+    } else if (currentRole === 'SPECTATOR') {
+      requests.predictions = api.getPredictions({ spectatorId: userId });
     }
-  };
+
+    const entries = Object.entries(requests);
+    const results = await Promise.allSettled(entries.map(([, request]) => request));
+    const next = emptyData();
+    const failures = [];
+    results.forEach((result, index) => {
+      const key = entries[index][0];
+      if (result.status === 'fulfilled') next[key] = Array.isArray(result.value) ? result.value : [];
+      else failures.push(key);
+    });
+    next.users = next.users.length ? next.users : [user];
+
+    setData(next);
+    setOffline(failures.length === entries.length);
+    setMessage(failures.length ? `Some dashboard data could not be loaded: ${failures.join(', ')}.` : '');
+    if (next.races.length) {
+      const visibleRaces = currentRole === 'REFEREE'
+        ? next.races.filter((race) => Number(race.refereeId) === Number(userId))
+        : next.races;
+      setSelectedRaceId((current) => visibleRaces.some((race) => Number(race.id) === Number(current)) ? current : visibleRaces[0]?.id || '');
+      setPredictionForm((form) => ({ ...form, raceId: form.raceId || next.races[0].id }));
+    }
+    setLoading(false);
+  }, [currentRole, user, userId]);
 
   useEffect(() => {
-    loadData();
-  }, [currentRole, userId]);
+    const timeout = window.setTimeout(() => loadData(), 0);
+    return () => window.clearTimeout(timeout);
+  }, [loadData]);
 
   const selectedRace = useMemo(
     () => byId(data.races, selectedRaceId) || data.races[0],
@@ -194,7 +180,7 @@ function DashboardPage() {
   const jockeyAssignments = data.registrations.filter((registration) => Number(registration.jockeyId) === Number(userId));
   const selectedRaceRegistrations = data.registrations.filter((registration) => Number(registration.raceId) === Number(selectedRace?.id));
   const pendingAdminRegistrations = data.registrations.filter((registration) => registration.status === 'PENDING_ADMIN');
-  const checkableRegistrations = data.registrations.filter((registration) => ['READY_FOR_CHECK', 'CLEARED_TO_RACE', 'APPROVED'].includes(registration.status));
+  const checkableRegistrations = data.registrations.filter((registration) => ['READY_FOR_CHECK', 'APPROVED'].includes(registration.status));
 
   const setDemoData = (updater) => {
     setData((current) => {
@@ -203,14 +189,8 @@ function DashboardPage() {
     });
   };
 
-  const execute = async (label, action, demoAction) => {
+  const execute = async (label, action) => {
     setMessage('');
-    if (offline) {
-      demoAction?.();
-      setMessage(`${label} completed in demo mode`);
-      return;
-    }
-
     try {
       await action();
       setMessage(`${label} completed`);
@@ -270,8 +250,13 @@ function DashboardPage() {
     );
   };
 
-  const handleInviteJockey = (registration) => {
-    const jockeyId = selectedJockeyByRegistration[registration.id] || data.jockeys[0]?.id;
+  const handleInviteJockey = (raceId) => {
+    const horseId = selectedHorseByRace[raceId] || ownerHorses[0]?.id;
+    const jockeyId = selectedJockeyByRace[raceId] || data.jockeys[0]?.id;
+    if (!horseId) {
+      setMessage('Create an available horse before inviting a jockey');
+      return;
+    }
     if (!jockeyId) {
       setMessage('No jockey account available');
       return;
@@ -280,20 +265,16 @@ function DashboardPage() {
     execute(
       'Jockey invitation',
       () => api.inviteJockey({
-        raceId: registration.raceId,
-        horseId: registration.horseId,
-        ownerId: registration.ownerId,
+        raceId,
+        horseId,
         jockeyId,
-        message: `Invitation for ${nameOf(data.horses, registration.horseId, 'horseName', 'horse')}`,
+        message: `Invitation for ${nameOf(data.horses, horseId, 'horseName', 'horse')}`,
       }),
       () => setDemoData((current) => ({
         invitations: [
           ...current.invitations,
-          { id: Date.now(), raceId: registration.raceId, horseId: registration.horseId, ownerId: registration.ownerId, jockeyId, status: 'PENDING' },
+          { id: Date.now(), raceId, horseId, ownerId: userId, jockeyId, status: 'PENDING' },
         ],
-        registrations: current.registrations.map((item) => (
-          item.id === registration.id ? { ...item, jockeyId } : item
-        )),
       })),
     );
   };
@@ -302,7 +283,7 @@ function DashboardPage() {
     event.preventDefault();
     execute(
       'Create race',
-      () => api.createRace({ ...raceForm, status: 'REGISTRATION_OPEN', refereeId: 3 }),
+      () => api.createRace({ ...raceForm, status: 'REGISTRATION_OPEN' }),
       () => setDemoData((current) => ({
         races: [...current.races, { id: Date.now(), ...raceForm, status: 'REGISTRATION_OPEN', refereeId: 3 }],
       })),
@@ -337,21 +318,6 @@ function DashboardPage() {
 
   const handleSimulate = () => {
     if (!selectedRace) return;
-    if (offline) {
-      const lanes = selectedRaceRegistrations.map((registration, index) => ({
-        registrationId: registration.id,
-        laneNumber: registration.laneNumber || index + 1,
-        horseId: registration.horseId,
-        horseName: nameOf(data.horses, registration.horseId, 'horseName', `Horse #${registration.horseId}`),
-        jockeyId: registration.jockeyId,
-        position: Math.min(100, 45 + index * 8 + Math.floor(Math.random() * 20)),
-        status: 'IN_PROGRESS',
-      })).sort((a, b) => b.position - a.position);
-      setSimulation({ raceId: selectedRace.id, lanes });
-      setMessage('Race simulation completed in demo mode');
-      return;
-    }
-
     execute(
       'Race simulation',
       async () => {
@@ -361,21 +327,21 @@ function DashboardPage() {
     );
   };
 
-  const handleConfirmResults = () => {
-    if (!selectedRace) return;
-    const runners = selectedRaceRegistrations.filter((item) => !['WITHDRAWN', 'REJECTED_BY_REFEREE'].includes(item.status));
+  const handleConfirmResults = (race = selectedRace) => {
+    if (!race) return;
+    const runners = data.registrations.filter((item) => Number(item.raceId) === Number(race.id) && !['WITHDRAWN', 'REJECTED_BY_REFEREE'].includes(item.status));
     if (!runners.length) {
       setMessage('No runners available for result confirmation');
       return;
     }
 
-    const ordered = simulation?.lanes?.length
+    const ordered = Number(race.id) === Number(selectedRace?.id) && simulation?.lanes?.length
       ? simulation.lanes.map((lane) => runners.find((item) => Number(item.id) === Number(lane.registrationId))).filter(Boolean)
       : runners;
 
     execute(
       'Confirm results',
-      () => api.confirmResults(selectedRace.id, {
+      () => api.confirmResults(race.id, {
         results: ordered.map((registration, index) => ({
           registrationId: registration.id,
           finishPosition: index + 1,
@@ -384,7 +350,7 @@ function DashboardPage() {
         })),
       }),
       () => setDemoData((current) => ({
-        races: current.races.map((race) => race.id === selectedRace.id ? { ...race, status: 'OFFICIAL' } : race),
+        races: current.races.map((item) => item.id === race.id ? { ...item, status: 'OFFICIAL' } : item),
         horseLeaderboard: ordered.map((registration, index) => {
           const horse = byId(current.horses, registration.horseId);
           return {
@@ -437,11 +403,9 @@ function DashboardPage() {
     <div className="dashboard-page" id="dashboard-page">
       <div className="dash-header dash-header-row">
         <div>
-          <h1 className="dash-title">
-            Welcome back, <span className="text-primary-color">{user.name || user.email}</span>
-          </h1>
+          <h1 className="dash-title">{section ? section.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : <>Welcome back, <span className="text-primary-color">{user.name || user.email}</span></>}</h1>
           <p className="dash-subtitle">
-            {currentRole} workflow dashboard
+            {section ? `${currentRole} workspace` : `${currentRole} workflow dashboard`}
           </p>
         </div>
         <button className="btn btn-outline" onClick={loadData} disabled={loading}>
@@ -451,12 +415,12 @@ function DashboardPage() {
 
       {(offline || message) && (
         <div className={`dash-message ${offline ? 'warning' : 'success'}`}>
-          {offline ? 'Backend is offline. Demo data is being shown.' : message}
+          {offline ? 'Dashboard data is currently unavailable. Please retry.' : message}
           {offline && message ? ` ${message}` : ''}
         </div>
       )}
 
-      {currentRole === 'OWNER' && (
+      {currentRole === 'HORSE_OWNER' && (
         <OwnerDashboard
           data={data}
           userId={userId}
@@ -466,12 +430,13 @@ function DashboardPage() {
           setHorseForm={setHorseForm}
           selectedHorseByRace={selectedHorseByRace}
           setSelectedHorseByRace={setSelectedHorseByRace}
-          selectedJockeyByRegistration={selectedJockeyByRegistration}
-          setSelectedJockeyByRegistration={setSelectedJockeyByRegistration}
+          selectedJockeyByRace={selectedJockeyByRace}
+          setSelectedJockeyByRace={setSelectedJockeyByRace}
           onCreateHorse={handleCreateHorse}
           onRegisterHorse={handleRegisterHorse}
           onInviteJockey={handleInviteJockey}
           onWithdraw={(id) => handleRegistrationPatch('Withdraw registration', id, () => api.withdrawRegistration(id, 'Horse or jockey unavailable'), { status: 'WITHDRAWN', withdrawReason: 'Horse or jockey unavailable' })}
+          section={section}
         />
       )}
 
@@ -483,6 +448,8 @@ function DashboardPage() {
           pendingAdminRegistrations={pendingAdminRegistrations}
           onCreateRace={handleCreateRace}
           onApprove={(id) => handleRegistrationPatch('Approve registration', id, () => api.approveRegistration(id), { status: 'APPROVED' })}
+          onStatus={(raceId, status) => execute(`Set race ${status}`, () => api.updateRaceStatus(raceId, status))}
+          onConfirmResults={handleConfirmResults}
         />
       )}
 
@@ -492,6 +459,7 @@ function DashboardPage() {
           invitations={jockeyInvitations}
           assignments={jockeyAssignments}
           onDecision={handleInvitationDecision}
+          section={section}
         />
       )}
 
@@ -512,9 +480,11 @@ function DashboardPage() {
             { refereeApproved: approved, healthCheckStatus: approved ? 'FIT' : 'NOT_FIT', status: approved ? 'CLEARED_TO_RACE' : 'REJECTED_BY_REFEREE' },
           )}
           onStart={() => handleRegistrationPatch('Start race', selectedRace.id, () => api.startRace(selectedRace.id), {})}
+          onComplete={() => execute('Complete race', () => api.completeRace(selectedRace.id))}
+          onSubmitReport={(raceId = selectedRace?.id) => execute('Submit clean race report', () => api.submitRaceReport(raceId, { description: 'Clean race execution; no incidents observed.', severity: 'INFO', actionTaken: 'No action required' }))}
           onSimulate={handleSimulate}
-          onConfirmResults={handleConfirmResults}
-          setDemoData={setDemoData}
+          userId={userId}
+          section={section}
         />
       )}
 
@@ -524,6 +494,7 @@ function DashboardPage() {
           predictionForm={predictionForm}
           setPredictionForm={setPredictionForm}
           onPrediction={handlePrediction}
+          section={section}
         />
       )}
     </div>
@@ -539,25 +510,26 @@ function OwnerDashboard({
   setHorseForm,
   selectedHorseByRace,
   setSelectedHorseByRace,
-  selectedJockeyByRegistration,
-  setSelectedJockeyByRegistration,
+  selectedJockeyByRace,
+  setSelectedJockeyByRace,
   onCreateHorse,
   onRegisterHorse,
   onInviteJockey,
   onWithdraw,
+  section,
 }) {
   const readyCount = ownerRegistrations.filter((item) => ['READY_FOR_CHECK', 'CLEARED_TO_RACE'].includes(item.status)).length;
 
   return (
     <>
-      <div className="dash-stats-grid">
+      {!section && <div className="dash-stats-grid">
         <StatCard icon={<GiHorseHead />} label="My Horses" value={ownerHorses.length} color="red" />
         <StatCard icon={<FiFlag />} label="Registrations" value={ownerRegistrations.length} color="green" />
         <StatCard icon={<GiHorseshoe />} label="Ready Pairings" value={readyCount} color="yellow" />
         <StatCard icon={<FiAward />} label="Reward Points" value={nameOf(data.users, userId, 'rewardPoints', 100)} />
-      </div>
+      </div>}
 
-      <div className="workflow-grid two">
+      {(!section || section === 'horses') && <div className="workflow-grid two">
         <section className="workflow-panel">
           <div className="workflow-panel-heading">
             <h3>Create Horse</h3>
@@ -591,9 +563,9 @@ function OwnerDashboard({
             empty="No horses yet"
           />
         </section>
-      </div>
+      </div>}
 
-      <section className="workflow-panel">
+      {(!section || section === 'jockeys' || section === 'races') && <section className="workflow-panel">
         <div className="workflow-panel-heading">
           <h3>Available Races</h3>
           <FiFlag />
@@ -606,12 +578,17 @@ function OwnerDashboard({
                 <th>Date</th>
                 <th>Prize</th>
                 <th>Horse</th>
+                <th>Jockey</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {data.races.map((race) => (
-                <tr key={race.id}>
+              {data.races.map((race) => {
+                const horseId = selectedHorseByRace[race.id] || ownerHorses[0]?.id;
+                const invitation = data.invitations.find((item) => Number(item.raceId) === Number(race.id) && Number(item.horseId) === Number(horseId));
+                const paired = invitation?.status === 'ACCEPTED';
+                const registered = ownerRegistrations.some((item) => Number(item.raceId) === Number(race.id) && Number(item.horseId) === Number(horseId) && item.status !== 'WITHDRAWN');
+                return <tr key={race.id}>
                   <td>{race.name}<span className="workflow-muted">{statusLabel(race.status)}</span></td>
                   <td>{race.raceDate} {shortTime(race.raceTime)}</td>
                   <td>${money(race.prizePool)}</td>
@@ -621,20 +598,26 @@ function OwnerDashboard({
                     </select>
                   </td>
                   <td>
-                    <button className="btn btn-secondary btn-sm" onClick={() => onRegisterHorse(race.id)} disabled={race.status !== 'REGISTRATION_OPEN' || !ownerHorses.length}>
-                      Register
+                    <select className="form-select compact" value={selectedJockeyByRace[race.id] || data.jockeys[0]?.id || ''} onChange={(e) => setSelectedJockeyByRace({ ...selectedJockeyByRace, [race.id]: e.target.value })} disabled={Boolean(invitation)}>
+                      {data.jockeys.map((jockey) => <option key={jockey.id} value={jockey.id}>{jockey.fullName || jockey.username || jockey.email}</option>)}
+                    </select>
+                    {invitation && <span className="workflow-muted">Invitation: {statusLabel(invitation.status)}</span>}
+                  </td>
+                  <td>
+                    <button className="btn btn-secondary btn-sm" onClick={() => paired ? onRegisterHorse(race.id) : onInviteJockey(race.id)} disabled={race.status !== 'REGISTRATION_OPEN' || !ownerHorses.length || registered || invitation?.status === 'PENDING'}>
+                      {registered ? 'Registered' : paired ? 'Register pair' : invitation?.status === 'PENDING' ? 'Awaiting jockey' : 'Invite jockey'}
                     </button>
                   </td>
-                </tr>
-              ))}
+                </tr>;
+              })}
             </tbody>
           </table>
         </div>
-      </section>
+      </section>}
 
-      <section className="workflow-panel">
+      {(!section || section === 'pairings') && <section className="workflow-panel">
         <div className="workflow-panel-heading">
-          <h3>Registrations And Jockeys</h3>
+          <h3>Registered Pairs</h3>
           <GiHorseshoe />
         </div>
         <div className="workflow-table-wrap">
@@ -644,7 +627,6 @@ function OwnerDashboard({
                 <th>Race</th>
                 <th>Horse</th>
                 <th>Status</th>
-                <th>Jockey</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -654,15 +636,7 @@ function OwnerDashboard({
                   <td>{nameOf(data.races, registration.raceId, 'name', `Race #${registration.raceId}`)}</td>
                   <td>{nameOf(data.horses, registration.horseId, 'horseName', `Horse #${registration.horseId}`)}</td>
                   <td><StatusBadge status={registration.status} /></td>
-                  <td>
-                    <select className="form-select compact" value={selectedJockeyByRegistration[registration.id] || registration.jockeyId || data.jockeys[0]?.id || ''} onChange={(e) => setSelectedJockeyByRegistration({ ...selectedJockeyByRegistration, [registration.id]: e.target.value })}>
-                      {data.jockeys.map((jockey) => <option key={jockey.id} value={jockey.id}>{jockey.fullName || jockey.username || jockey.email}</option>)}
-                    </select>
-                  </td>
                   <td className="workflow-actions">
-                    <button className="btn btn-secondary btn-sm" onClick={() => onInviteJockey(registration)} disabled={!['APPROVED', 'READY_FOR_CHECK', 'CLEARED_TO_RACE'].includes(registration.status)}>
-                      Invite
-                    </button>
                     <button className="btn btn-outline btn-sm" onClick={() => onWithdraw(registration.id)}>
                       Withdraw
                     </button>
@@ -672,12 +646,21 @@ function OwnerDashboard({
             </tbody>
           </table>
         </div>
-      </section>
+      </section>}
+
+      {section === 'leaderboard' && <section className="workflow-panel">
+        <div className="workflow-panel-heading"><h3>Horse Leaderboard</h3><FiAward /></div>
+        <CompactTable
+          headers={['Rank', 'Horse', 'Owner', 'Races', 'Wins', 'Top 3', 'Points']}
+          rows={data.horseLeaderboard.map((row, index) => [index + 1, row.horseName, row.ownerName || `Owner #${row.ownerId}`, row.totalRaces || 0, row.totalWins || 0, row.totalTop3 || 0, row.totalPoints || 0])}
+          empty="No leaderboard data"
+        />
+      </section>}
     </>
   );
 }
 
-function AdminDashboard({ data, raceForm, setRaceForm, pendingAdminRegistrations, onCreateRace, onApprove }) {
+function AdminDashboard({ data, raceForm, setRaceForm, pendingAdminRegistrations, onCreateRace, onApprove, onStatus, onConfirmResults }) {
   return (
     <>
       <div className="dash-stats-grid">
@@ -696,6 +679,16 @@ function AdminDashboard({ data, raceForm, setRaceForm, pendingAdminRegistrations
           <form className="workflow-form" onSubmit={onCreateRace}>
             <input className="form-input" placeholder="Race name" value={raceForm.name} onChange={(e) => setRaceForm({ ...raceForm, name: e.target.value })} required />
             <div className="workflow-form-row">
+              <select className="form-select" value={raceForm.tournamentId} onChange={(e) => setRaceForm({ ...raceForm, tournamentId: Number(e.target.value) })} required>
+                <option value="">Tournament</option>
+                {data.tournaments.map((tournament) => <option key={tournament.id} value={tournament.id}>{tournament.name}</option>)}
+              </select>
+              <select className="form-select" value={raceForm.refereeId} onChange={(e) => setRaceForm({ ...raceForm, refereeId: Number(e.target.value) })} required>
+                <option value="">Assigned referee</option>
+                {data.referees.map((referee) => <option key={referee.id} value={referee.id}>{referee.fullName || referee.email}</option>)}
+              </select>
+            </div>
+            <div className="workflow-form-row">
               <select className="form-select" value={raceForm.type} onChange={(e) => setRaceForm({ ...raceForm, type: e.target.value })}>
                 <option>Sprint</option>
                 <option>Mile</option>
@@ -709,7 +702,7 @@ function AdminDashboard({ data, raceForm, setRaceForm, pendingAdminRegistrations
               <input className="form-input" type="time" value={raceForm.raceTime} onChange={(e) => setRaceForm({ ...raceForm, raceTime: e.target.value })} />
             </div>
             <div className="workflow-form-row">
-              <input className="form-input" type="number" min="2" value={raceForm.maxParticipants} onChange={(e) => setRaceForm({ ...raceForm, maxParticipants: Number(e.target.value) })} />
+              <input className="form-input" type="number" min="6" max="18" value={raceForm.maxParticipants} onChange={(e) => setRaceForm({ ...raceForm, maxParticipants: Number(e.target.value) })} />
               <input className="form-input" type="number" min="0" value={raceForm.prizePool} onChange={(e) => setRaceForm({ ...raceForm, prizePool: Number(e.target.value) })} />
             </div>
             <button className="btn btn-primary" type="submit">Create Race</button>
@@ -722,12 +715,18 @@ function AdminDashboard({ data, raceForm, setRaceForm, pendingAdminRegistrations
             <FiFlag />
           </div>
           <CompactTable
-            headers={['Race', 'Date', 'Distance', 'Status']}
+            headers={['Race', 'Date', 'Distance', 'Status', 'Action']}
             rows={data.races.map((race) => [
               race.name,
               `${race.raceDate} ${shortTime(race.raceTime)}`,
               `${race.distanceM || '-'}m`,
               statusLabel(race.status),
+              <div className="workflow-actions" key={`race-action-${race.id}`}>
+                {race.status === 'DRAFT' && <button className="btn btn-secondary btn-sm" onClick={() => onStatus(race.id, 'REGISTRATION_OPEN')}>Open</button>}
+                {race.status === 'REGISTRATION_OPEN' && <button className="btn btn-outline btn-sm" onClick={() => onStatus(race.id, 'REGISTRATION_CLOSED')}>Close</button>}
+                {race.status === 'REGISTRATION_CLOSED' && <button className="btn btn-secondary btn-sm" onClick={() => onStatus(race.id, 'STANDBY')}>Standby</button>}
+                {race.status === 'REPORT_READY' && <button className="btn btn-primary btn-sm" onClick={() => onConfirmResults(race)}>Finalize</button>}
+              </div>,
             ])}
             empty="No races"
           />
@@ -771,17 +770,17 @@ function AdminDashboard({ data, raceForm, setRaceForm, pendingAdminRegistrations
   );
 }
 
-function JockeyDashboard({ data, invitations, assignments, onDecision }) {
+function JockeyDashboard({ data, invitations, assignments, onDecision, section }) {
   return (
     <>
-      <div className="dash-stats-grid">
+      {!section && <div className="dash-stats-grid">
         <StatCard icon={<FiMail />} label="Invitations" value={invitations.length} color="red" />
         <StatCard icon={<GiHorseHead />} label="Assignments" value={assignments.length} color="green" />
         <StatCard icon={<FiFlag />} label="Upcoming Races" value={assignments.filter((item) => item.status !== 'WITHDRAWN').length} color="yellow" />
         <StatCard icon={<FiAward />} label="Career Points" value={data.jockeyLeaderboard[0]?.totalPoints || 0} />
-      </div>
+      </div>}
 
-      <section className="workflow-panel">
+      {(!section || section === 'invitations') && <section className="workflow-panel">
         <div className="workflow-panel-heading">
           <h3>Invitations</h3>
           <FiMail />
@@ -816,9 +815,9 @@ function JockeyDashboard({ data, invitations, assignments, onDecision }) {
             </tbody>
           </table>
         </div>
-      </section>
+      </section>}
 
-      <section className="workflow-panel">
+      {(!section || section === 'horse' || section === 'races') && <section className="workflow-panel">
         <div className="workflow-panel-heading">
           <h3>Race Assignments</h3>
           <GiHorseshoe />
@@ -833,7 +832,16 @@ function JockeyDashboard({ data, invitations, assignments, onDecision }) {
           ])}
           empty="No assignments"
         />
-      </section>
+      </section>}
+
+      {section === 'achievements' && <section className="workflow-panel">
+        <div className="workflow-panel-heading"><h3>Jockey Achievements</h3><FiAward /></div>
+        <CompactTable
+          headers={['Rank', 'Jockey', 'Official Races', 'Points']}
+          rows={data.jockeyLeaderboard.map((row, index) => [index + 1, row.jockeyName, row.totalRaces || 0, row.totalPoints || 0])}
+          empty="No official jockey results yet"
+        />
+      </section>}
     </>
   );
 }
@@ -850,49 +858,66 @@ function RefereeDashboard({
   onCheck,
   onStart,
   onSimulate,
-  onConfirmResults,
-  setDemoData,
+  onComplete,
+  onSubmitReport,
+  userId,
+  section,
 }) {
-  const assignedRaces = data.races.filter((race) => Number(race.refereeId) === 3 || race.refereeId == null);
-
-  const handleDemoStart = () => {
-    if (!selectedRace) return;
-    setDemoData((current) => ({
-      races: current.races.map((race) => Number(race.id) === Number(selectedRace.id) ? { ...race, status: 'IN_PROGRESS' } : race),
-    }));
-    onStart();
-  };
+  const assignedRaces = data.races.filter((race) => Number(race.refereeId) === Number(userId));
 
   return (
     <>
-      <div className="dash-stats-grid">
+      {!section && <div className="dash-stats-grid">
         <StatCard icon={<FiShield />} label="Assigned Races" value={assignedRaces.length} color="red" />
         <StatCard icon={<FiActivity />} label="Pending Checks" value={checkableRegistrations.length} color="yellow" />
         <StatCard icon={<FiCheckCircle />} label="Cleared Horses" value={data.registrations.filter((item) => item.status === 'CLEARED_TO_RACE').length} color="green" />
         <StatCard icon={<FiAward />} label="Official Races" value={data.races.filter((race) => race.status === 'OFFICIAL').length} />
-      </div>
+      </div>}
 
-      <section className="workflow-panel">
+      {section === 'assigned-races' && <section className="workflow-panel">
+        <div className="workflow-panel-heading"><h3>Assigned Races</h3><FiFlag /></div>
+        <CompactTable
+          headers={['Race', 'Date', 'Distance', 'Status']}
+          rows={assignedRaces.map((race) => [race.name, `${race.raceDate} ${shortTime(race.raceTime)}`, `${race.distanceM || '-'}m`, statusLabel(race.status)])}
+          empty="No assigned races"
+        />
+      </section>}
+
+      {section === 'reports' && <section className="workflow-panel">
+        <div className="workflow-panel-heading"><h3>Race Reports</h3><FiAward /></div>
+        <CompactTable
+          headers={['Race', 'Status', 'Report Action']}
+          rows={assignedRaces.filter((race) => ['COMPLETED', 'REPORT_READY', 'OFFICIAL'].includes(race.status)).map((race) => [
+            race.name,
+            statusLabel(race.status),
+            race.status === 'COMPLETED' ? <button key={race.id} className="btn btn-primary btn-sm" onClick={() => onSubmitReport(race.id)}>Submit Clean Report</button> : 'Submitted',
+          ])}
+          empty="No races are ready for reporting"
+        />
+      </section>}
+
+      {(!section || section === 'monitor') && <section className="workflow-panel">
         <div className="workflow-panel-heading">
           <h3>Race Control</h3>
           <FiActivity />
         </div>
         <div className="workflow-control-bar">
           <select className="form-select" value={selectedRaceId || ''} onChange={(e) => setSelectedRaceId(e.target.value)}>
-            {data.races.map((race) => <option key={race.id} value={race.id}>{race.name}</option>)}
+            {assignedRaces.map((race) => <option key={race.id} value={race.id}>{race.name}</option>)}
           </select>
-          <button className="btn btn-secondary" onClick={handleDemoStart} disabled={!selectedRaceRegistrations.length}>Start Race</button>
-          <button className="btn btn-outline" onClick={onSimulate} disabled={!selectedRaceRegistrations.length}>Simulate</button>
-          <button className="btn btn-primary" onClick={onConfirmResults} disabled={!selectedRaceRegistrations.length}>Confirm Results</button>
+          <button className="btn btn-secondary" onClick={onStart} disabled={selectedRace?.status !== 'STANDBY'}>Start Race</button>
+          <button className="btn btn-outline" onClick={onSimulate} disabled={!['IN_PROGRESS', 'COMPLETED', 'REPORT_READY', 'OFFICIAL'].includes(selectedRace?.status)}>Simulate</button>
+          <button className="btn btn-outline" onClick={onComplete} disabled={selectedRace?.status !== 'IN_PROGRESS'}>Complete</button>
+          <button className="btn btn-primary" onClick={onSubmitReport} disabled={selectedRace?.status !== 'COMPLETED'}>Submit Report</button>
         </div>
         {selectedRace && (
           <p className="workflow-muted inline">
             {selectedRace.name} - {statusLabel(selectedRace.status)} - {selectedRace.distanceM}m
           </p>
         )}
-      </section>
+      </section>}
 
-      {selectedRaceRegistrations.length > 0 && (
+      {(!section || section === 'monitor') && selectedRaceRegistrations.length > 0 && (
         <section className="workflow-panel">
           <div className="workflow-panel-heading">
             <h3>Pre-race Checks</h3>
@@ -917,8 +942,10 @@ function RefereeDashboard({
                     <td>{nameOf(data.users, registration.jockeyId, 'fullName', registration.jockeyId ? `Jockey #${registration.jockeyId}` : 'Unassigned')}</td>
                     <td><StatusBadge status={registration.status} /></td>
                     <td className="workflow-actions">
-                      <button className="btn btn-secondary btn-sm" onClick={() => onCheck(registration.id, true)}><FiCheckCircle /> Fit</button>
-                      <button className="btn btn-outline btn-sm" onClick={() => onCheck(registration.id, false)}><FiXCircle /> Reject</button>
+                      {['READY_FOR_CHECK', 'APPROVED'].includes(registration.status) ? <>
+                        <button className="btn btn-secondary btn-sm" onClick={() => onCheck(registration.id, true)}><FiCheckCircle /> Fit</button>
+                        <button className="btn btn-outline btn-sm" onClick={() => onCheck(registration.id, false)}><FiXCircle /> Reject</button>
+                      </> : <span className="workflow-muted">Check completed</span>}
                     </td>
                   </tr>
                 ))}
@@ -928,13 +955,13 @@ function RefereeDashboard({
         </section>
       )}
 
-      {liveTrackHorses.length > 0 && (
+      {(!section || section === 'monitor') && liveTrackHorses.length > 0 && (
         <section className="workflow-panel unframed">
           <RaceTrack horses={liveTrackHorses} duration={60} isLive={selectedRace?.status === 'IN_PROGRESS'} />
         </section>
       )}
 
-      {simulation?.lanes?.length > 0 && (
+      {(!section || section === 'monitor') && simulation?.lanes?.length > 0 && (
         <section className="workflow-panel">
           <div className="workflow-panel-heading">
             <h3>Simulation State</h3>
@@ -955,7 +982,7 @@ function RefereeDashboard({
   );
 }
 
-function SpectatorDashboard({ data, predictionForm, setPredictionForm, onPrediction }) {
+function SpectatorDashboard({ data, predictionForm, setPredictionForm, onPrediction, section }) {
   const raceHorses = data.registrations
     .filter((registration) => Number(registration.raceId) === Number(predictionForm.raceId))
     .map((registration) => byId(data.horses, registration.horseId))
@@ -964,17 +991,17 @@ function SpectatorDashboard({ data, predictionForm, setPredictionForm, onPredict
 
   return (
     <>
-      <div className="dash-stats-grid">
+      {!section && <div className="dash-stats-grid">
         <StatCard icon={<FiFlag />} label="Open Races" value={data.races.filter((race) => race.status === 'REGISTRATION_OPEN').length} color="red" />
         <StatCard icon={<FiActivity />} label="Predictions" value={data.predictions.length} color="green" />
         <StatCard icon={<FiAward />} label="Top Horse Points" value={data.horseLeaderboard[0]?.totalPoints || 0} color="yellow" />
         <StatCard icon={<FiCheckCircle />} label="Official Races" value={data.races.filter((race) => race.status === 'OFFICIAL').length} />
-      </div>
+      </div>}
 
-      <div className="workflow-grid two">
-        <section className="workflow-panel">
+      {(!section || section === 'races' || section === 'guesses') && <div className="workflow-grid two">
+        {(!section || section === 'races') && <section className="workflow-panel">
           <div className="workflow-panel-heading">
-            <h3>Prediction</h3>
+            <h3>Race Guess</h3>
             <FiAward />
           </div>
           <form className="workflow-form" onSubmit={onPrediction}>
@@ -984,12 +1011,11 @@ function SpectatorDashboard({ data, predictionForm, setPredictionForm, onPredict
             <select className="form-select" value={predictionForm.predictedHorseId || ''} onChange={(e) => setPredictionForm({ ...predictionForm, predictedHorseId: Number(e.target.value) })}>
               {selectableHorses.map((horse) => <option key={horse.id} value={horse.id}>{horse.horseName}</option>)}
             </select>
-            <input className="form-input" type="number" min="1" value={predictionForm.wagerPoints} onChange={(e) => setPredictionForm({ ...predictionForm, wagerPoints: Number(e.target.value) })} />
-            <button className="btn btn-primary" type="submit">Submit Prediction</button>
+            <button className="btn btn-primary" type="submit">Save Guess</button>
           </form>
-        </section>
+        </section>}
 
-        <section className="workflow-panel">
+        {(!section || section === 'guesses') && <section className="workflow-panel">
           <div className="workflow-panel-heading">
             <h3>My Predictions</h3>
             <FiActivity />
@@ -1004,10 +1030,10 @@ function SpectatorDashboard({ data, predictionForm, setPredictionForm, onPredict
             ])}
             empty="No predictions yet"
           />
-        </section>
-      </div>
+        </section>}
+      </div>}
 
-      <section className="workflow-panel">
+      {(!section || section === 'leaderboard') && <section className="workflow-panel">
         <div className="workflow-panel-heading">
           <h3>Horse Leaderboard</h3>
           <FiAward />
@@ -1023,7 +1049,7 @@ function SpectatorDashboard({ data, predictionForm, setPredictionForm, onPredict
           ])}
           empty="No leaderboard data"
         />
-      </section>
+      </section>}
     </>
   );
 }

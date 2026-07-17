@@ -7,43 +7,64 @@ import com.equix.horseracingsystem.entity.User;
 import com.equix.horseracingsystem.repository.PasswordResetTokenRepository;
 import com.equix.horseracingsystem.repository.UserRepository;
 import com.equix.horseracingsystem.service.EmailService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth/password-reset")
 @CrossOrigin("*")
+@Tag(name = "Password Reset", description = "Password reset request and confirmation flow")
 public class PasswordResetController {
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final String frontendBaseUrl;
 
     public PasswordResetController(UserRepository userRepository,
                                    PasswordResetTokenRepository tokenRepository,
                                    PasswordEncoder passwordEncoder,
-                                   EmailService emailService) {
+                                   EmailService emailService,
+                                   @Value("${app.frontend-base-url}") String frontendBaseUrl) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.frontendBaseUrl = frontendBaseUrl.replaceAll("/+$", "");
     }
 
+    @Operation(summary = "Request a password reset",
+            description = "Sends a password reset email if the account exists. Always returns a generic message to prevent user enumeration.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Generic success message returned"),
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content)
+    })
+    @SecurityRequirements
     @PostMapping("/request")
+    @Transactional
     public String requestReset(@RequestBody PasswordResetRequest req) {
         // Always return generic success message to avoid user enumeration
         String generic = "If an account with that email exists, a reset link has been sent.";
 
         if (req.getEmail() == null || req.getEmail().isBlank()) return generic;
 
-        userRepository.findByEmail(req.getEmail()).ifPresent(user -> {
+        userRepository.findByEmailIgnoreCaseAndDeletedAtIsNull(req.getEmail()).ifPresent(user -> {
+            tokenRepository.findByUserIdAndUsedFalseAndExpiresAtAfter(user.getId(), LocalDateTime.now())
+                    .forEach(existing -> existing.setUsed(true));
             // generate secure token
             String token = generateSecureToken();
             String hashed = passwordEncoder.encode(token);
@@ -56,7 +77,7 @@ public class PasswordResetController {
             tokenRepository.save(prt);
 
             // build reset link (frontend will have route to consume token)
-            String resetLink = String.format("%s/reset-password?token=%s", "https://example.com", token);
+            String resetLink = String.format("%s/reset-password?token=%s", frontendBaseUrl, token);
 
             // send email (implementation may be logging during dev)
             emailService.sendPasswordReset(user.getEmail(), resetLink);
@@ -65,7 +86,15 @@ public class PasswordResetController {
         return generic;
     }
 
+    @Operation(summary = "Confirm password reset",
+            description = "Validates the reset token and updates the user's password")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Password updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired token", content = @Content)
+    })
+    @SecurityRequirements
     @PostMapping("/confirm")
+    @Transactional
     public String confirmReset(@RequestBody PasswordResetConfirmRequest req) {
         if (req.getToken() == null || req.getToken().isBlank()) {
             throw new IllegalArgumentException("Invalid token");
@@ -82,7 +111,7 @@ public class PasswordResetController {
         for (PasswordResetToken t : candidates) {
             if (passwordEncoder.matches(req.getToken(), t.getTokenHash())) {
                 matched = t;
-                user = userRepository.findById(t.getUserId()).orElse(null);
+                user = userRepository.findByIdAndDeletedAtIsNull(t.getUserId()).orElse(null);
                 break;
             }
         }
@@ -122,4 +151,3 @@ public class PasswordResetController {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(b);
     }
 }
-

@@ -20,6 +20,7 @@ public class User {
 
     private String username;
 
+    @Column(name = "password_hash", nullable = false)
     private String password;
 
     @Column(name = "full_name")
@@ -34,7 +35,8 @@ public class User {
     @Column(name = "reward_points")
     private Integer rewardPoints;
 
-    private Boolean enabled;
+    @Column(nullable = false)
+    private String status;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
@@ -44,4 +46,21 @@ public class User {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @PrePersist
+    void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        if (createdAt == null) createdAt = now;
+        if (updatedAt == null) updatedAt = now;
+        if (rewardPoints == null) rewardPoints = 0;
+        if (status == null) status = "PENDING";
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
