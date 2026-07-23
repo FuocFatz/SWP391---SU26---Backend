@@ -1,397 +1,415 @@
-# EquiX Horse Racing Tournament Management System
+<div align="center">
 
-![EquiX Banner](https://img.shields.io/badge/EquiX-Horse_Racing_System-2ecc71?style=for-the-badge)
+# EquiX
 
-## 1. Project Overview
+### Horse Racing Tournament Management System
 
-**EquiX** is a comprehensive, full-stack Horse Racing Tournament Management System designed to streamline the operations of horse racing events. The platform facilitates the complete lifecycle of a horse race, from horse registration and jockey pairing to race simulation, result confirmation, and spectator predictions.
+An end-to-end SWP391 project for managing horse-racing tournaments, role-based operations, live race workflows, spectator predictions, points, and rewards.
 
-The business purpose of EquiX is to provide a digital ecosystem where various stakeholders can interact securely and efficiently.
+![Java](https://img.shields.io/badge/Java-17-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.14-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react&logoColor=111111)
+![Vite](https://img.shields.io/badge/Vite-8.0-646CFF?style=flat-square&logo=vite&logoColor=white)
+![SQL Server](https://img.shields.io/badge/SQL%20Server-2019%2B-CC2927?style=flat-square&logo=microsoftsqlserver&logoColor=white)
+![Course](https://img.shields.io/badge/FPT%20University-SWP391-F36F21?style=flat-square)
 
-### Stakeholders & Roles
-* **Admin**: System administrators who oversee the platform, create tournaments, manage races, and approve horse registrations.
-* **Horse Owner**: Users who register their horses, manage their horse profiles, and invite jockeys to ride their horses in specific races.
-* **Jockey**: Professional riders who receive invitations from owners to participate in races and can accept or decline them.
-* **Referee**: Race officials responsible for health checks of horses, starting races, and confirming official race results.
-* **Spectator**: Fans who view race schedules, monitor leaderboards, and place predictions on race outcomes for reward points.
+**SE1916 · Group 06 · Final Project 2026**
 
----
+</div>
 
-## 2. Features
+![EquiX home page](docs/demo-screenshots/final-demo/01-guest-home-desktop.png)
 
-### Authentication
-* **Login**: Secure user authentication returning a JWT token.
-* **Register**: Account creation with role selection.
-* **JWT Authentication**: Stateless request validation using Bearer tokens.
-* **Role-based Access**: Endpoints and UI elements restricted based on user roles (Admin, Owner, Jockey, Referee, Spectator).
+## Table of contents
 
-### User Management
-* **Create User**: Add new users to the system.
-* **Update User**: Modify existing user details (profile, role, status).
-* **Delete User**: Remove users from the platform.
-* **Search User**: Fetch users by ID, role, or list all users.
+- [Overview](#overview)
+- [Core features](#core-features)
+- [Roles and permissions](#roles-and-permissions)
+- [System architecture](#system-architecture)
+- [Race lifecycle](#race-lifecycle)
+- [Database design](#database-design)
+- [Technology stack](#technology-stack)
+- [Project structure](#project-structure)
+- [Getting started](#getting-started)
+- [Quick Login](#quick-login)
+- [Testing](#testing)
+- [Demo workflow](#demo-workflow)
+- [Documentation](#documentation)
+- [Security notes](#security-notes)
 
-### Horse Management
-* **Create Horse**: Owners can add their horses with detailed stats (speed, stamina, breed, etc.).
-* **Update Horse**: Modify horse attributes and health status.
-* **Delete Horse**: Remove a horse from the registry.
-* **View Horses**: Fetch all horses or filter by owner.
+## Overview
 
-### Tournament Management
-* **Create Tournament**: Set up new multi-race tournaments.
-* **View Tournament**: Browse existing tournaments.
-* **Update Tournament**: Edit tournament details and status.
+EquiX replaces disconnected race-management activities with one traceable workflow. The system coordinates accounts, horses, jockey invitations, pairings, tournaments, registrations, referee checks, race simulation, signed reports, official results, spectator predictions, points, rewards, notifications, and audit history.
 
-### Race Management
-* **Create Race**: Define race parameters (distance, surface, prize pool).
-* **Start Race**: Referees transition races to `IN_PROGRESS` status.
-* **Simulate Race**: Run race simulations with algorithmic positioning based on horse stats.
-* **Confirm Results**: Referees submit official finish positions and times.
-* **Race Status Updates**: Track races from `REGISTRATION_OPEN` to `OFFICIAL`.
+The application provides five role-specific workspaces:
 
-### Registration Management
-* **Horse Registration**: Owners enter their horses into specific races.
-* **Owner Confirmation**: Final owner sign-off on race entries.
-* **Referee Checks**: Health and eligibility checks (`FIT` / `NOT_FIT`) before the race.
-* **Approval Workflow**: Admin approval of pending registrations.
-* **Withdrawal**: Ability to withdraw a registered horse with a reason.
+- **Administrator** — governs accounts, tournaments, races, referee assignments, approvals, results, and rewards.
+- **Horse Owner** — creates horses, invites jockeys, manages pairings, and registers eligible pairs.
+- **Jockey** — responds to invitations and follows accepted assignments and race schedules.
+- **Referee** — performs pre-race checks, controls races, records incidents, and signs reports.
+- **Spectator** — browses races, submits predictions, earns points, exchanges rewards, and redeems gift codes.
 
-### Jockey Invitation
-* **Invite Jockey**: Owners send race-specific invitations to jockeys.
-* **Accept Invitation**: Jockeys confirm their participation.
-* **Reject Invitation**: Jockeys decline invitations.
+The current business behavior follows [`EquiX_Business_Logic_Definitive_v4.md`](EquiX_Business_Logic_Definitive_v4.md).
 
-### Prediction System
-* **Place Predictions**: Spectators wager reward points on expected winners.
-* **View Predictions**: Track pending and settled predictions.
-* **Automatic Settlement**: Wagers are evaluated and rewarded upon official race results.
+## Core features
 
-### Notification System
-* **View Notifications**: In-app alerts for invitations, race starts, and prediction results.
-* **Mark As Read**: Update notification status.
+- JWT authentication and server-side role-based access control.
+- Database-backed Quick Login for local demonstrations.
+- Account approval, role management, profile, avatar, password, and email-change flows.
+- Horse CRUD, health status, portrait upload, and deletion safeguards.
+- Jockey invitation and accepted horse–jockey pairing contracts.
+- Tournament and race creation, scheduling, referee assignment, cancellation, rescheduling, and deletion controls.
+- Registration approval, owner confirmation, withdrawal, referee clearance, bulk approval, and DNF handling.
+- Live race simulation with WebSocket updates.
+- Incident log, provisional results, signed referee report, revision loop, and Admin officialization.
+- Horse and jockey leaderboards.
+- One prediction per spectator per race with point settlement.
+- 500 starting points for newly created accounts.
+- Point-based reward exchange, one-time gift codes, fulfillment tracking, and notifications.
+- Toast notifications, persistent notification center, and audit trail.
+- Responsive Vietnamese user interface for desktop and mobile.
+- Swagger/OpenAPI documentation and automated backend/frontend tests.
 
-### Leaderboards
-* **Horse Leaderboard**: Ranked by total points, wins, and top-3 finishes.
-* **Jockey Leaderboard**: Ranked by accumulated race points.
+## Roles and permissions
 
----
+| Role | Main responsibilities |
+|---|---|
+| `ADMIN` | Manage users, tournaments, races, referees, registrations, official results, analytics, and reward fulfillment |
+| `HORSE_OWNER` | Manage owned horses, invite jockeys, create pairings, register or withdraw eligible race entries |
+| `JOCKEY` | Accept or decline invitations and review active pairings and race assignments |
+| `REFEREE` | Clear registrations, start and complete assigned races, record incidents, submit signed reports |
+| `SPECTATOR` | Browse races, predict one registered pair per race, earn points, exchange and redeem rewards |
 
-## 3. Technology Stack
+Frontend route protection improves the user experience, while every sensitive operation is authorized again by Spring Security and the service layer.
 
-### Backend
-* **Java 17**: Core language.
-* **Spring Boot 3.5.x**: Application framework.
-* **Spring Security 6**: Authentication and access control.
-* **JWT (JSON Web Tokens)**: Stateless API security.
-* **Hibernate / Spring Data JPA**: ORM and database interactions.
-* **SQL Server**: Relational database management system.
+## System architecture
 
-### Frontend
-* **React 19**: UI library.
-* **Vite**: Next-generation frontend tooling and bundler.
-* **React Router DOM**: Client-side routing.
-* **Fetch API**: Centralized API client wrapper.
-* **React Bootstrap & Vanilla CSS**: Styling and responsive design.
-
-### Documentation
-* **Swagger / OpenAPI 3**: Automated API documentation and testing interface.
-
----
-
-## 4. Database
-
-The database uses SQL Server and is designed to handle the complex relationships between stakeholders, horses, and races.
-
-### Entity Relationship Overview (ERD)
-
-* **User**: The central entity representing all stakeholders. Has a one-to-many relationship with Horses (Owner), Registrations (Owner/Jockey), and Predictions (Spectator).
-* **Horse**: Belongs to a User (Owner). Can have many RaceRegistrations.
-* **Tournament**: Groups multiple Races.
-* **Race**: The core event. Belongs to a Tournament. Has a designated Referee (User). Contains many RaceRegistrations, Predictions, and RaceResults.
-* **RaceRegistration**: The pivot table linking a Race, a Horse, an Owner, and a Jockey. Tracks the workflow status of an entry.
-* **JockeyInvitation**: Workflow entity where an Owner invites a Jockey to a specific Race/Horse combination.
-* **RaceResult**: Official outcome of a Race for a specific Registration, detailing finish position, time, and points awarded.
-* **Prediction**: A Spectator's wager on a specific Horse in a Race.
-* **Notification**: System alerts targeted at a specific User.
-* **AuditLog**: System-wide tracking of critical events (optional tracking).
-
----
-
-## 5. API Documentation
-
-*All non-auth endpoints require `Authorization: Bearer <token>`.*
-
-### Authentication (`/api/auth`)
-* `POST /api/auth/register` - Register a new user.
-* `POST /api/auth/login` - Authenticate and receive JWT.
-* `POST /api/auth/password-reset/request` - Request password reset link.
-* `POST /api/auth/password-reset/confirm` - Confirm password reset.
-
-### Users (`/api/v1/users`)
-* `GET /api/v1/users` - Get all users.
-* `POST /api/v1/users` - Create a new user.
-* `GET /api/v1/users/{id}` - Get user by ID.
-* `PUT /api/v1/users/{id}` - Update user.
-* `DELETE /api/v1/users/{id}` - Delete user.
-* `GET /api/v1/users/role/{role}` - Get users by specific role.
-
-### Horses (`/api/horses`)
-* `GET /api/horses` - Get all horses.
-* `POST /api/horses` - Register a new horse.
-* `GET /api/horses/{id}` - Get horse by ID.
-* `PUT /api/horses/{id}` - Update a horse.
-* `DELETE /api/horses/{id}` - Delete a horse.
-* `GET /api/horses/owner/{ownerId}` - Get horses belonging to an owner.
-
-### Races (`/api/races`)
-* `GET /api/races` - Get all races.
-* `POST /api/races` - Create a new race.
-* `GET /api/races/{id}` - Get race by ID.
-* `PUT /api/races/{id}` - Update a race.
-* `PATCH /api/races/{id}/status` - Update race status.
-* `GET /api/races/{id}/registrations` - Get registrations for a race.
-* `POST /api/races/{id}/registrations` - Register a horse for a race.
-* `POST /api/races/{id}/start` - Start a race.
-* `GET /api/races/{id}/simulate` - Simulate race progress.
-* `GET /api/races/{id}/results` - Get final results.
-* `POST /api/races/{id}/results` - Confirm official results.
-* `GET /api/races/{id}/predictions` - Get spectator predictions.
-* `POST /api/races/{id}/predictions` - Place a prediction.
-* `GET /api/races/leaderboard/horses` - Get global horse leaderboard.
-* `GET /api/races/leaderboard/jockeys` - Get global jockey leaderboard.
-
-### Tournaments (`/api/tournaments`)
-* `GET /api/tournaments` - Get all tournaments.
-* `POST /api/tournaments` - Create a tournament.
-* `GET /api/tournaments/{id}` - Get tournament by ID.
-* `PUT /api/tournaments/{id}` - Update a tournament.
-
-### Jockey Invitations (`/api/invitations`)
-* `GET /api/invitations` - Get all invitations.
-* `POST /api/invitations` - Send a jockey invitation.
-* `PATCH /api/invitations/{id}/respond` - Accept/decline an invitation.
-
-### Race Registrations (`/api/registrations`)
-* `GET /api/registrations` - Get all registrations.
-* `PATCH /api/registrations/{id}/approve` - Admin approves registration.
-* `PATCH /api/registrations/{id}/owner-confirm` - Owner confirms entry.
-* `PATCH /api/registrations/{id}/withdraw` - Withdraw registration.
-* `PATCH /api/registrations/{id}/referee-check` - Referee logs health check.
-
-### Predictions (`/api/predictions`)
-* `GET /api/predictions` - Get predictions.
-* `POST /api/predictions` - Place a prediction.
-
-### Notifications (`/api/notifications`)
-* `GET /api/notifications` - Get user notifications.
-* `PATCH /api/notifications/{id}/read` - Mark notification as read.
-
----
-
-## 6. Installation Guide
-
-### Prerequisites
-* Java 17 Development Kit (JDK)
-* Apache Maven
-* Microsoft SQL Server
-* Node.js & npm (for frontend)
-
-### Backend Setup
-
-1. **Database Creation**: Create a SQL Server database named `EquiX`.
-   ```sql
-   CREATE DATABASE EquiX;
-   ```
-2. **Configuration**: Ensure `application.properties` matches your SQL Server credentials (see Configuration section).
-3. **Build & Run**:
-   ```bash
-   cd horse-racing-system
-   ./mvnw clean install -DskipTests
-   ./mvnw spring-boot:run
-   ```
-4. **Access Swagger**: Open your browser to `http://localhost:9090/swagger-ui.html`
-
-### Frontend Setup
-
-1. **Install Dependencies**:
-   ```bash
-   cd equix-frontend
-   npm install
-   ```
-2. **Start Development Server**:
-   ```bash
-   npm run dev
-   ```
-3. **Access App**: Open your browser to `http://localhost:5173/` (or the port specified by Vite).
-
----
-
-## 7. Configuration
-
-### Backend (`src/main/resources/application.properties`)
-
-```properties
-server.port=9090
-
-# Database Configuration
-spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=EquiX;encrypt=true;trustServerCertificate=true
-spring.datasource.username=equix_user
-spring.datasource.password=123456
-spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
-
-# Hibernate
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.database-platform=org.hibernate.dialect.SQLServerDialect
-
-# JWT Configuration (Externalize in production!)
-# Secret is located in com.equix.horseracingsystem.config.JwtUtil
+```mermaid
+flowchart LR
+    U[Browser] --> UI[React 19 + Vite 8]
+    UI -->|REST / JSON + JWT| API[Spring Boot 3.5 REST API]
+    UI <-->|WebSocket live updates| WS[Race WebSocket broker]
+    WS --> API
+    API --> SEC[Spring Security + JWT]
+    API --> SVC[Transactional service layer]
+    SVC --> JPA[Spring Data JPA]
+    JPA --> DB[(Microsoft SQL Server 2019+)]
+    SVC --> FS[Local avatar and horse-image storage]
+    SVC --> N[Notifications and audit logs]
 ```
 
-### Frontend Environment (`equix-frontend/.env` - Create if needed)
+The production runtime uses **Microsoft SQL Server only**. H2 is scoped to automated tests and does not replace the EquiX runtime database.
 
-```env
-VITE_API_BASE_URL=http://localhost:9090/api
+## Race lifecycle
+
+```mermaid
+flowchart LR
+    D[DRAFT] --> RO[REGISTRATION_OPEN]
+    RO --> RC[REGISTRATION_CLOSED]
+    RC --> S[STANDBY]
+    S --> IP[IN_PROGRESS]
+    IP --> C[COMPLETED]
+    C --> RR[REPORT_READY]
+    RR --> O[OFFICIAL]
+    RR --> REV[REVISION_REQUIRED]
+    REV --> RR
+    D -. before start .-> X[CANCELLED]
+    RO -. before start .-> X
+    RC -. before start .-> X
+    S -. before start .-> X
 ```
 
----
+Important workflow rules:
 
-## 8. Swagger
+1. A race belongs to a tournament and must have a responsible referee.
+2. A horse owner registers an accepted horse–jockey pairing, not a horse alone.
+3. Registration and schedule rules are validated on the server.
+4. A referee can start a race only after at least **six** registrations are `CLEARED_TO_RACE`.
+5. Completing a race creates provisional results; it does not make them official.
+6. The referee submits a signed report. The Admin either requests revision or declares the result `OFFICIAL`.
+7. Officialization settles predictions, points, rewards, notifications, rankings, and audit records transactionally.
+8. `OFFICIAL` is a locked terminal state. Cancellation is allowed only before the race starts.
 
-Interactive API documentation is automatically generated.
-* **Swagger UI**: [http://localhost:9090/swagger-ui/index.html](http://localhost:9090/swagger-ui/index.html)
-* **OpenAPI JSON**: [http://localhost:9090/v3/api-docs](http://localhost:9090/v3/api-docs)
+## Database design
 
-To test secure endpoints in Swagger, login via `/api/auth/login`, copy the `token`, click the **Authorize** button at the top of the Swagger UI, and enter the token.
+The `races` table stores race configuration and current workflow state. It does **not** store every output produced by a race. Child tables keep changing business data normalized and traceable.
 
----
+```mermaid
+erDiagram
+    USERS ||--o{ HORSES : owns
+    USERS ||--o{ PAIRING_CONTRACTS : participates
+    HORSES ||--o{ PAIRING_CONTRACTS : paired_in
+    TOURNAMENTS ||--o{ RACES : contains
+    RACES ||--o{ RACE_REGISTRATIONS : receives
+    PAIRING_CONTRACTS ||--o{ RACE_REGISTRATIONS : enters
+    RACES ||--o{ RACE_RESULTS : produces
+    RACES ||--o{ PREDICTIONS : receives
+    USERS ||--o{ PREDICTIONS : submits
+    RACES ||--o{ RACE_NOTES : records
+    USERS ||--o{ NOTIFICATIONS : receives
+    USERS ||--o{ REWARD_HISTORY : owns
+    REWARD_TYPES ||--o{ REWARD_HISTORY : classifies
+```
 
-## 9. Test Accounts
+| Data area | Main tables | Purpose |
+|---|---|---|
+| Identity | `users`, `password_reset_tokens`, `email_change_tokens` | Authentication, account state, profile, password recovery, and email change verification |
+| Horse and pairing | `horses`, `jockey_invitations`, `pairing_contracts` | Ownership, invitation decisions, and accepted pair contracts |
+| Race operations | `tournaments`, `races`, `race_registrations`, `race_notes` | Configuration, scheduling, workflow, entries, checks, incidents, and reports |
+| Results and engagement | `race_results`, `predictions`, `reward_types`, `reward_history` | Rankings, guesses, point settlement, reward codes, and fulfillment |
+| Cross-cutting | `notifications`, `audit_logs` | User communication and traceability |
 
-Upon initialization, you may seed the database with these test accounts (or create them via the Register endpoint). All default passwords should be configured to `123456` for testing.
+Primary keys, foreign keys, unique constraints, check constraints, transactional services, and optimistic conflict checks protect multi-table business operations.
 
-* **Admin**: `admin@equix.vn` (Role: `ADMIN`)
-* **Owner**: `owner@equix.vn` (Role: `OWNER`)
-* **Jockey**: `jockey@equix.vn` (Role: `JOCKEY`)
-* **Referee**: `referee@equix.vn` (Role: `REFEREE`)
-* **Spectator**: `spectator@equix.vn` (Role: `SPECTATOR`)
+## Technology stack
 
----
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, React Router 7, Vite 8, Bootstrap 5, React Bootstrap, React Icons |
+| Backend | Java 17, Spring Boot 3.5, Spring Web, Spring Security, Spring Data JPA, Bean Validation |
+| Authentication | JWT with JJWT 0.12, BCrypt password hashing, role-based authorization |
+| Realtime | Spring WebSocket and frontend live-race client |
+| Database | Microsoft SQL Server 2019 or newer |
+| API documentation | Springdoc OpenAPI and Swagger UI |
+| Testing | JUnit, Spring Boot Test, Spring Security Test, Node test runner |
 
-## 10. Project Structure
+## Project structure
 
 ```text
 horse-racing-system/
-├── src/main/java/com/equix/horseracingsystem/
-│   ├── config/          # JWT, Security, CORS, and OpenAPI configurations
-│   ├── controller/      # REST API Controllers exposing endpoints
-│   ├── dto/             # Data Transfer Objects for requests and responses
-│   ├── entity/          # JPA Entities mapping to SQL Server tables
-│   ├── repository/      # Spring Data JPA Repositories
-│   └── service/         # Business logic and workflow services
-├── src/main/resources/
-│   └── application.properties # Backend config
-├── pom.xml              # Maven dependencies
-└── README.md            # Project documentation
-
-equix-frontend/
 ├── src/
-│   ├── assets/          # Static assets (images, icons)
-│   ├── components/      # Reusable React components (Navbar, Cards, etc.)
-│   ├── contexts/        # React Contexts (AuthContext)
-│   ├── layouts/         # Page wrappers (DashboardLayout, PublicLayout)
-│   ├── pages/           # Main route views (Login, Dashboard, Races)
-│   ├── routes/          # Application routing logic (AppRoutes.jsx)
-│   └── services/        # API client wrapper (api.js)
-├── package.json         # NPM dependencies
-└── vite.config.js       # Vite bundler config
+│   ├── main/java/com/equix/horseracingsystem/
+│   │   ├── config/          # Security, JWT, WebSocket, demo initialization
+│   │   ├── controller/      # REST API endpoints
+│   │   ├── dto/             # Validated request and response contracts
+│   │   ├── entity/          # JPA domain model
+│   │   ├── realtime/        # Live race event publication
+│   │   ├── repository/      # Spring Data repositories
+│   │   └── service/         # Business rules and transactions
+│   ├── main/resources/      # Single runtime application.properties
+│   └── test/                # Integration and business-workflow tests
+├── equix-frontend/
+│   ├── src/components/      # Reusable UI components
+│   ├── src/contexts/        # Authentication state
+│   ├── src/layouts/         # Public and role dashboards
+│   ├── src/pages/           # Feature pages
+│   ├── src/routes/          # Route and role guards
+│   ├── src/services/        # REST and realtime clients
+│   └── src/utils/           # Validation, roles, localization, race mapping
+├── docs/
+│   ├── database/            # SQL login, migrations, seeds, transfer guide
+│   └── demo-screenshots/    # Desktop and mobile evidence
+├── EquiX_Business_Logic_Definitive_v4.md
+├── HUONG_DAN_CHAY_VA_DEMO_EQUIX.md
+├── EQUIX_CAM_NANG_HOC_PROJECT_VA_VAN_DAP.md
+├── pom.xml
+└── README.md
 ```
 
----
+The Spring Boot backend is located at the repository root. There is no separate `equix-backend` directory.
 
-## 11. Build & Deployment
+## Getting started
+
+### Prerequisites
+
+- JDK 17
+- Node.js 20 or newer and npm
+- Microsoft SQL Server 2019 or newer
+- SQL Server Management Studio or `sqlcmd`
+- Git
+
+Confirm the local tools:
+
+```powershell
+java -version
+node --version
+npm --version
+```
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/FuocFatz/SWP391---SU26---Backend.git
+cd SWP391---SU26---Backend
+```
+
+### 2. Prepare SQL Server
+
+The backend uses `spring.jpa.hibernate.ddl-auto=validate`, so it validates an existing schema instead of building a complete empty database automatically.
+
+1. Restore a valid `EquiX` database backup in SQL Server, or import the complete project schema and data.
+2. Enable **SQL Server and Windows Authentication mode**.
+3. Enable TCP/IP on port `1433` when required.
+4. Run [`docs/database/create-equix-login.sql`](docs/database/create-equix-login.sql) with an administrative SQL Server account.
+5. Apply the scripts in [`docs/database/migrations`](docs/database/migrations) in filename order when upgrading an older EquiX database.
+
+The local demonstration defaults are:
+
+| Setting | Value |
+|---|---|
+| Server | `localhost:1433` |
+| Database | `EquiX` |
+| SQL login | `equix_user` |
+| SQL password | `123456` |
+
+These credentials are intended for local academic demonstration only. Replace them outside a trusted local environment.
+
+### 3. Configure and run the backend
+
+The backend reads a single runtime configuration file: [`src/main/resources/application.properties`](src/main/resources/application.properties). Environment variables override its local defaults.
+
+PowerShell example:
+
+```powershell
+$env:EQUIX_DB_URL='jdbc:sqlserver://localhost:1433;databaseName=EquiX;encrypt=true;trustServerCertificate=true'
+$env:EQUIX_DB_USERNAME='equix_user'
+$env:EQUIX_DB_PASSWORD='123456'
+$env:EQUIX_JWT_SECRET='replace-with-at-least-32-random-bytes'
+$env:EQUIX_FRONTEND_BASE_URL='http://localhost:5173'
+$env:EQUIX_QUICK_LOGIN_ENABLED='true'
+
+.\mvnw.cmd spring-boot:run
+```
+
+macOS/Linux example:
+
+```bash
+export EQUIX_DB_URL='jdbc:sqlserver://localhost:1433;databaseName=EquiX;encrypt=true;trustServerCertificate=true'
+export EQUIX_DB_USERNAME='equix_user'
+export EQUIX_DB_PASSWORD='123456'
+export EQUIX_JWT_SECRET='replace-with-at-least-32-random-bytes'
+export EQUIX_FRONTEND_BASE_URL='http://localhost:5173'
+export EQUIX_QUICK_LOGIN_ENABLED='true'
+
+./mvnw spring-boot:run
+```
+
+Backend endpoints:
+
+| Service | URL |
+|---|---|
+| REST API | `http://localhost:9090/api` |
+| Swagger UI | `http://localhost:9090/swagger-ui.html` |
+| OpenAPI JSON | `http://localhost:9090/v3/api-docs` |
+
+### 4. Configure and run the frontend
+
+Open another terminal:
+
+```powershell
+cd equix-frontend
+Copy-Item .env.example .env.local
+npm install
+```
+
+Set these values in `equix-frontend/.env.local`:
+
+```dotenv
+VITE_API_BASE_URL=http://localhost:9090/api
+VITE_ENABLE_QUICK_LOGIN=true
+```
+
+Then start Vite:
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:5173`.
+
+## Quick Login
+
+Quick Login is designed for local demonstration. It loads active accounts directly from SQL Server, lets the presenter choose an account under one of the five roles, and asks the backend to issue a real JWT session.
+
+Seed the five standard local accounts by running:
+
+```text
+docs/database/seed-quick-login.sql
+```
+
+All seeded accounts use `12345` for normal email/password login. Quick Login itself selects a database account and does not expose its password to the frontend.
+
+Both flags must be enabled:
+
+```properties
+# Backend
+EQUIX_QUICK_LOGIN_ENABLED=true
+```
+
+```dotenv
+# Frontend
+VITE_ENABLE_QUICK_LOGIN=true
+```
+
+> Disable Quick Login in production. Hiding only the frontend buttons is insufficient; the backend endpoint must also be disabled.
+
+For a larger presentation-ready data set, review [`docs/database/seed-presentation-ready.sql`](docs/database/seed-presentation-ready.sql) before running it.
+
+## Testing
 
 ### Backend
-To package the Spring Boot application into an executable JAR:
-```bash
-./mvnw clean package -DskipTests
-java -jar target/horse-racing-system-0.0.1-SNAPSHOT.jar
+
+```powershell
+.\mvnw.cmd test
 ```
+
+The test profile uses the temporary H2 database configured in `src/test/resources/application-test.properties`. It does not modify the runtime SQL Server database.
 
 ### Frontend
-To build the React application for production:
+
 ```bash
+cd equix-frontend
+npm test
+npm run lint
 npm run build
 ```
-This generates optimized static files in the `dist` folder, which can be served by Nginx, Apache, or deployed to Vercel/Netlify.
 
----
+The automated suites cover authentication, authorization, notifications, race workflows, rewards, avatar validation, role mapping, race-track mapping, and Vietnamese localization.
 
-## 12. Team Information
+## Demo workflow
 
-### Project Team
+A complete presentation can follow this order:
 
-| Student ID | Full Name        | Role                             | Technology        |
-| ---------- | ---------------- | -------------------------------- | ----------------- |
-| SE161980   | Mai Chí Huy      | Team Leader / Frontend Developer | ReactJS           |
-| SE180221   | Võ Quốc Đạt      | Backend Developer                | Java, Spring Boot |
-| SE190419   | Trương Tấn Phước | Backend Developer                | Java, Spring Boot |
-| SE196402   | Võ Kế Trí        | Backend Developer                | Java, Spring Boot |
+1. **Administrator** creates a tournament and race, assigns a referee, and opens registration.
+2. **Horse Owner** creates a horse and invites a jockey.
+3. **Jockey** accepts the invitation, producing an active pairing contract.
+4. **Horse Owner** registers the accepted pair in the open race.
+5. **Administrator** approves the registration and closes registration.
+6. **Referee** clears at least six entries and moves the race to standby.
+7. **Spectator** submits one prediction before the race starts.
+8. **Referee** starts, simulates, completes the race, records incidents, and submits a signed report.
+9. **Administrator** reviews the report and declares the result official.
+10. **Spectator** checks settled points, notifications, reward exchange, and the one-time gift code.
 
-### Team Responsibilities
+The full Vietnamese runbook is available in [`HUONG_DAN_CHAY_VA_DEMO_EQUIX.md`](HUONG_DAN_CHAY_VA_DEMO_EQUIX.md).
 
-#### Mai Chí Huy (Team Leader)
+## Screenshots
 
-* Project planning and team coordination
-* Frontend architecture design
-* ReactJS development
-* UI/UX implementation
-* Frontend integration with backend APIs
+| Quick Login | Administrator workspace |
+|---|---|
+| ![Quick Login](docs/demo-screenshots/final-demo/03-quick-login-five-roles.png) | ![Admin dashboard](docs/demo-screenshots/final-demo/04-admin-dashboard.png) |
 
-#### Võ Quốc Đạt
+| Referee workflow | Spectator rewards |
+|---|---|
+| ![Referee check](docs/demo-screenshots/final-demo/08-referee-check-completed.png) | ![Spectator rewards](docs/demo-screenshots/final-demo/11-spectator-rewards-claimed.png) |
 
-* Backend development
-* REST API implementation
-* Business logic development
-* Database integration
+## Documentation
 
-#### Trương Tấn Phước
+- [Business logic v4](EquiX_Business_Logic_Definitive_v4.md)
+- [Detailed run and demo guide](HUONG_DAN_CHAY_VA_DEMO_EQUIX.md)
+- [Project study and defense handbook](EQUIX_CAM_NANG_HOC_PROJECT_VA_VAN_DAP.md)
+- [SQL Server transfer guide](docs/database/SQL_SERVER_TRANSFER_GUIDE.md)
+- [Database scripts](docs/database)
+- [Demo screenshots](docs/demo-screenshots)
 
-* Backend development
-* Spring Security & JWT Authentication
-* API integration
-* Swagger/OpenAPI documentation
-* System configuration and deployment
+## Security notes
 
-#### Võ Kế Trí
+- Never commit real database passwords, JWT secrets, personal data, `.env.local`, database backups, or uploaded user files.
+- Change all demonstration credentials before deploying outside localhost.
+- Keep `EQUIX_QUICK_LOGIN_ENABLED=false` and `VITE_ENABLE_QUICK_LOGIN=false` in production.
+- Use a strong random JWT secret and HTTPS in deployed environments.
+- Restrict SQL Server to the required network and grant the application account only the permissions it needs.
+- Validate uploaded files and store production uploads outside the source repository.
 
-* Backend development
-* Database management
-* Entity relationship implementation
-* Business workflow development
+## Academic context
 
----
-
-### Academic Information
-
-**Course:** SWP391 – Software Development Project
-
-**Project Name:** EquiX Horse Racing Tournament Management System
-
-**Institution:** FPT University
-
-**Semester:** Summer 2026
-
----
-
-### Acknowledgements
-
-The EquiX Horse Racing Tournament Management System was developed as part of the SWP391 Software Development Project course. The team would like to thank the course instructors and reviewers for their valuable guidance and support throughout the project lifecycle.
-
-
-## 13. Future Improvements
-
-* **WebSockets Integration**: Implement real-time updates for race simulations, leaderboards, and instant notifications using Spring WebSockets/STOMP.
-* **Payment Gateway**: Integrate Stripe/PayPal to allow real-world transactions for race prize pools and spectator wagering.
-* **Advanced Analytics**: Dashboard charts and data visualization for horse performance history and betting trends.
-* **Mobile Application**: Port the React frontend to React Native for dedicated iOS/Android apps for Jockeys and Owners on the go.
-* **Externalize Secrets**: Move JWT secrets and database passwords to environment variables or a secure vault for production deployment.
+EquiX was developed as an SWP391 software project at FPT University. The repository demonstrates requirements traceability, layered full-stack architecture, normalized SQL Server data design, role-based security, transactional business rules, automated verification, and a repeatable multi-role presentation workflow.
