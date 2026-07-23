@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { FiSearch, FiFilter } from 'react-icons/fi';
 import { api } from '../services/api';
+import { subscribeRaceRealtime } from '../services/raceRealtime';
 import RaceCard from '../components/RaceCard/RaceCard';
 import './RacesPage.css';
 
-const statusFilters = ['All', 'DRAFT', 'REGISTRATION_OPEN', 'REGISTRATION_CLOSED', 'STANDBY', 'IN_PROGRESS', 'COMPLETED', 'REPORT_READY', 'OFFICIAL', 'CANCELLED'];
+const statusFilters = ['All', 'DRAFT', 'REGISTRATION_OPEN', 'REGISTRATION_CLOSED', 'STANDBY', 'IN_PROGRESS', 'COMPLETED', 'REPORT_READY', 'REVISION_REQUIRED', 'OFFICIAL', 'CANCELLED'];
 const typeFilters = ['All', 'SPRINT', 'MILE', 'MEDIUM', 'LONG'];
 
 function RacesPage() {
@@ -14,6 +15,7 @@ function RacesPage() {
   const [typeFilter, setTypeFilter] = useState('All');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [realtimeStatus, setRealtimeStatus] = useState('connecting');
 
   useEffect(() => {
     const fetchRaces = async () => {
@@ -24,7 +26,7 @@ function RacesPage() {
         setError('');
       } catch (err) {
         console.error('Failed to fetch races:', err);
-        setError('Failed to load races');
+        setError('Không thể tải danh sách cuộc đua');
         setRaces([]);
       } finally {
         setLoading(false);
@@ -33,6 +35,16 @@ function RacesPage() {
 
     fetchRaces();
   }, []);
+
+  useEffect(() => subscribeRaceRealtime((event) => {
+    if (event?.type !== 'RACE_STATE' || !event.payload?.id) return;
+    setRaces((current) => {
+      const exists = current.some((race) => Number(race.id) === Number(event.payload.id));
+      return exists
+        ? current.map((race) => Number(race.id) === Number(event.payload.id) ? event.payload : race)
+        : [...current, event.payload];
+    });
+  }, setRealtimeStatus), []);
 
   const filtered = races.filter((race) => {
     const matchSearch = String(race.name || '').toLowerCase().includes(search.toLowerCase());
@@ -45,8 +57,9 @@ function RacesPage() {
     <div className="races-page" id="races-page">
       <div className="container">
         <div className="races-page-header">
-          <h1 className="races-page-title">All Races</h1>
-          <p className="races-page-subtitle">Browse upcoming, live, and completed races</p>
+          <h1 className="races-page-title">Tất cả cuộc đua</h1>
+          <p className="races-page-subtitle">Xem các cuộc đua sắp diễn ra, đang diễn ra, đã hoàn thành hoặc đã hủy</p>
+          <span className={`races-realtime-status ${realtimeStatus}`}><i />{realtimeStatus === 'connected' ? 'Đã kết nối cập nhật trực tiếp' : 'Đang kết nối cập nhật trực tiếp…'}</span>
         </div>
 
         {error && (
@@ -56,50 +69,59 @@ function RacesPage() {
         )}
 
         <div className="races-filters">
-          <div className="races-search">
-            <FiSearch className="races-search-icon" />
-            <input
-              type="text"
-              className="form-input races-search-input"
-              placeholder="Search races..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              id="race-search"
-            />
-          </div>
+          <label className="form-field races-search-field">
+            <span className="form-field-label">Tìm cuộc đua</span>
+            <span className="races-search">
+              <FiSearch className="races-search-icon" aria-hidden="true" />
+              <input
+                type="text"
+                className="form-input races-search-input"
+                placeholder="Tìm theo tên cuộc đua"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                id="race-search"
+              />
+            </span>
+          </label>
 
           <div className="races-filter-group">
-            <FiFilter className="races-filter-icon" />
-            <select
-              className="form-select races-filter-select"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              id="race-status-filter"
-            >
-              {statusFilters.map((s) => (
-                <option key={s} value={s}>{s === 'All' ? 'All Status' : s}</option>
-              ))}
-            </select>
+            <FiFilter className="races-filter-icon" aria-hidden="true" />
+            <label className="form-field races-filter-field">
+              <span className="form-field-label">Trạng thái cuộc đua</span>
+              <select
+                className="form-select races-filter-select"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                id="race-status-filter"
+              >
+                {statusFilters.map((s) => (
+                  <option key={s} value={s}>{s === 'All' ? 'Tất cả trạng thái' : s}</option>
+                ))}
+              </select>
+            </label>
 
-            <select
-              className="form-select races-filter-select"
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              id="race-type-filter"
-            >
-              {typeFilters.map((t) => (
-                <option key={t} value={t}>{t === 'All' ? 'All Types' : t}</option>
-              ))}
-            </select>
+            <label className="form-field races-filter-field">
+              <span className="form-field-label">Loại cuộc đua</span>
+              <select
+                className="form-select races-filter-select"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                id="race-type-filter"
+              >
+                {typeFilters.map((t) => (
+                  <option key={t} value={t}>{t === 'All' ? 'Tất cả loại' : t}</option>
+                ))}
+              </select>
+            </label>
           </div>
         </div>
 
         {loading ? (
-          <div className="page-state">Loading races...</div>
+          <div className="page-state">Đang tải cuộc đua...</div>
         ) : (
           <>
             <div className="races-results-count">
-              Showing {filtered.length} of {races.length} races
+              Đang hiển thị {filtered.length}/{races.length} cuộc đua
             </div>
 
             <div className="races-grid">
@@ -110,7 +132,7 @@ function RacesPage() {
 
             {filtered.length === 0 && (
               <div className="races-empty">
-                <p>No races match your filters. Try adjusting your search.</p>
+                <p>Không có cuộc đua phù hợp. Hãy điều chỉnh bộ lọc hoặc từ khóa tìm kiếm.</p>
               </div>
             )}
           </>

@@ -1,6 +1,8 @@
 package com.equix.horseracingsystem.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 @Data
@@ -17,5 +19,7 @@ public class PredictionRequest {
     private Long predictedHorseId;
 
     @Schema(description = "Points wagered on this prediction", example = "10")
+    @Min(0)
+    @Max(100000)
     private Integer wagerPoints;
 }

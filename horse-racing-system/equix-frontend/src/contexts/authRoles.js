@@ -8,9 +8,14 @@ export const ROLES = Object.freeze({
 });
 
 export const ROLE_LABELS = Object.freeze({
-  HORSE_OWNER: 'Horse Owner',
-  JOCKEY: 'Jockey',
-  REFEREE: 'Referee',
-  SPECTATOR: 'Spectator',
-  ADMIN: 'Administrator',
+  HORSE_OWNER: 'Chủ ngựa',
+  JOCKEY: 'Nài ngựa',
+  REFEREE: 'Trọng tài',
+  SPECTATOR: 'Khán giả',
+  ADMIN: 'Quản trị viên',
 });
+
+export function getStartedDestination({ sessionLoading, isAuthenticated }) {
+  if (sessionLoading) return null;
+  return isAuthenticated ? '/dashboard' : '/register';
+}

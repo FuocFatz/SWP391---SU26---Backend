@@ -13,6 +13,7 @@ public class RaceEntryResponse {
     private Long raceId;
     private Long horseId;
     private String horseName;
+    private String horseImageUrl;
     private Long ownerId;
     private String ownerName;
     private Long jockeyId;
@@ -26,11 +27,13 @@ public class RaceEntryResponse {
     private String healthCheckStatus;
     private String refereeNotes;
     private String withdrawReason;
+    private String dnfReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public static RaceEntryResponse from(RaceRegistration registration,
                                          String horseName,
+                                         String horseImageUrl,
                                          String ownerName,
                                          String jockeyName) {
         return RaceEntryResponse.builder()
@@ -38,6 +41,7 @@ public class RaceEntryResponse {
                 .raceId(registration.getRaceId())
                 .horseId(registration.getHorseId())
                 .horseName(horseName)
+                .horseImageUrl(horseImageUrl)
                 .ownerId(registration.getOwnerId())
                 .ownerName(ownerName)
                 .jockeyId(registration.getJockeyId())
@@ -51,6 +55,7 @@ public class RaceEntryResponse {
                 .healthCheckStatus(registration.getHealthCheckStatus())
                 .refereeNotes(registration.getRefereeNotes())
                 .withdrawReason(registration.getWithdrawReason())
+                .dnfReason(registration.getDnfReason())
                 .createdAt(registration.getCreatedAt())
                 .updatedAt(registration.getUpdatedAt())
                 .build();

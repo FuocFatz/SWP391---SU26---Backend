@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
+import { api } from '../services/api';
 import { GiHorseHead, GiHorseshoe } from 'react-icons/gi';
 import {
   FiArrowRight,
@@ -11,23 +12,22 @@ import {
   FiMail,
   FiShield,
   FiUsers,
+  FiX,
 } from 'react-icons/fi';
 import './LoginPage.css';
 
 const QUICK_LOGIN_ENABLED = import.meta.env.VITE_ENABLE_QUICK_LOGIN === 'true';
 
 const QUICK_ROLES = [
-  { role: 'ADMIN', label: 'Administrator', icon: <FiShield />, emailKey: 'VITE_DEMO_ADMIN_EMAIL', passwordKey: 'VITE_DEMO_ADMIN_PASSWORD' },
-  { role: 'HORSE_OWNER', label: 'Horse Owner', icon: <GiHorseHead />, emailKey: 'VITE_DEMO_OWNER_EMAIL', passwordKey: 'VITE_DEMO_OWNER_PASSWORD' },
-  { role: 'JOCKEY', label: 'Jockey', icon: <GiHorseshoe />, emailKey: 'VITE_DEMO_JOCKEY_EMAIL', passwordKey: 'VITE_DEMO_JOCKEY_PASSWORD' },
-  { role: 'REFEREE', label: 'Referee', icon: <FiCheckCircle />, emailKey: 'VITE_DEMO_REFEREE_EMAIL', passwordKey: 'VITE_DEMO_REFEREE_PASSWORD' },
-  { role: 'SPECTATOR', label: 'Spectator', icon: <FiUsers />, emailKey: 'VITE_DEMO_SPECTATOR_EMAIL', passwordKey: 'VITE_DEMO_SPECTATOR_PASSWORD' },
+  { role: 'ADMIN', label: 'Quản trị viên', icon: <FiShield /> },
+  { role: 'HORSE_OWNER', label: 'Chủ ngựa', icon: <GiHorseHead /> },
+  { role: 'JOCKEY', label: 'Nài ngựa', icon: <GiHorseshoe /> },
+  { role: 'REFEREE', label: 'Trọng tài', icon: <FiCheckCircle /> },
+  { role: 'SPECTATOR', label: 'Khán giả', icon: <FiUsers /> },
 ];
 
-const ENV = import.meta.env;
-
 function LoginPage() {
-  const { login } = useAuth();
+  const { login, quickLogin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -36,50 +36,59 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [quickLoadingRole, setQuickLoadingRole] = useState(null);
+  const [quickLoadingAccountId, setQuickLoadingAccountId] = useState(null);
+  const [selectedQuickRole, setSelectedQuickRole] = useState(null);
+  const [databaseAccounts, setDatabaseAccounts] = useState([]);
   const sessionExpired = new URLSearchParams(location.search).get('reason') === 'session-expired';
 
-  const quickAccounts = useMemo(() => QUICK_ROLES.map((item) => ({
-    ...item,
-    email: ENV[item.emailKey],
-    password: ENV[item.passwordKey],
-  })), []);
-
-  const completeLogin = async (credentials) => {
-    const authenticatedUser = await login(credentials);
-    navigate('/dashboard', { replace: true, state: { loginRole: authenticatedUser.role } });
+  const completeLogin = async (authenticate) => {
+    const authenticatedUser = await authenticate();
+    navigate(location.state?.from || '/dashboard', { replace: true, state: { loginRole: authenticatedUser.role } });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
     if (!email.trim() || !password) {
-      setError('Please enter your email and password.');
+      setError('Vui lòng nhập email và mật khẩu.');
       return;
     }
     setLoading(true);
     try {
-      await completeLogin({ email: email.trim(), password });
+      await completeLogin(() => login({ email: email.trim(), password }));
     } catch (err) {
-      setError(err.message || 'Unable to sign in. Please verify your credentials.');
+      setError(err.message || 'Không thể đăng nhập. Vui lòng kiểm tra lại thông tin.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleQuickLogin = async (account) => {
+  const handleQuickRole = async (account) => {
     if (quickLoadingRole) return;
     setError('');
-    if (!account.email || !account.password || account.email.startsWith('<') || account.password.startsWith('<')) {
-      setError(`Demo credentials for ${account.label} are not configured in the local environment.`);
-      return;
-    }
     setQuickLoadingRole(account.role);
     try {
-      await completeLogin({ email: account.email, password: account.password });
+      const accounts = await api.getQuickLoginAccounts(account.role);
+      setSelectedQuickRole(account);
+      setDatabaseAccounts(Array.isArray(accounts) ? accounts : []);
+      if (!accounts?.length) setError(`Không có tài khoản ${account.label} đang hoạt động trong cơ sở dữ liệu.`);
     } catch (err) {
-      setError(err.message || `Unable to sign in as ${account.label}.`);
+      setError(err.message || `Không thể tải danh sách tài khoản ${account.label}.`);
     } finally {
       setQuickLoadingRole(null);
+    }
+  };
+
+  const handleQuickAccountLogin = async (account) => {
+    if (quickLoadingAccountId) return;
+    setError('');
+    setQuickLoadingAccountId(account.id);
+    try {
+      await completeLogin(() => quickLogin(account.id));
+    } catch (err) {
+      setError(err.message || `Không thể đăng nhập bằng tài khoản ${account.fullName || account.email}.`);
+    } finally {
+      setQuickLoadingAccountId(null);
     }
   };
 
@@ -93,10 +102,10 @@ function LoginPage() {
             <span>Equi<span className="auth-brand-logo-accent">X</span></span>
           </Link>
           <h1 className="auth-brand-title">
-            Welcome Back to the <span className="text-primary-color">Race</span>
+            Chào mừng trở lại <span className="text-primary-color">đường đua</span>
           </h1>
           <p className="auth-brand-desc">
-            Sign in securely to manage horses, assignments, results, and predictions.
+            Đăng nhập an toàn để quản lý ngựa, phân công, kết quả và dự đoán.
           </p>
         </div>
       </div>
@@ -104,20 +113,20 @@ function LoginPage() {
       <div className="auth-form-panel">
         <div className="auth-form-container">
           <div className="auth-form-header">
-            <h2 className="auth-form-title">Sign In</h2>
-            <p className="auth-form-subtitle">Use your EquiX account credentials.</p>
+            <h2 className="auth-form-title">Đăng nhập</h2>
+            <p className="auth-form-subtitle">Sử dụng tài khoản EquiX của bạn.</p>
           </div>
 
           {(location.state?.message || sessionExpired) && (
             <div className="auth-notice">
-              {location.state?.message || 'Your session expired. Please sign in again.'}
+              {location.state?.message || 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'}
             </div>
           )}
           {error && <div className="auth-error" id="login-error" role="alert">{error}</div>}
 
           <form className="auth-form" onSubmit={handleSubmit} id="login-form">
             <div className="form-group">
-              <label className="form-label" htmlFor="login-email">Email Address</label>
+              <label className="form-label" htmlFor="login-email">Địa chỉ email</label>
               <div className="auth-input-wrapper">
                 <FiMail className="auth-input-icon" />
                 <input id="login-email" type="email" className="form-input auth-input"
@@ -127,16 +136,16 @@ function LoginPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="login-password">Password</label>
+              <label className="form-label" htmlFor="login-password">Mật khẩu</label>
               <div className="auth-input-wrapper">
                 <FiLock className="auth-input-icon" />
                 <input id="login-password" type={showPassword ? 'text' : 'password'}
-                  className="form-input auth-input" placeholder="Enter your password"
+                  className="form-input auth-input" placeholder="Nhập mật khẩu"
                   autoComplete="current-password" value={password}
                   onChange={(event) => setPassword(event.target.value)} />
                 <button type="button" className="auth-input-toggle"
                   onClick={() => setShowPassword((value) => !value)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}>
                   {showPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
@@ -144,26 +153,27 @@ function LoginPage() {
 
             <button type="submit" className={`btn btn-primary btn-lg auth-submit ${loading ? 'loading' : ''}`}
               disabled={loading || Boolean(quickLoadingRole)} id="btn-login-submit">
-              {loading ? <><span className="spinner" /> Signing in...</> : <>Sign In <FiArrowRight /></>}
+              {loading ? <><span className="spinner" /> Đang đăng nhập...</> : <>Đăng nhập <FiArrowRight /></>}
             </button>
           </form>
 
-          <p className="auth-switch">Do not have an account? <Link to="/register" className="auth-switch-link">Create one</Link></p>
-          <p className="auth-switch">Forgot password? <Link to="/reset-password" className="auth-switch-link">Reset it</Link></p>
+          <p className="auth-switch">Bạn chưa có tài khoản? <Link to="/register" className="auth-switch-link">Tạo tài khoản</Link></p>
+          <p className="auth-switch">Quên mật khẩu? <Link to="/reset-password" className="auth-switch-link">Đặt lại</Link></p>
 
           {QUICK_LOGIN_ENABLED && (
             <section className="auth-dev-panel" aria-labelledby="quick-login-title">
               <div className="quick-login-heading">
-                <span className="auth-dev-label" id="quick-login-title">Demo Quick Login</span>
-                <span className="badge badge-neutral">Secure login endpoint</span>
+                <span className="auth-dev-label" id="quick-login-title">Đăng nhập nhanh</span>
+                <span className="badge badge-neutral">Đăng nhập an toàn</span>
               </div>
               <div className="auth-dev-buttons">
-                {quickAccounts.map((account) => {
+                {QUICK_ROLES.map((account) => {
                   const isLoading = quickLoadingRole === account.role;
                   return (
-                    <button key={account.role} type="button" className="quick-login-button"
-                      onClick={() => handleQuickLogin(account)} disabled={Boolean(quickLoadingRole) || loading}
-                      aria-label={`Quick login as ${account.label}`}>
+                    <button key={account.role} type="button" className={`quick-login-button ${selectedQuickRole?.role === account.role ? 'selected' : ''}`}
+                      onClick={() => handleQuickRole(account)} disabled={Boolean(quickLoadingRole) || Boolean(quickLoadingAccountId) || loading}
+                      aria-expanded={selectedQuickRole?.role === account.role}
+                      aria-label={`Hiển thị tài khoản ${account.label}`}>
                       <span className="quick-login-icon">{account.icon}</span>
                       <span>{account.label}</span>
                       {isLoading && <span className="spinner" aria-hidden="true" />}
@@ -171,6 +181,25 @@ function LoginPage() {
                   );
                 })}
               </div>
+              {selectedQuickRole && databaseAccounts.length > 0 && (
+                <div className="quick-account-panel" aria-live="polite">
+                  <div className="quick-account-panel-heading">
+                    <div><strong>Tài khoản {selectedQuickRole.label}</strong><span>Chọn một tài khoản đang hoạt động trên SQL Server</span></div>
+                    <button type="button" onClick={() => { setSelectedQuickRole(null); setDatabaseAccounts([]); }} aria-label="Đóng danh sách tài khoản"><FiX /></button>
+                  </div>
+                  <div className="quick-account-list">
+                    {databaseAccounts.map((account) => (
+                      <button type="button" className="quick-account-item" key={account.id}
+                        onClick={() => handleQuickAccountLogin(account)} disabled={Boolean(quickLoadingAccountId)}>
+                        <span className="quick-account-avatar">{String(account.fullName || account.username || account.email).charAt(0).toUpperCase()}</span>
+                        <span className="quick-account-identity"><strong>{account.fullName || account.username}</strong><small>{account.email}</small></span>
+                        {account.role === 'SPECTATOR' && <span className="quick-account-points">{Number(account.rewardPoints || 0).toLocaleString()} point</span>}
+                        {quickLoadingAccountId === account.id ? <span className="spinner" /> : <FiArrowRight />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </section>
           )}
         </div>

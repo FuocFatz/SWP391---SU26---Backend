@@ -119,8 +119,47 @@
 
 .race-prediction-panel h2 { margin-bottom: var(--space-2); }
 .race-prediction-panel p { color: var(--text-tertiary); }
-.race-prediction-form { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3); margin-top: var(--space-5); }
+.race-prediction-form { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: var(--space-3); margin-top: var(--space-5); }
 .race-prediction-count { margin-top: var(--space-4); }
+
+.race-schedule-notice {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid rgba(52, 152, 219, 0.35);
+  border-radius: var(--radius-md);
+  background: rgba(52, 152, 219, 0.08);
+  color: var(--text-secondary);
+}
+
+.race-schedule-notice.cancelled {
+  border-color: rgba(231, 76, 60, 0.4);
+  background: rgba(231, 76, 60, 0.08);
+}
+
+.race-schedule-notice strong { color: var(--text-primary); }
+
+.race-realtime-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  color: var(--text-tertiary);
+  font-size: var(--fs-sm);
+}
+
+.race-realtime-status span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-warning);
+}
+
+.race-realtime-status.connected span {
+  background: var(--color-success);
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.65);
+}
 
 @media (max-width: 768px) {
   .race-detail-header {
@@ -136,4 +175,13 @@
   }
 
   .race-prediction-form { grid-template-columns: 1fr; }
+}
+.race-detail-horse-thumb {
+  width: 34px;
+  height: 34px;
+  margin-right: var(--space-2);
+  vertical-align: middle;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid var(--border-primary);
 }

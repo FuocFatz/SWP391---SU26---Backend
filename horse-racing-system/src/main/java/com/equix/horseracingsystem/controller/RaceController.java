@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,15 +59,15 @@ public class RaceController {
             @Parameter(description = "Filter by referee ID") @RequestParam(required = false) Long refereeId,
             @Parameter(description = "Filter by status") @RequestParam(required = false) String status) {
         if (tournamentId != null) {
-            return raceRepository.findByTournamentId(tournamentId);
+            return raceRepository.findByTournamentIdAndDeletedAtIsNull(tournamentId);
         }
         if (refereeId != null) {
-            return raceRepository.findByRefereeId(refereeId);
+            return raceRepository.findByRefereeIdAndDeletedAtIsNull(refereeId);
         }
         if (status != null && !status.isBlank()) {
-            return raceRepository.findByStatus(status);
+            return raceRepository.findByStatusAndDeletedAtIsNull(status);
         }
-        return raceRepository.findAll();
+        return raceRepository.findByDeletedAtIsNull();
     }
 
     @Operation(summary = "Get race by ID", description = "Retrieves a single race by its ID")
@@ -77,7 +78,7 @@ public class RaceController {
     })
     @GetMapping("/{id}")
     public Race getById(@Parameter(description = "Race ID") @PathVariable Long id) {
-        return raceRepository.findById(id)
+        return raceRepository.findById(id).filter(race -> race.getDeletedAt() == null)
                 .orElseThrow(() -> new RuntimeException("Race not found: " + id));
     }
 
@@ -101,6 +102,14 @@ public class RaceController {
         return workflowService.updateRace(principal.getName(), id, race);
     }
 
+    @Operation(summary = "Delete a race",
+            description = "Soft-deletes an empty pre-start race. Races with participant or result activity must be cancelled instead.")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(Principal principal, @Parameter(description = "Race ID") @PathVariable Long id) {
+        workflowService.deleteRace(principal.getName(), id);
+    }
+
     @Operation(summary = "Update race status", description = "Patches only the status field of a race")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Status updated",
@@ -114,6 +123,26 @@ public class RaceController {
         return workflowService.adminUpdateStatus(principal.getName(), id, status);
     }
 
+    @Operation(summary = "Cancel a race", description = "Cancels a pre-start race and voids its entries and guesses")
+    @PostMapping("/{id}/cancel")
+    public Race cancelRace(Principal principal, @PathVariable Long id,
+                           @Valid @RequestBody CancelRaceRequest request) {
+        return workflowService.cancelRace(principal.getName(), id, request);
+    }
+
+    @Operation(summary = "Reschedule a race", description = "Moves a pre-start race to a new date and time")
+    @PostMapping("/{id}/reschedule")
+    public Race rescheduleRace(Principal principal, @PathVariable Long id,
+                               @Valid @RequestBody RescheduleRaceRequest request) {
+        return workflowService.rescheduleRace(principal.getName(), id, request);
+    }
+
+    @PostMapping("/{id}/referee")
+    public Race reassignReferee(Principal principal, @PathVariable Long id,
+                                @Valid @RequestBody ReassignRefereeRequest request) {
+        return workflowService.reassignReferee(principal.getName(), id, request);
+    }
+
     @Operation(summary = "Get race registrations",
             description = "Retrieves all registrations for a specific race")
     @ApiResponse(responseCode = "200", description = "List of registrations",
@@ -123,9 +152,12 @@ public class RaceController {
             @Parameter(description = "Race ID") @PathVariable Long id) {
         return registrationRepository.findByRaceId(id).stream()
                 .filter(registration -> registration.getDeletedAt() == null)
+                .filter(registration -> List.of("READY_FOR_CHECK", "APPROVED", "CLEARED_TO_RACE", "DNF")
+                        .contains(registration.getStatus()))
                 .map(registration -> RaceEntryResponse.from(
                         registration,
                         horseName(registration.getHorseId()),
+                        horseImageUrl(registration.getHorseId()),
                         userName(registration.getOwnerId(), "Unknown owner"),
                         userName(registration.getJockeyId(), "Unassigned jockey")))
                 .toList();
@@ -161,10 +193,32 @@ public class RaceController {
         return workflowService.completeRace(principal.getName(), id);
     }
 
+    @PostMapping("/{id}/prepare")
+    public Race prepareRace(Principal principal, @PathVariable Long id) {
+        return workflowService.prepareRace(principal.getName(), id);
+    }
+
     @PostMapping("/{id}/report")
     public RaceNote submitReport(Principal principal, @PathVariable Long id,
                                  @Valid @RequestBody RaceReportRequest request) {
         return workflowService.submitRaceReport(principal.getName(), id, request);
+    }
+
+    @PostMapping("/{id}/incidents")
+    public RaceNote addIncident(Principal principal, @PathVariable Long id,
+                                @Valid @RequestBody RaceIncidentNoteRequest request) {
+        return workflowService.addRaceIncident(principal.getName(), id, request);
+    }
+
+    @GetMapping("/{id}/notes")
+    public List<RaceNote> getRaceNotes(Principal principal, @PathVariable Long id) {
+        return workflowService.raceNotesFor(principal.getName(), id);
+    }
+
+    @PostMapping("/{id}/report/revision")
+    public Race requestReportRevision(Principal principal, @PathVariable Long id,
+                                      @Valid @RequestBody AdminReportRevisionRequest request) {
+        return workflowService.requestReportRevision(principal.getName(), id, request);
     }
 
     @Operation(summary = "Simulate a race",
@@ -172,9 +226,10 @@ public class RaceController {
     @ApiResponse(responseCode = "200", description = "Simulation results")
     @GetMapping("/{id}/simulate")
     public Map<String, Object> simulateRace(
+            Principal principal,
             @Parameter(description = "Race ID") @PathVariable Long id,
             @Parameter(description = "Simulation duration in seconds") @RequestParam(required = false) Integer durationSeconds) {
-        return workflowService.simulateRace(id, durationSeconds);
+        return workflowService.simulateRaceForReferee(principal.getName(), id, durationSeconds);
     }
 
     @Operation(summary = "Get race results",
@@ -244,6 +299,11 @@ public class RaceController {
     private String horseName(Long horseId) {
         if (horseId == null) return "Unknown horse";
         return horseRepository.findById(horseId).map(Horse::getHorseName).orElse("Horse #" + horseId);
+    }
+
+    private String horseImageUrl(Long horseId) {
+        if (horseId == null) return null;
+        return horseRepository.findById(horseId).map(Horse::getImageUrl).orElse(null);
     }
 
     private String userName(Long userId, String fallback) {

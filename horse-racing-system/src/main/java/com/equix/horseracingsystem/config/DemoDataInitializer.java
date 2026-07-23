@@ -8,11 +8,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
 @Component
 @ConditionalOnProperty(name = "app.demo-data.enabled", havingValue = "true")
+@Order(100)
 public class DemoDataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -48,7 +50,7 @@ public class DemoDataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         for (DemoAccount account : accounts) {
-            if (account.password() == null || account.password().length() < 8) {
+            if (account.password() == null || account.password().isBlank()) {
                 throw new IllegalStateException("Every demo password must be provided through environment variables");
             }
             if (userRepository.findByEmailIgnoreCaseAndDeletedAtIsNull(account.email()).isPresent()) {
@@ -61,7 +63,7 @@ public class DemoDataInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode(account.password()))
                     .role(account.role())
                     .status("VERIFIED")
-                    .rewardPoints(0)
+                    .rewardPoints(User.INITIAL_REWARD_POINTS)
                     .build());
 
             notificationService.createIfAbsent(saved.getId(), "ACCOUNT_APPROVED", "Welcome to EquiX",

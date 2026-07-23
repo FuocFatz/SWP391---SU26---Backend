@@ -17,5 +17,7 @@ public interface HorseService {
 
     Horse update(@NonNull Long id, Horse horse);
 
+    Horse updatePortrait(@NonNull Long id, String imageUrl);
+
     void delete(@NonNull Long id);
 }

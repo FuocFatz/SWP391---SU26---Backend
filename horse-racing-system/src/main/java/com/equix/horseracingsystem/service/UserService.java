@@ -2,6 +2,7 @@ package com.equix.horseracingsystem.service;
 
 import com.equix.horseracingsystem.dto.AccountStatusRequest;
 import com.equix.horseracingsystem.dto.CreateRefereeRequest;
+import com.equix.horseracingsystem.dto.RoleChangeRequest;
 import com.equix.horseracingsystem.entity.User;
 
 import java.util.List;
@@ -12,5 +13,6 @@ public interface UserService {
     List<User> getByRole(String role);
     User getById(Long id);
     User updateStatus(Long id, AccountStatusRequest request);
+    User updateRole(String adminEmail, Long id, RoleChangeRequest request);
     void softDelete(Long id);
 }

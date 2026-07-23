@@ -3,34 +3,35 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/useAuth';
 import { FiBell, FiMenu, FiX, FiChevronDown, FiLogOut, FiUser, FiSettings } from 'react-icons/fi';
 import { GiHorseshoe } from 'react-icons/gi';
+import UserAvatar from '../UserAvatar/UserAvatar';
 import './Navbar.css';
 
 const publicLinks = [
-  { path: '/', label: 'Home' },
-  { path: '/races', label: 'Races' },
-  { path: '/leaderboard', label: 'Leaderboard' },
-  { path: '/about', label: 'About' },
-  { path: '/faq', label: 'FAQ' },
+  { path: '/', label: 'Trang chủ' },
+  { path: '/races', label: 'Cuộc đua' },
+  { path: '/leaderboard', label: 'Bảng xếp hạng' },
+  { path: '/about', label: 'Giới thiệu' },
+  { path: '/faq', label: 'Hỏi đáp' },
 ];
 
 const roleLinks = {
   HORSE_OWNER: [
-    ['/dashboard/horses', 'My Horses'], ['/dashboard/jockeys', 'Hire Jockey'],
-    ['/dashboard/pairings', 'Pairings'], ['/dashboard/races', 'Races'], ['/dashboard/leaderboard', 'Leaderboard'],
+    ['/dashboard/horses', 'Ngựa của tôi'], ['/dashboard/jockeys', 'Thuê nài ngựa'],
+    ['/dashboard/pairings', 'Ghép cặp'], ['/dashboard/races', 'Cuộc đua'], ['/dashboard/leaderboard', 'Bảng xếp hạng'],
   ],
   JOCKEY: [
-    ['/dashboard/invitations', 'Invitations'], ['/dashboard/horse', 'My Horse'],
-    ['/dashboard/races', 'Races'], ['/dashboard/achievements', 'Achievements'],
+    ['/dashboard/invitations', 'Lời mời'], ['/dashboard/horse', 'Ngựa của tôi'],
+    ['/dashboard/races', 'Cuộc đua'], ['/dashboard/achievements', 'Thành tích'],
   ],
   REFEREE: [
-    ['/dashboard/assigned-races', 'Assigned Races'], ['/dashboard/monitor', 'Race Monitor'], ['/dashboard/reports', 'Reports'],
+    ['/dashboard/assigned-races', 'Cuộc đua được phân công'], ['/dashboard/monitor', 'Điều hành cuộc đua'], ['/dashboard/reports', 'Báo cáo'],
   ],
   SPECTATOR: [
-    ['/dashboard/races', 'Browse Races'], ['/dashboard/guesses', 'My Guesses'], ['/dashboard/leaderboard', 'Leaderboard'],
+    ['/dashboard/races', 'Xem cuộc đua'], ['/dashboard/guesses', 'Dự đoán của tôi'], ['/dashboard/rewards', 'Phần thưởng của tôi'], ['/dashboard/leaderboard', 'Bảng xếp hạng'],
   ],
   ADMIN: [
-    ['/dashboard/accounts', 'Accounts'], ['/dashboard/tournaments', 'Tournaments'], ['/dashboard/horses', 'Horses'],
-    ['/dashboard/jockeys', 'Jockeys'], ['/dashboard/referees', 'Referees'], ['/dashboard/results', 'Results'], ['/dashboard/guesses', 'Guesses'],
+    ['/dashboard/accounts', 'Tài khoản'], ['/dashboard/tournaments', 'Giải đấu'], ['/dashboard/horses', 'Ngựa'],
+    ['/dashboard/jockeys', 'Nài ngựa'], ['/dashboard/referees', 'Trọng tài'], ['/dashboard/results', 'Kết quả'], ['/dashboard/guesses', 'Dự đoán'], ['/dashboard/rewards', 'Xử lý phần thưởng'],
   ],
 };
 
@@ -70,16 +71,16 @@ function Navbar() {
           {!isAuthenticated ? (
             <div className="navbar-auth-buttons">
               <Link to="/login" className="btn btn-ghost" id="btn-login">
-                Login
+                Đăng nhập
               </Link>
               <Link to="/register" className="btn btn-primary" id="btn-register">
-                Register
+                Đăng ký
               </Link>
             </div>
           ) : (
             <div className="navbar-user-wrap">
               <Link to="/notifications" className="navbar-notification-button"
-                aria-label={`${unreadCount} unread notifications`} title="Notifications">
+                aria-label={`${unreadCount} thông báo chưa đọc`} title="Thông báo">
                 <FiBell />
                 {unreadCount > 0 && <span className="navbar-notification-count">{unreadCount > 99 ? '99+' : unreadCount}</span>}
               </Link>
@@ -89,9 +90,7 @@ function Navbar() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 id="btn-user-menu"
               >
-                <div className="navbar-avatar">
-                  {(user.name || user.email || 'U').charAt(0)}
-                </div>
+                <UserAvatar user={user} className="navbar-avatar" />
                 <span className="navbar-user-name">{user.name}</span>
                 <FiChevronDown className={`navbar-chevron ${dropdownOpen ? 'open' : ''}`} />
               </button>
@@ -108,21 +107,21 @@ function Navbar() {
                     className="navbar-dropdown-item"
                     onClick={() => setDropdownOpen(false)}
                   >
-                    <FiSettings /> Dashboard
+                    <FiSettings /> Bảng điều khiển
                   </Link>
                   <Link
                     to="/profile"
                     className="navbar-dropdown-item"
                     onClick={() => setDropdownOpen(false)}
                   >
-                    <FiUser /> Profile
+                    <FiUser /> Hồ sơ
                   </Link>
                   <div className="navbar-dropdown-divider" />
                   <button
                     className="navbar-dropdown-item logout"
                     onClick={() => { logout(); setDropdownOpen(false); }}
                   >
-                    <FiLogOut /> Logout
+                    <FiLogOut /> Đăng xuất
                   </button>
                 </div>
               )}
@@ -134,7 +133,7 @@ function Navbar() {
             className="navbar-mobile-toggle"
             onClick={() => setMobileOpen(!mobileOpen)}
             id="btn-mobile-menu"
-            aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-label={mobileOpen ? 'Đóng menu điều hướng' : 'Mở menu điều hướng'}
           >
             {mobileOpen ? <FiX /> : <FiMenu />}
           </button>
@@ -156,17 +155,17 @@ function Navbar() {
           {isAuthenticated && (
             <>
               <div className="navbar-mobile-divider" />
-              <Link to="/dashboard" className={`navbar-mobile-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>Dashboard</Link>
+              <Link to="/dashboard" className={`navbar-mobile-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>Bảng điều khiển</Link>
               {(roleLinks[user?.role] || []).map(([path, label]) => <Link key={path} to={path} className={`navbar-mobile-link ${isActive(path) ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>{label}</Link>)}
-              <Link to="/notifications" className={`navbar-mobile-link ${isActive('/notifications') ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>Notifications {unreadCount > 0 ? `(${unreadCount})` : ''}</Link>
-              <Link to="/profile" className={`navbar-mobile-link ${isActive('/profile') ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>Profile</Link>
-              <button className="navbar-mobile-link navbar-mobile-logout" onClick={() => { logout(); setMobileOpen(false); }}>Logout</button>
+              <Link to="/notifications" className={`navbar-mobile-link ${isActive('/notifications') ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>Thông báo {unreadCount > 0 ? `(${unreadCount})` : ''}</Link>
+              <Link to="/profile" className={`navbar-mobile-link ${isActive('/profile') ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>Hồ sơ</Link>
+              <button className="navbar-mobile-link navbar-mobile-logout" onClick={() => { logout(); setMobileOpen(false); }}>Đăng xuất</button>
             </>
           )}
           {!isAuthenticated && (
             <div className="navbar-mobile-auth">
-              <Link to="/login" className="btn btn-outline" onClick={() => setMobileOpen(false)}>Login</Link>
-              <Link to="/register" className="btn btn-primary" onClick={() => setMobileOpen(false)}>Register</Link>
+              <Link to="/login" className="btn btn-outline" onClick={() => setMobileOpen(false)}>Đăng nhập</Link>
+              <Link to="/register" className="btn btn-primary" onClick={() => setMobileOpen(false)}>Đăng ký</Link>
             </div>
           )}
         </div>

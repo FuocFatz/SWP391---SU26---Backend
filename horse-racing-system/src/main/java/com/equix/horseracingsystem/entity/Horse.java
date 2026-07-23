@@ -77,6 +77,9 @@ public class Horse {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Transient
+    private Boolean fitConfirmation;
+
     @Column(name = "description")
     private String description;
 
@@ -97,6 +100,9 @@ public class Horse {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
+        if (gender == null || gender.isBlank()) {
+            gender = "STALLION";
+        }
         if (healthStatus == null) {
             healthStatus = "HEALTHY";
         }

@@ -36,6 +36,8 @@ build/
 .env
 .env.*
 !.env.example
-application-local.properties
 *.pid
 *.log
+
+### User-uploaded runtime files ###
+/uploads/

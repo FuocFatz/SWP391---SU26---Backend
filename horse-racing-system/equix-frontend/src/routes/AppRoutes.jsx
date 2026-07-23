@@ -7,6 +7,7 @@ import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import PasswordResetPage from "../pages/PasswordResetPage";
+import EmailChangeVerifyPage from "../pages/EmailChangeVerifyPage";
 import AboutPage from "../pages/AboutPage";
 import TermsPage from "../pages/TermsPage";
 import FaqPage from "../pages/FaqPage";
@@ -40,6 +41,7 @@ function AppRoutes() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/reset-password" element={<PasswordResetPage />} />
+                <Route path="/verify-email-change" element={<EmailChangeVerifyPage />} />
 
                 {/* Authenticated dashboard routes */}
                 <Route element={<ProtectedRoute />}>

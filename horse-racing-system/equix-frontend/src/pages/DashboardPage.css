@@ -106,9 +106,75 @@
 
 .workflow-control-bar {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) repeat(3, auto);
+  grid-template-columns: minmax(220px, 1fr) repeat(4, auto);
   gap: var(--space-3);
+  align-items: end;
+}
+
+.referee-decision-form {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-color);
+}
+
+.workflow-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.workflow-confirm input {
+  margin-top: 3px;
+  accent-color: var(--color-primary);
+}
+
+.horse-portrait-thumb,
+.horse-portrait-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+}
+
+.horse-portrait-thumb {
+  display: block;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+
+.horse-portrait-placeholder {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border: 1px dashed var(--border-color);
+}
+
+.race-schedule-panel {
+  margin-top: var(--space-6);
+}
+
+.race-schedule-panel .workflow-panel-heading p {
+  margin-top: var(--space-1);
+  color: var(--text-tertiary);
+  font-size: var(--fs-sm);
+}
+
+.race-schedule-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(2, minmax(150px, 0.7fr));
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.race-schedule-reason {
+  grid-column: 1 / -2;
+}
+
+.race-schedule-actions {
+  justify-content: flex-end;
 }
 
 .workflow-table-wrap {
@@ -135,6 +201,11 @@
   font-size: var(--fs-sm);
 }
 
+.race-status-locked {
+  margin-top: 0;
+  white-space: nowrap;
+}
+
 .form-select.compact {
   min-width: 170px;
   padding-top: var(--space-2);
@@ -152,9 +223,13 @@
   }
 
   .workflow-grid.two,
-  .workflow-control-bar {
+  .workflow-control-bar,
+  .race-schedule-grid {
     grid-template-columns: 1fr;
   }
+
+  .race-schedule-reason { grid-column: auto; }
+  .race-schedule-actions { justify-content: flex-start; }
 }
 
 @media (max-width: 768px) {

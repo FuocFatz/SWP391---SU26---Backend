@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface PairingContractRepository extends JpaRepository<PairingContract, Long> {
     boolean existsByHorseIdAndStatus(Long horseId, String status);
     boolean existsByJockeyIdAndStatus(Long jockeyId, String status);
+    boolean existsByOwnerIdAndStatus(Long ownerId, String status);
     Optional<PairingContract> findByHorseIdAndOwnerIdAndStatus(Long horseId, Long ownerId, String status);
 }

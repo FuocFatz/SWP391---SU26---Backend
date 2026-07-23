@@ -6,10 +6,10 @@ function ProtectedRoute() {
   const location = useLocation();
 
   if (sessionLoading) {
-    return <div className="route-loading" aria-label="Restoring session"><span className="spinner spinner-lg" /></div>;
+    return <div className="route-loading" aria-label="Đang khôi phục phiên"><span className="spinner spinner-lg" /></div>;
   }
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />;
   }
   return <Outlet />;
 }
