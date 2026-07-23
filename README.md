@@ -12,6 +12,7 @@ An end-to-end SWP391 project for managing horse-racing tournaments, role-based o
 ![Vite](https://img.shields.io/badge/Vite-8.0-646CFF?style=flat-square&logo=vite&logoColor=white)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-2019%2B-CC2927?style=flat-square&logo=microsoftsqlserver&logoColor=white)
 ![Course](https://img.shields.io/badge/FPT%20University-SWP391-F36F21?style=flat-square)
+[![CI](https://github.com/FuocFatz/SWP391---SU26---Backend/actions/workflows/ci.yml/badge.svg)](https://github.com/FuocFatz/SWP391---SU26---Backend/actions/workflows/ci.yml)
 
 **SE1916 · Group 06 · Final Project 2026**
 
