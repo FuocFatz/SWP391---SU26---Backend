@@ -4,16 +4,16 @@ import { FiCode, FiDatabase, FiShield, FiUsers } from 'react-icons/fi';
 import './AboutPage.css';
 
 const techStack = [
-  { icon: <FiCode />, name: 'ReactJS', desc: 'Component-based frontend framework' },
-  { icon: <FiShield />, name: 'Spring Boot + JWT', desc: 'Secure backend with token authentication' },
-  { icon: <FiDatabase />, name: 'SQL Server', desc: 'Relational database with ACID compliance' },
+  { icon: <FiCode />, name: 'ReactJS', desc: 'Giao diện được xây dựng theo kiến trúc thành phần' },
+  { icon: <FiShield />, name: 'Spring Boot + JWT', desc: 'Backend bảo mật với xác thực bằng token' },
+  { icon: <FiDatabase />, name: 'SQL Server', desc: 'Cơ sở dữ liệu quan hệ tuân thủ ACID' },
 ];
 
 const features = [
-  { icon: <GiHorseHead />, title: 'Horse Management', desc: 'Register and manage your stable of horses with detailed profiles and training positions.' },
-  { icon: <FiUsers />, title: 'Jockey Pairing', desc: 'Hire available jockeys and create powerful horse-jockey pairs for competition.' },
-  { icon: <GiTrophy />, title: 'Tournament System', desc: 'Compete in Sprint, Mile, Medium, and Long-distance races with prize pools.' },
-  { icon: <FiUsers />, title: 'Spectator Engagement', desc: 'Watch live races, place guesses on winners, and earn rewards for correct predictions.' },
+  { icon: <GiHorseHead />, title: 'Quản lý ngựa', desc: 'Đăng ký và quản lý chuồng ngựa với hồ sơ chi tiết cùng chiến thuật chạy.' },
+  { icon: <FiUsers />, title: 'Ghép nài ngựa', desc: 'Thuê nài ngựa đang sẵn sàng và tạo cặp ngựa–nài ngựa để thi đấu.' },
+  { icon: <GiTrophy />, title: 'Hệ thống giải đấu', desc: 'Thi đấu ở cự ly Nước rút, Một dặm, Trung bình và Đường dài với điểm thưởng.' },
+  { icon: <FiUsers />, title: 'Tương tác khán giả', desc: 'Xem cuộc đua trực tiếp, dự đoán người thắng và nhận thưởng khi dự đoán đúng.' },
 ];
 
 function AboutPage() {
@@ -22,22 +22,19 @@ function AboutPage() {
       <section className="about-hero">
         <div className="container">
           <h1 className="about-hero-title animate-fadeInUp">
-            About <span className="text-primary-color">EquiX</span>
+            Giới thiệu <span className="text-primary-color">EquiX</span>
           </h1>
           <p className="about-hero-subtitle animate-fadeInUp delay-1">
-            A comprehensive Horse Racing Tournament Management System built with passion 
-            for the SWP391 course at FPT College Vietnam.
+            Hệ thống quản lý giải đua ngựa toàn diện được xây dựng cho môn SWP391 tại FPT College Vietnam.
           </p>
         </div>
       </section>
 
       <section className="section">
         <div className="container">
-          <h2 className="section-title">Our Mission</h2>
+          <h2 className="section-title">Sứ mệnh của chúng tôi</h2>
           <p className="section-subtitle">
-            EquiX (from 'Equine' + 'X' for the unknown thrill of racing) delivers a full-featured 
-            platform for managing horse racing tournaments — from registration to live race simulation 
-            and result finalization.
+            EquiX cung cấp nền tảng đầy đủ để quản lý giải đua ngựa — từ đăng ký, mô phỏng cuộc đua trực tiếp đến công bố kết quả.
           </p>
 
           <div className="about-features-grid">
@@ -54,9 +51,9 @@ function AboutPage() {
 
       <section className="section about-tech-section">
         <div className="container">
-          <h2 className="section-title">Technology Stack</h2>
+          <h2 className="section-title">Công nghệ sử dụng</h2>
           <p className="section-subtitle">
-            Built on modern, industry-standard technologies for scalability and performance
+            Xây dựng trên các công nghệ hiện đại, tiêu chuẩn ngành để đảm bảo hiệu năng và khả năng mở rộng
           </p>
 
           <div className="about-tech-grid">
@@ -75,23 +72,22 @@ function AboutPage() {
         <div className="container text-center">
           <h2 className="section-title">FPT College Vietnam</h2>
           <p className="section-subtitle">
-            Developed as part of the SWP391 software engineering course, demonstrating full-stack 
-            development skills, database design, and business logic implementation.
+            Được phát triển trong môn kỹ nghệ phần mềm SWP391, thể hiện kỹ năng full-stack, thiết kế cơ sở dữ liệu và triển khai nghiệp vụ.
           </p>
           <Link to="/register" className="btn btn-primary btn-lg" style={{ marginTop: 'var(--space-6)' }}>
-            Join EquiX Today
+            Tham gia EquiX ngay
           </Link>
         </div>
       </section>
 
       <section className="section about-tech-section" id="contact">
         <div className="container text-center">
-          <h2 className="section-title">Contact & Support</h2>
+          <h2 className="section-title">Liên hệ và hỗ trợ</h2>
           <p className="section-subtitle">
-            For this academic deployment, contact the project administrator through your course team and include your account email, role, and the affected race ID.
+            Với bản triển khai học thuật này, hãy liên hệ quản trị viên dự án và cung cấp email tài khoản, vai trò cùng mã cuộc đua liên quan.
           </p>
           <Link to="/faq" className="btn btn-outline" style={{ marginTop: 'var(--space-6)' }}>
-            Read Frequently Asked Questions
+            Đọc câu hỏi thường gặp
           </Link>
         </div>
       </section>

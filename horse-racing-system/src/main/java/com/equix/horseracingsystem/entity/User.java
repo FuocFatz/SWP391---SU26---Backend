@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 public class User {
 
+    public static final int INITIAL_REWARD_POINTS = 500;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -55,7 +57,7 @@ public class User {
         LocalDateTime now = LocalDateTime.now();
         if (createdAt == null) createdAt = now;
         if (updatedAt == null) updatedAt = now;
-        if (rewardPoints == null) rewardPoints = 0;
+        if (rewardPoints == null) rewardPoints = INITIAL_REWARD_POINTS;
         if (status == null) status = "PENDING";
     }
 

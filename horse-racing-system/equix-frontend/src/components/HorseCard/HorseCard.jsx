@@ -8,6 +8,21 @@ const statusStyles = {
   Unavailable: 'badge-neutral',
 };
 
+const statusLabels = {
+  Available: 'Sẵn sàng',
+  Training: 'Đang huấn luyện',
+  Paired: 'Đã ghép cặp',
+  Registered: 'Đã đăng ký',
+  Unavailable: 'Không sẵn sàng',
+};
+
+const positionLabels = {
+  Front: 'Dẫn đầu',
+  Pace: 'Bám tốc độ',
+  Late: 'Tăng tốc cuối',
+  End: 'Nước rút cuối',
+};
+
 const positionEmojis = {
   Front: '🏃',
   Pace: '⚡',
@@ -38,7 +53,7 @@ function HorseCard({ horse, onClick }) {
           </div>
         )}
         <span className={`horse-card-status badge ${statusStyles[status] || 'badge-neutral'}`}>
-          {status}
+          {statusLabels[status] || status}
         </span>
       </div>
 
@@ -48,16 +63,16 @@ function HorseCard({ horse, onClick }) {
 
         <div className="horse-card-stats">
           <div className="horse-card-stat">
-            <span className="horse-card-stat-label">Age</span>
-            <span className="horse-card-stat-value">{age}y</span>
+            <span className="horse-card-stat-label">Tuổi</span>
+            <span className="horse-card-stat-value">{age} tuổi</span>
           </div>
           <div className="horse-card-stat">
-            <span className="horse-card-stat-label">Weight</span>
+            <span className="horse-card-stat-label">Cân nặng</span>
             <span className="horse-card-stat-value">{weight}kg</span>
           </div>
           <div className="horse-card-stat">
-            <span className="horse-card-stat-label">Position</span>
-            <span className="horse-card-stat-value">{positionEmojis[position]} {position}</span>
+            <span className="horse-card-stat-label">Vị trí</span>
+            <span className="horse-card-stat-value">{positionEmojis[position]} {positionLabels[position] || position}</span>
           </div>
         </div>
       </div>

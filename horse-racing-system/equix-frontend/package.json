@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "node --test src/contexts/authRoles.test.js src/utils/avatarValidation.test.js src/utils/raceTrackMapping.test.js src/utils/vietnameseLocalization.test.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.6",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.6",

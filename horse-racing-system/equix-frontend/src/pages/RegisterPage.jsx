@@ -6,9 +6,9 @@ import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-ico
 import './LoginPage.css';
 
 const roles = [
-  { id: 'HORSE_OWNER', name: 'Horse Owner', desc: 'Manage horses and enter races' },
-  { id: 'JOCKEY', name: 'Jockey', desc: 'Accept ride invitations' },
-  { id: 'SPECTATOR', name: 'Spectator', desc: 'Watch races and predict winners' },
+  { id: 'HORSE_OWNER', name: 'Chủ ngựa', desc: 'Quản lý ngựa và đăng ký cuộc đua' },
+  { id: 'JOCKEY', name: 'Nài ngựa', desc: 'Chấp nhận lời mời cưỡi ngựa' },
+  { id: 'SPECTATOR', name: 'Khán giả', desc: 'Xem cuộc đua và dự đoán người thắng' },
 ];
 
 function RegisterPage() {
@@ -29,15 +29,15 @@ function RegisterPage() {
     setError('');
 
     if (!fullName || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
+      setError('Vui lòng điền đầy đủ thông tin');
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Mật khẩu xác nhận không khớp');
       return;
     }
     if (!acceptTerms) {
-      setError('Please accept the Terms of Service');
+      setError('Vui lòng chấp nhận Điều khoản dịch vụ');
       return;
     }
 
@@ -52,12 +52,12 @@ function RegisterPage() {
         role: selectedRole,
       });
       if (result.pending) {
-        navigate('/login', { state: { message: 'Registration received. Your account is pending Admin confirmation.' } });
+        navigate('/login', { state: { message: 'Đã nhận đăng ký. Tài khoản của bạn đang chờ Quản trị viên xác nhận.' } });
       } else {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.message || 'Registration failed');
+      setError(err.message || 'Đăng ký thất bại');
     } finally {
       setLoading(false);
     }
@@ -73,10 +73,10 @@ function RegisterPage() {
             <span>Equi<span className="auth-brand-logo-accent">X</span></span>
           </Link>
           <h1 className="auth-brand-title">
-            Join the <span className="text-primary-color">EquiX</span> Race
+            Tham gia đường đua <span className="text-primary-color">EquiX</span>
           </h1>
           <p className="auth-brand-desc">
-            Create an account for the role you want to demo in the racing workflow.
+            Tạo tài khoản cho vai trò bạn muốn sử dụng trong quy trình cuộc đua.
           </p>
         </div>
       </div>
@@ -84,9 +84,9 @@ function RegisterPage() {
       <div className="auth-form-panel">
         <div className="auth-form-container">
           <div className="auth-form-header">
-            <h2 className="auth-form-title">Create Account</h2>
+            <h2 className="auth-form-title">Tạo tài khoản</h2>
             <p className="auth-form-subtitle">
-              Choose a role and enter your details
+              Chọn vai trò và nhập thông tin của bạn
             </p>
           </div>
 
@@ -98,7 +98,7 @@ function RegisterPage() {
 
           <form className="auth-form" onSubmit={handleSubmit} id="register-form">
             <div className="form-group">
-              <label className="form-label">Select Your Role</label>
+              <label className="form-label">Chọn vai trò</label>
               <div className="role-cards">
                 {roles.map((role) => (
                   <button
@@ -116,14 +116,14 @@ function RegisterPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="register-name">Full Name</label>
+              <label className="form-label" htmlFor="register-name">Họ và tên</label>
               <div className="auth-input-wrapper">
                 <FiUser className="auth-input-icon" />
                 <input
                   id="register-name"
                   type="text"
                   className="form-input auth-input"
-                  placeholder="Enter your full name"
+                  placeholder="Nhập họ và tên"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                 />
@@ -131,7 +131,7 @@ function RegisterPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="register-email">Email Address</label>
+              <label className="form-label" htmlFor="register-email">Địa chỉ email</label>
               <div className="auth-input-wrapper">
                 <FiMail className="auth-input-icon" />
                 <input
@@ -146,14 +146,14 @@ function RegisterPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="register-password">Password</label>
+              <label className="form-label" htmlFor="register-password">Mật khẩu</label>
               <div className="auth-input-wrapper">
                 <FiLock className="auth-input-icon" />
                 <input
                   id="register-password"
                   type={showPassword ? 'text' : 'password'}
                   className="form-input auth-input"
-                  placeholder="Create a password"
+                  placeholder="Tạo mật khẩu"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -161,7 +161,7 @@ function RegisterPage() {
                   type="button"
                   className="auth-input-toggle"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label="Toggle password visibility"
+                  aria-label="Ẩn hoặc hiện mật khẩu"
                 >
                   {showPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
@@ -169,14 +169,14 @@ function RegisterPage() {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="register-confirm">Confirm Password</label>
+              <label className="form-label" htmlFor="register-confirm">Xác nhận mật khẩu</label>
               <div className="auth-input-wrapper">
                 <FiLock className="auth-input-icon" />
                 <input
                   id="register-confirm"
                   type="password"
                   className="form-input auth-input"
-                  placeholder="Confirm your password"
+                  placeholder="Nhập lại mật khẩu"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
@@ -190,7 +190,7 @@ function RegisterPage() {
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
               />
-              <span>I accept the <Link to="/terms" className="auth-switch-link">Terms of Service</Link></span>
+              <span>Tôi chấp nhận <Link to="/terms" className="auth-switch-link">Điều khoản dịch vụ</Link></span>
             </label>
 
             <button
@@ -199,13 +199,13 @@ function RegisterPage() {
               disabled={loading}
               id="btn-register-submit"
             >
-              {loading ? <span className="spinner" /> : <>Create Account <FiArrowRight /></>}
+              {loading ? <span className="spinner" /> : <>Tạo tài khoản <FiArrowRight /></>}
             </button>
           </form>
 
           <p className="auth-switch">
-            Already have an account?{' '}
-            <Link to="/login" className="auth-switch-link">Sign in</Link>
+            Bạn đã có tài khoản?{' '}
+            <Link to="/login" className="auth-switch-link">Đăng nhập</Link>
           </p>
         </div>
       </div>

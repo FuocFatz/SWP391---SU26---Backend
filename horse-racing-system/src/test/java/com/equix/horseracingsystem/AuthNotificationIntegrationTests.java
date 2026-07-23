@@ -1,9 +1,12 @@
 package com.equix.horseracingsystem;
 
 import com.equix.horseracingsystem.entity.Notification;
+import com.equix.horseracingsystem.entity.EmailChangeToken;
 import com.equix.horseracingsystem.entity.User;
 import com.equix.horseracingsystem.repository.AuditLogRepository;
 import com.equix.horseracingsystem.repository.NotificationRepository;
+import com.equix.horseracingsystem.repository.EmailChangeTokenRepository;
+import com.equix.horseracingsystem.repository.RewardHistoryRepository;
 import com.equix.horseracingsystem.repository.UserRepository;
 import com.equix.horseracingsystem.service.NotificationService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,6 +20,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.mock.web.MockMultipartFile;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -34,21 +41,29 @@ class AuthNotificationIntegrationTests {
     @Autowired AuditLogRepository auditLogRepository;
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired NotificationService notificationService;
+    @Autowired RewardHistoryRepository rewardHistoryRepository;
+    @Autowired EmailChangeTokenRepository emailChangeTokenRepository;
 
     private User spectator;
     private User otherSpectator;
+    private User admin;
     private String spectatorToken;
+    private String adminToken;
 
     @BeforeEach
     void setUp() throws Exception {
+        rewardHistoryRepository.deleteAll();
         notificationRepository.deleteAll();
         auditLogRepository.deleteAll();
+        emailChangeTokenRepository.deleteAll();
         userRepository.deleteAll();
 
         spectator = saveUser("spectator", "spectator@equix.test", "SPECTATOR", "VERIFIED");
         otherSpectator = saveUser("other", "other@equix.test", "SPECTATOR", "VERIFIED");
+        admin = saveUser("admin", "admin@equix.test", "ADMIN", "VERIFIED");
         saveUser("owner", "owner@equix.test", "HORSE_OWNER", "PENDING");
         spectatorToken = login("spectator@equix.test", "Password123");
+        adminToken = login("admin@equix.test", "Password123");
     }
 
     @Test
@@ -58,6 +73,22 @@ class AuthNotificationIntegrationTests {
                 .andExpect(jsonPath("$.email").value("spectator@equix.test"))
                 .andExpect(jsonPath("$.role").value("SPECTATOR"))
                 .andExpect(jsonPath("$.password").doesNotExist());
+    }
+
+    @Test
+    void quickLoginListsActiveDatabaseAccountsByRoleAndCreatesARealSession() throws Exception {
+        mockMvc.perform(get("/api/v1/auth/quick-login/accounts").param("role", "SPECTATOR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].password").doesNotExist());
+
+        mockMvc.perform(post("/api/v1/auth/quick-login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"userId\":" + spectator.getId() + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(spectator.getEmail()))
+                .andExpect(jsonPath("$.role").value("SPECTATOR"))
+                .andExpect(jsonPath("$.token").isNotEmpty());
     }
 
     @Test
@@ -81,6 +112,100 @@ class AuthNotificationIntegrationTests {
     }
 
     @Test
+    void emailChangeKeepsCurrentAddressUntilPublicTokenConfirmation() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/me/email-change")
+                        .header("Authorization", bearer(spectatorToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"newEmail":"new-spectator@equix.test","currentPassword":"Password123"}
+                                """))
+                .andExpect(status().isAccepted());
+
+        assertThat(userRepository.findById(spectator.getId()).orElseThrow().getEmail())
+                .isEqualTo("spectator@equix.test");
+        EmailChangeToken pending = emailChangeTokenRepository.findAll().get(0);
+        pending.setTokenHash(passwordEncoder.encode("known-email-change-token"));
+        emailChangeTokenRepository.save(pending);
+
+        mockMvc.perform(post("/api/v1/auth/email-change/confirm")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"known-email-change-token\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Please sign in again")));
+
+        assertThat(userRepository.findById(spectator.getId()).orElseThrow().getEmail())
+                .isEqualTo("new-spectator@equix.test");
+        assertThat(emailChangeTokenRepository.findById(pending.getId()).orElseThrow().getUsed()).isTrue();
+        assertThat(auditLogRepository.findAll()).extracting("action").contains("EMAIL_CHANGE_REQUESTED", "EMAIL_CHANGED");
+    }
+
+    @Test
+    void adminCanReassignAnUncommittedUserRoleWithAuditReason() throws Exception {
+        mockMvc.perform(patch("/api/v1/users/{id}/role", otherSpectator.getId())
+                        .header("Authorization", bearer(adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"role":"HORSE_OWNER","reason":"Approved role promotion after identity review."}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.role").value("HORSE_OWNER"))
+                .andExpect(jsonPath("$.status").value("VERIFIED"));
+
+        assertThat(userRepository.findById(otherSpectator.getId()).orElseThrow().getRole())
+                .isEqualTo("HORSE_OWNER");
+        assertThat(auditLogRepository.findAll()).extracting("action").contains("ROLE_CHANGED");
+    }
+
+    @Test
+    void avatarUploadIsOwnerScopedPubliclyReadableAndRemovable() throws Exception {
+        byte[] png = new byte[] {
+                (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+                0x01, 0x02, 0x03, 0x04
+        };
+        MockMultipartFile avatar = new MockMultipartFile("file", "avatar.png", "image/png", png);
+
+        String body = mockMvc.perform(multipart("/api/v1/auth/me/avatar")
+                        .file(avatar)
+                        .header("Authorization", bearer(spectatorToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.avatarUrl").isNotEmpty())
+                .andReturn().getResponse().getContentAsString();
+
+        String avatarUrl = objectMapper.readTree(body).get("avatarUrl").asText();
+        String filename = avatarUrl.substring(avatarUrl.lastIndexOf('/') + 1);
+        Path storedFile = Path.of("target/test-avatars").toAbsolutePath().resolve(filename);
+        assertThat(Files.exists(storedFile)).isTrue();
+        assertThat(userRepository.findById(spectator.getId()).orElseThrow().getAvatarUrl()).isEqualTo(avatarUrl);
+
+        mockMvc.perform(get(avatarUrl))
+                .andExpect(status().isOk())
+                .andExpect(content().bytes(png));
+
+        mockMvc.perform(delete("/api/v1/auth/me/avatar")
+                        .header("Authorization", bearer(spectatorToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.avatarUrl").doesNotExist());
+
+        assertThat(Files.exists(storedFile)).isFalse();
+        assertThat(userRepository.findById(spectator.getId()).orElseThrow().getAvatarUrl()).isNull();
+    }
+
+    @Test
+    void avatarUploadRejectsSpoofedOrUnauthenticatedFiles() throws Exception {
+        MockMultipartFile spoofed = new MockMultipartFile(
+                "file", "avatar.png", "image/png", "not-a-png".getBytes());
+
+        mockMvc.perform(multipart("/api/v1/auth/me/avatar").file(spoofed))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(multipart("/api/v1/auth/me/avatar")
+                        .file(spoofed)
+                        .header("Authorization", bearer(spectatorToken)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Avatar file content does not match its image type"));
+    }
+
+    @Test
     void pendingAccountCannotLogin() throws Exception {
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -98,6 +223,7 @@ class AuthNotificationIntegrationTests {
                         .content(registrationJson("new-spec", "new-spec@equix.test", "SPECTATOR")))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("VERIFIED"))
+                .andExpect(jsonPath("$.rewardPoints").value(User.INITIAL_REWARD_POINTS))
                 .andExpect(jsonPath("$.token").isNotEmpty());
 
         mockMvc.perform(post("/api/v1/auth/register")
@@ -105,6 +231,7 @@ class AuthNotificationIntegrationTests {
                         .content(registrationJson("new-owner", "new-owner@equix.test", "HORSE_OWNER")))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.rewardPoints").value(User.INITIAL_REWARD_POINTS))
                 .andExpect(jsonPath("$.token").isEmpty());
 
         mockMvc.perform(post("/api/v1/auth/register")

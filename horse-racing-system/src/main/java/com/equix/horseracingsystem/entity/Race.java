@@ -74,6 +74,24 @@ public class Race {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "cancellation_reason", length = 1000)
+    private String cancellationReason;
+
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
+
+    @Column(name = "reschedule_reason", length = 1000)
+    private String rescheduleReason;
+
+    @Column(name = "rescheduled_at")
+    private LocalDateTime rescheduledAt;
+
+    @Column(name = "admin_review_required")
+    private Boolean adminReviewRequired;
+
+    @Column(name = "review_reason", length = 1000)
+    private String reviewReason;
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
@@ -92,10 +110,13 @@ public class Race {
             surface = "Turf";
         }
         if (maxParticipants == null) {
-            maxParticipants = 8;
+            maxParticipants = 12;
         }
         if (prizePool == null) {
             prizePool = BigDecimal.ZERO;
+        }
+        if (adminReviewRequired == null) {
+            adminReviewRequired = false;
         }
     }
 

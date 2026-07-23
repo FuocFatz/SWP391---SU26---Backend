@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { GiHorseHead } from 'react-icons/gi';
+import { mapRealtimePositions } from '../../utils/raceTrackMapping';
 import './RaceTrack.css';
 
 const defaultHorses = [
@@ -11,13 +12,18 @@ const defaultHorses = [
   { id: 6, name: 'Midnight Run', jockey: 'Rider F', color: '#1ABC9C' },
 ];
 
-function RaceTrack({ horses = defaultHorses, duration = 67, isLive = true }) {
+function RaceTrack({ horses = defaultHorses, duration = 67, isLive = true, livePositions = [], remainingSeconds = null }) {
   const [positions, setPositions] = useState(() => horses.map((_, index) => (index * 7) % 11));
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(isLive);
+  const hasRealtimeFeed = Array.isArray(livePositions) && livePositions.length > 0;
+  const realtimePositions = mapRealtimePositions(horses, livePositions, positions);
+  const displayTimeLeft = hasRealtimeFeed && Number.isFinite(Number(remainingSeconds))
+    ? Math.max(0, Number(remainingSeconds)) : timeLeft;
+  const displayRunning = isLive && (hasRealtimeFeed ? displayTimeLeft > 0 : isRunning);
 
   useEffect(() => {
-    if (!isRunning) return undefined;
+    if (!isLive || !isRunning || hasRealtimeFeed) return undefined;
 
     const posInterval = setInterval(() => {
       setPositions((prev) =>
@@ -41,7 +47,7 @@ function RaceTrack({ horses = defaultHorses, duration = 67, isLive = true }) {
       clearInterval(posInterval);
       clearInterval(timerInterval);
     };
-  }, [isRunning]);
+  }, [hasRealtimeFeed, isLive, isRunning]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -50,18 +56,18 @@ function RaceTrack({ horses = defaultHorses, duration = 67, isLive = true }) {
   };
 
   const sortedHorses = horses
-    .map((horse, index) => ({ ...horse, position: positions[index] || 0 }))
+    .map((horse, index) => ({ ...horse, position: realtimePositions[index] || 0 }))
     .sort((a, b) => b.position - a.position);
 
   return (
     <div className="race-track" id="live-race-track">
       <div className="race-track-timer">
-        <div className={`race-track-timer-display ${isRunning ? 'live' : ''}`}>
+        <div className={`race-track-timer-display ${displayRunning ? 'live' : ''}`}>
           <span className="race-track-timer-label">
-            {isRunning ? 'LIVE' : 'FINISHED'}
+            {displayRunning ? hasRealtimeFeed ? 'ĐỒNG BỘ TRỰC TIẾP' : 'TRỰC TIẾP' : 'ĐÃ KẾT THÚC'}
           </span>
           <span className="race-track-timer-value">
-            {formatTime(timeLeft)}
+            {formatTime(displayTimeLeft)}
           </span>
         </div>
       </div>
@@ -77,7 +83,7 @@ function RaceTrack({ horses = defaultHorses, duration = 67, isLive = true }) {
               <div
                 className="race-track-horse-marker"
                 style={{
-                  left: `${Math.min(positions[index] || 0, 95)}%`,
+                  left: `${Math.min(realtimePositions[index] || 0, 95)}%`,
                   backgroundColor: horse.color,
                   boxShadow: `0 0 10px ${horse.color}40`,
                 }}
@@ -85,7 +91,7 @@ function RaceTrack({ horses = defaultHorses, duration = 67, isLive = true }) {
                 <GiHorseHead />
               </div>
               <div className="race-track-lane-fill" style={{
-                width: `${positions[index] || 0}%`,
+                width: `${realtimePositions[index] || 0}%`,
                 background: `linear-gradient(90deg, ${horse.color}20, ${horse.color}05)`,
               }} />
             </div>
@@ -94,7 +100,7 @@ function RaceTrack({ horses = defaultHorses, duration = 67, isLive = true }) {
       </div>
 
       <div className="race-track-positions">
-        <h4 className="race-track-positions-title">Current Positions</h4>
+        <h4 className="race-track-positions-title">Thứ hạng hiện tại</h4>
         {sortedHorses.map((horse, index) => (
           <div key={horse.id} className={`race-track-position-row ${index < 3 ? 'top' : ''}`}>
             <span className="race-track-position-rank">{index + 1}</span>

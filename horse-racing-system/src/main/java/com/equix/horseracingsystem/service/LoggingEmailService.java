@@ -19,6 +19,12 @@ public class LoggingEmailService implements EmailService {
         log.info("Password change confirmation requested for masked recipient {}", mask(toEmail));
     }
 
+    @Override
+    public void sendEmailChangeVerification(String toEmail, String verificationLink) {
+        // Never log the secret-bearing verification link.
+        log.info("Email-change verification delivery requested for masked recipient {}", mask(toEmail));
+    }
+
     private String mask(String email) {
         int at = email == null ? -1 : email.indexOf('@');
         return at <= 1 ? "***" : email.charAt(0) + "***" + email.substring(at);

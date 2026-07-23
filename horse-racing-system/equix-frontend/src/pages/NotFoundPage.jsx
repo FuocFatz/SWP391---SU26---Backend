@@ -8,12 +8,12 @@ function NotFoundPage() {
       <div className="not-found-content">
         <span className="not-found-emoji">🏇</span>
         <h1 className="not-found-code">404</h1>
-        <h2 className="not-found-title">Horse has left the track!</h2>
+        <h2 className="not-found-title">Ngựa đã rời khỏi đường đua!</h2>
         <p className="not-found-desc">
-          The page you're looking for doesn't exist or has been moved.
+          Trang bạn đang tìm không tồn tại hoặc đã được chuyển đi.
         </p>
         <Link to="/" className="btn btn-primary btn-lg">
-          <FiArrowLeft /> Back to Home
+          <FiArrowLeft /> Quay lại trang chủ
         </Link>
       </div>
     </div>

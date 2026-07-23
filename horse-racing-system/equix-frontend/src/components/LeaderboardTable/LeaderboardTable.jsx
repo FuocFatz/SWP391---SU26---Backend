@@ -1,4 +1,5 @@
 import './LeaderboardTable.css';
+import { resolveAssetUrl } from '../../services/api';
 
 const rankMedals = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
@@ -9,13 +10,13 @@ function LeaderboardTable({ data = [], compact = false }) {
         <table className="data-table leaderboard-table">
           <thead>
             <tr>
-              <th>Rank</th>
-              <th>Horse</th>
-              <th>Owner</th>
-              <th>Points</th>
-              {!compact && <th>Races</th>}
-              {!compact && <th>Wins</th>}
-              {!compact && <th>Top 3</th>}
+              <th>Hạng</th>
+              <th>Ngựa</th>
+              <th>Chủ ngựa</th>
+              <th>Điểm</th>
+              {!compact && <th>Cuộc đua</th>}
+              {!compact && <th>Số trận thắng</th>}
+              {!compact && <th>Ba hạng đầu</th>}
             </tr>
           </thead>
           <tbody>
@@ -24,8 +25,8 @@ function LeaderboardTable({ data = [], compact = false }) {
               return (
                 <tr key={row.horseId || rank} className={rank <= 3 ? `rank-${rank}` : ''}>
                   <td><span className={`leaderboard-rank ${rank <= 3 ? 'top' : ''}`}>{rankMedals[rank] || rank}</span></td>
-                  <td><span className="leaderboard-horse-name">{row.horseName || 'Unknown horse'}</span></td>
-                  <td>{row.ownerName || 'Unknown owner'}</td>
+                  <td>{row.horseImageUrl && <img className="leaderboard-horse-portrait" src={resolveAssetUrl(row.horseImageUrl)} alt="" />}<span className="leaderboard-horse-name">{row.horseName || 'Không rõ ngựa'}</span></td>
+                  <td>{row.ownerName || 'Không rõ chủ ngựa'}</td>
                   <td><span className="leaderboard-points">{Number(row.totalPoints || 0).toLocaleString()}</span></td>
                   {!compact && <td>{row.totalRaces || 0}</td>}
                   {!compact && <td>{row.totalWins || 0}</td>}
@@ -33,7 +34,7 @@ function LeaderboardTable({ data = [], compact = false }) {
                 </tr>
               );
             })}
-            {!data.length && <tr><td colSpan={compact ? 4 : 7}>No official leaderboard data yet.</td></tr>}
+            {!data.length && <tr><td colSpan={compact ? 4 : 7}>Chưa có dữ liệu bảng xếp hạng chính thức.</td></tr>}
           </tbody>
         </table>
       </div>

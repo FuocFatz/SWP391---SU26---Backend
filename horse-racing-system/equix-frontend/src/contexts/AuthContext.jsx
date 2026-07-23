@@ -92,6 +92,7 @@ export function AuthProvider({ children }) {
   }, [user, refreshUnreadCount]);
 
   const login = async (credentials) => persistSession(await api.login(credentials));
+  const quickLogin = async (userId) => persistSession(await api.quickLogin(userId));
 
   const register = async (payload) => {
     const response = await api.register(payload);
@@ -99,13 +100,19 @@ export function AuthProvider({ children }) {
     return { user: mapAuthUser(response), pending: !response.token };
   };
 
-  const updateProfile = async (payload) => {
-    const response = await api.updateProfile(payload);
+  const applyUserResponse = useCallback((response) => {
     const nextUser = mapAuthUser(response);
     localStorage.setItem('equix_user', JSON.stringify(nextUser));
     setUser(nextUser);
     return nextUser;
-  };
+  }, []);
+
+  const refreshUser = useCallback(async () => applyUserResponse(await api.getMe()), [applyUserResponse]);
+
+  const updateProfile = async (payload) => applyUserResponse(await api.updateProfile(payload));
+
+  const updateAvatar = async (file) => applyUserResponse(await api.updateAvatar(file));
+  const removeAvatar = async () => applyUserResponse(await api.removeAvatar());
 
   const logout = () => clearSession();
   const isAuthenticated = Boolean(user && localStorage.getItem('equix_token'));
@@ -121,8 +128,12 @@ export function AuthProvider({ children }) {
       setUnreadCount,
       refreshUnreadCount,
       login,
+      quickLogin,
       register,
+      refreshUser,
       updateProfile,
+      updateAvatar,
+      removeAvatar,
       logout,
       ROLES,
     }}>

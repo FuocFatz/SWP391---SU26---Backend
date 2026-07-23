@@ -40,11 +40,22 @@ public class RaceNote {
     @Column(name = "race_time_seconds")
     private Integer raceTimeSeconds;
 
+    @Column(name = "signature", length = 150)
+    private String signature;
+
+    @Column(name = "reviewed_incidents")
+    private Boolean reviewedIncidents;
+
+    @Column(name = "revision_number")
+    private Integer revisionNumber;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @PrePersist
     void onCreate() {
         if (createdAt == null) createdAt = LocalDateTime.now();
+        if (reviewedIncidents == null) reviewedIncidents = false;
+        if (revisionNumber == null) revisionNumber = 0;
     }
 }

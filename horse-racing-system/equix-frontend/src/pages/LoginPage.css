@@ -362,3 +362,102 @@
     grid-template-columns: 1fr;
   }
 }
+
+.quick-login-button.selected {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--bg-card));
+}
+
+.quick-account-panel {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-primary);
+}
+
+.quick-account-panel-heading,
+.quick-account-item {
+  display: flex;
+  align-items: center;
+}
+
+.quick-account-panel-heading {
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.quick-account-panel-heading div,
+.quick-account-identity {
+  display: grid;
+  gap: 2px;
+}
+
+.quick-account-panel-heading span,
+.quick-account-identity small {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+}
+
+.quick-account-panel-heading button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.quick-account-list {
+  display: grid;
+  gap: var(--space-2);
+  max-height: 230px;
+  overflow-y: auto;
+}
+
+.quick-account-item {
+  width: 100%;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  background: var(--bg-card);
+  text-align: left;
+  cursor: pointer;
+}
+
+.quick-account-item:hover:not(:disabled),
+.quick-account-item:focus-visible {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.quick-account-avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--color-primary);
+  font-weight: var(--fw-bold);
+}
+
+.quick-account-identity {
+  min-width: 0;
+  flex: 1;
+}
+
+.quick-account-identity strong,
+.quick-account-identity small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-account-points {
+  color: var(--color-success);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+}

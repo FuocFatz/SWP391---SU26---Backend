@@ -22,18 +22,18 @@ function PasswordResetPage() {
     setMessage('');
 
     if (!email) {
-      setError('Please enter your email');
+      setError('Vui lòng nhập email của bạn');
       return;
     }
 
     try {
       setLoading(true);
       await api.requestPasswordReset(email);
-      setMessage('✓ If an account with that email exists, a reset link has been sent. Please check your email.');
+      setMessage('✓ Nếu tồn tại tài khoản với email này, liên kết đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra email.');
       setEmail('');
       setTimeout(() => setStep('request'), 3000);
     } catch (err) {
-      setError(err.message || 'Failed to request password reset');
+      setError(err.message || 'Không thể yêu cầu đặt lại mật khẩu');
     } finally {
       setLoading(false);
     }
@@ -45,24 +45,24 @@ function PasswordResetPage() {
     setMessage('');
 
     if (!password || !confirmPassword) {
-      setError('Please enter both password fields');
+      setError('Vui lòng nhập đầy đủ hai ô mật khẩu');
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Hai mật khẩu không trùng khớp');
       return;
     }
 
     if (password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
-      setError('Password must be at least 8 characters and include a letter and a number');
+      setError('Mật khẩu phải có ít nhất 8 ký tự, gồm một chữ cái và một chữ số');
       return;
     }
 
     try {
       setLoading(true);
       await api.confirmPasswordReset(token, password);
-      setMessage('✓ Password reset successful! Redirecting to login...');
+      setMessage('✓ Đặt lại mật khẩu thành công! Đang chuyển đến trang đăng nhập...');
       setPassword('');
       setConfirmPassword('');
       setStep('success');
@@ -70,7 +70,7 @@ function PasswordResetPage() {
         window.location.href = '/login';
       }, 2000);
     } catch (err) {
-      setError(err.message || 'Failed to reset password');
+      setError(err.message || 'Không thể đặt lại mật khẩu');
     } finally {
       setLoading(false);
     }
@@ -81,15 +81,15 @@ function PasswordResetPage() {
       <div className="password-reset-container">
         <div className="password-reset-header">
           <Link to="/login" className="password-reset-back">
-            <FiArrowLeft /> Back to Login
+            <FiArrowLeft /> Quay lại đăng nhập
           </Link>
-          <h1 className="password-reset-title">Reset Your Password</h1>
+          <h1 className="password-reset-title">Đặt lại mật khẩu</h1>
         </div>
 
         {step === 'request' && (
           <div className="password-reset-form-wrapper">
             <p className="password-reset-subtitle">
-              Enter the email address associated with your account, and we'll send you a link to reset your password.
+              Nhập địa chỉ email của tài khoản; hệ thống sẽ gửi cho bạn liên kết đặt lại mật khẩu.
             </p>
 
             {error && (
@@ -106,7 +106,7 @@ function PasswordResetPage() {
 
             <form onSubmit={handleRequestReset} className="password-reset-form">
               <div className="form-group">
-                <label htmlFor="reset-email" className="form-label">Email Address</label>
+                <label htmlFor="reset-email" className="form-label">Địa chỉ email</label>
                 <div className="form-input-wrapper">
                   <FiMail className="form-input-icon" />
                   <input
@@ -126,12 +126,12 @@ function PasswordResetPage() {
                 disabled={loading}
                 className={`btn btn-primary btn-lg ${loading ? 'loading' : ''}`}
               >
-                {loading ? 'Sending...' : 'Send Reset Link'}
+                {loading ? 'Đang gửi...' : 'Gửi liên kết đặt lại'}
               </button>
             </form>
 
             <p className="password-reset-footer">
-              Remember your password? <Link to="/login">Back to login</Link>
+              Bạn nhớ mật khẩu? <Link to="/login">Quay lại đăng nhập</Link>
             </p>
           </div>
         )}
@@ -139,7 +139,7 @@ function PasswordResetPage() {
         {step === 'confirm' && token && (
           <div className="password-reset-form-wrapper">
             <p className="password-reset-subtitle">
-              Enter your new password below. Make sure to use a strong, unique password.
+              Nhập mật khẩu mới bên dưới. Hãy sử dụng mật khẩu mạnh và riêng biệt.
             </p>
 
             {error && (
@@ -156,7 +156,7 @@ function PasswordResetPage() {
 
             <form onSubmit={handleConfirmReset} className="password-reset-form">
               <div className="form-group">
-                <label htmlFor="new-password" className="form-label">New Password</label>
+                <label htmlFor="new-password" className="form-label">Mật khẩu mới</label>
                 <div className="form-input-wrapper">
                   <FiLock className="form-input-icon" />
                   <input
@@ -172,7 +172,7 @@ function PasswordResetPage() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="confirm-password" className="form-label">Confirm Password</label>
+                <label htmlFor="confirm-password" className="form-label">Xác nhận mật khẩu</label>
                 <div className="form-input-wrapper">
                   <FiLock className="form-input-icon" />
                   <input
@@ -192,7 +192,7 @@ function PasswordResetPage() {
                 disabled={loading}
                 className={`btn btn-primary btn-lg ${loading ? 'loading' : ''}`}
               >
-                {loading ? 'Resetting...' : 'Reset Password'}
+                {loading ? 'Đang đặt lại...' : 'Đặt lại mật khẩu'}
               </button>
             </form>
           </div>
@@ -201,9 +201,9 @@ function PasswordResetPage() {
         {step === 'success' && (
           <div className="password-reset-success">
             <FiCheckCircle className="success-icon" />
-            <h2>Password Reset Successful</h2>
-            <p>Your password has been successfully reset. You will be redirected to the login page shortly.</p>
-            <Link to="/login" className="btn btn-primary">Go to Login</Link>
+            <h2>Đặt lại mật khẩu thành công</h2>
+            <p>Mật khẩu đã được đặt lại thành công. Bạn sẽ sớm được chuyển đến trang đăng nhập.</p>
+            <Link to="/login" className="btn btn-primary">Đi đến đăng nhập</Link>
           </div>
         )}
       </div>

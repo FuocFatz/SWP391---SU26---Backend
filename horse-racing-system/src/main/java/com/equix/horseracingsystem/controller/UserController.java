@@ -3,12 +3,14 @@ package com.equix.horseracingsystem.controller;
 import com.equix.horseracingsystem.dto.AccountStatusRequest;
 import com.equix.horseracingsystem.dto.CreateRefereeRequest;
 import com.equix.horseracingsystem.dto.UserResponse;
+import com.equix.horseracingsystem.dto.RoleChangeRequest;
 import com.equix.horseracingsystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -44,6 +46,12 @@ public class UserController {
     @PatchMapping("/{id}/status")
     public UserResponse updateStatus(@PathVariable Long id, @Valid @RequestBody AccountStatusRequest request) {
         return UserResponse.from(userService.updateStatus(id, request));
+    }
+
+    @PatchMapping("/{id}/role")
+    public UserResponse updateRole(@PathVariable Long id, @Valid @RequestBody RoleChangeRequest request,
+                                   Principal principal) {
+        return UserResponse.from(userService.updateRole(principal.getName(), id, request));
     }
 
     @DeleteMapping("/{id}")

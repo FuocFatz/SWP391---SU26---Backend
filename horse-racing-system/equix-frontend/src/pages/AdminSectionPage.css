@@ -42,13 +42,6 @@
   margin-top: var(--space-3);
 }
 
-.admin-field-label {
-  display: grid;
-  gap: var(--space-2);
-  color: var(--text-tertiary);
-  font-size: var(--fs-xs);
-}
-
 .admin-textarea {
   min-height: 88px;
   resize: vertical;
@@ -61,11 +54,20 @@
 .admin-toolbar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--space-3);
   padding: var(--space-4);
   border-bottom: 1px solid var(--border-primary);
   background: rgba(255, 255, 255, 0.01);
+}
+
+.admin-toolbar-field {
+  flex: 0 0 auto;
+}
+
+.admin-search-field {
+  flex: 1 1 440px;
+  max-width: 440px;
 }
 
 .admin-search {
@@ -179,8 +181,11 @@
   }
 
   .admin-search,
+  .admin-toolbar-field,
+  .admin-search-field,
   .admin-toolbar .form-select {
     width: 100%;
+    max-width: none;
     min-width: 0;
   }
 }

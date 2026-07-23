@@ -53,6 +53,30 @@ public class RaceRegistration {
     @Column(name = "referee_notes", length = 1000)
     private String refereeNotes;
 
+    @Column(name = "disqualification_reason", length = 1000)
+    private String disqualificationReason;
+
+    @Column(name = "disqualification_category", length = 40)
+    private String disqualificationCategory;
+
+    @Column(name = "disqualification_severity", length = 20)
+    private String disqualificationSeverity;
+
+    @Column(name = "disqualified_by")
+    private Long disqualifiedBy;
+
+    @Column(name = "disqualified_at")
+    private LocalDateTime disqualifiedAt;
+
+    @Column(name = "dnf_reason", length = 1000)
+    private String dnfReason;
+
+    @Column(name = "dnf_by")
+    private Long dnfBy;
+
+    @Column(name = "dnf_at")
+    private LocalDateTime dnfAt;
+
     @Column(name = "withdraw_reason", length = 1000)
     private String withdrawReason;
 

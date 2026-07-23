@@ -40,3 +40,12 @@
   font-weight: var(--fw-semibold);
   color: var(--color-accent);
 }
+.leaderboard-horse-portrait {
+  width: 32px;
+  height: 32px;
+  margin-right: var(--space-2);
+  vertical-align: middle;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid var(--border-primary);
+}
