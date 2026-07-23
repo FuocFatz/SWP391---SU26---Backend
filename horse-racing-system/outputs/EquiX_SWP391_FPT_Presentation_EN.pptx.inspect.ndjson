@@ -1,0 +1,420 @@
+{"kind":"deck","id":"pr/ej217i","name":"Deck"}
+{"kind":"layout","layoutId":"cc5206e4-ca78-4f7f-876b-2c149a6f32c3","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"02a26d83-8044-4057-8c11-5edb3eb197e0","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/uaiaio","slide":1,"title":"EQUIX","textShapes":6}
+{"kind":"shape","id":"sh/mhcv2pcb","slide":1,"name":"cover-red-rail","bbox":[0,0,18,720]}
+{"kind":"textbox","id":"sh/9k3ud4bm","slide":1,"name":"brand","text":"EQUIX","textPreview":"EQUIX","textChars":5,"textLines":1,"bbox":[62,55,160,34]}
+{"kind":"textbox","id":"sh/8jud4zu1","slide":1,"name":"cover-title","text":"Horse Racing\nTournament Management","textPreview":"Horse Racing | Tournament Management","textChars":34,"textLines":2,"bbox":[62,145,535,178]}
+{"kind":"textbox","id":"sh/zu1c7udk","slide":1,"name":"cover-subtitle","text":"An end-to-end, role-based workflow from registration and pairing to race operations, official results, and rewards.","textPreview":"An end-to-end, role-based workflow from registration and pairing to race operations, official results, and rewards.","textChars":115,"textLines":1,"bbox":[62,350,520,112]}
+{"kind":"shape","id":"sh/etsbypcz","slide":1,"name":"badge-SWP391 PROJECT · FPT UNIVERSITY","bbox":[62,500,330,34]}
+{"kind":"textbox","id":"sh/1g3u9kvq","slide":1,"text":"SWP391 PROJECT · FPT UNIVERSITY","textPreview":"SWP391 PROJECT · FPT UNIVERSITY","textChars":31,"textLines":1,"bbox":[74,507,306,20]}
+{"kind":"textbox","id":"sh/0fud0fu5","slide":1,"text":"EquiX Team · Business Logic V4","textPreview":"EquiX Team · Business Logic V4","textChars":30,"textLines":1,"bbox":[62,560,430,32]}
+{"kind":"shape","id":"sh/jq5cjet4","slide":1,"name":"cover-image-panel","bbox":[642,70,570,520]}
+{"kind":"textbox","id":"sh/cju18v29","slide":1,"text":"React · Spring Boot · SQL Server · JWT","textPreview":"React · Spring Boot · SQL Server · JWT","textChars":38,"textLines":1,"bbox":[662,610,530,24]}
+{"kind":"image","id":"im/bidszatw","slide":1,"name":"","geometry":"roundRect","alt":"EquiX referee operations interface","bbox":[662,90,530,480]}
+{"kind":"notes","id":"nt/uaiaio","slide":1,"text":"EquiX is an SWP391 project that models the complete lifecycle of horse racing tournament management.\nThe product is not only a user interface; its main value is an integrated workflow across five business roles.\nThis presentation focuses on the architecture, V4 rules, result governance, and test evidence."}
+{"kind":"slide","id":"sl/l27mhq","slide":2,"title":"A race succeeds only when every role acts at the right time","textShapes":15}
+{"kind":"textbox","id":"sh/l4nqp8f2","slide":2,"name":"slide-title","text":"A race succeeds only when every role acts at the right time","textPreview":"A race succeeds only when every role acts at the right time","textChars":59,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/yhwretwr","slide":2,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"shape","id":"sh/z258nyxw","slide":2,"name":"problem-panel","bbox":[52,166,552,438]}
+{"kind":"shape","id":"sh/cfe9cjel","slide":2,"name":"solution-panel","bbox":[636,166,592,438]}
+{"kind":"textbox","id":"sh/xgnqlof6","slide":2,"text":"Business challenge","textPreview":"Business challenge","textChars":18,"textLines":1,"bbox":[82,200,450,42]}
+{"kind":"textbox","id":"sh/adc7a9wf","slide":2,"text":"When data is fragmented or permissions are unclear, a system may accept invalid registrations, start a race too early, allow prediction edits after lock, or publish unverified results.","textPreview":"When data is fragmented or permissions are unclear, a system may accept invalid registrations, start a race too early, allow prediction e...","textChars":184,"textLines":1,"bbox":[82,260,456,160]}
+{"kind":"textbox","id":"sh/be58jex0","slide":2,"text":"Primary risks","textPreview":"Primary risks","textChars":13,"textLines":1,"bbox":[82,448,180,28]}
+{"kind":"textbox","id":"sh/obup8je9","slide":2,"text":"• Incorrect authorization\n• Lost data integrity\n• Unverified results","textPreview":"• Incorrect authorization | • Lost data integrity | • Unverified results","textChars":68,"textLines":3,"bbox":[82,486,420,105]}
+{"kind":"textbox","id":"sh/pc3qhofu","slide":2,"text":"How EquiX addresses it","textPreview":"How EquiX addresses it","textChars":22,"textLines":1,"bbox":[674,200,480,42]}
+{"kind":"textbox","id":"sh/hwvaxw7y","slide":2,"text":"A single platform uses explicit business states, JWT-based API authorization, and a mandatory approval chain so every role acts in the correct sequence.","textPreview":"A single platform uses explicit business states, JWT-based API authorization, and a mandatory approval chain so every role acts in the co...","textChars":152,"textLines":1,"bbox":[674,260,500,132]}
+{"kind":"shape","id":"sh/gvm9or6t","slide":2,"name":"bullet-0-438-circle","bbox":[674,441,22,22]}
+{"kind":"textbox","id":"sh/fudsvmp8","slide":2,"name":"bullet-0-438-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[674,442,22,20]}
+{"kind":"textbox","id":"sh/ut4rmhon","slide":2,"text":"State-driven workflow control","textPreview":"State-driven workflow control","textChars":29,"textLines":1,"bbox":[710,438,464,48]}
+{"kind":"shape","id":"sh/tsvatc72","slide":2,"name":"bullet-1-438-circle","bbox":[674,493,22,22]}
+{"kind":"textbox","id":"sh/sr29k76h","slide":2,"name":"bullet-1-438-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[674,494,22,20]}
+{"kind":"textbox","id":"sh/7qtsrmpw","slide":2,"text":"Each role receives only required permissions","textPreview":"Each role receives only required permissions","textChars":44,"textLines":1,"bbox":[710,490,464,48]}
+{"kind":"shape","id":"sh/65krihob","slide":2,"name":"bullet-2-438-circle","bbox":[674,545,22,22]}
+{"kind":"textbox","id":"sh/54bqpc76","slide":2,"name":"bullet-2-438-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[674,546,22,20]}
+{"kind":"textbox","id":"sh/k329g76l","slide":2,"text":"Every result becomes official through two steps","textPreview":"Every result becomes official through two steps","textChars":47,"textLines":1,"bbox":[710,542,464,48]}
+{"kind":"textbox","id":"sh/w769c7yh","slide":2,"name":"footer-label-2","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/x8fa5cfm","slide":2,"name":"footer-page-2","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/l27mhq","slide":2,"text":"Open with the coordination problem instead of listing features.\nEmphasize that the backend enforces the rules; the frontend reflects state and guides the user."}
+{"kind":"slide","id":"sl/tulb0u","slide":3,"title":"The platform covers the full race operations chain","textShapes":25}
+{"kind":"textbox","id":"sh/cvil0rm9","slide":3,"name":"slide-title","text":"The platform covers the full race operations chain","textPreview":"The platform covers the full race operations chain","textChars":50,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/ru94rm5o","slide":3,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/qt03yh43","slide":3,"name":"slide-subtitle","text":"Guests and five business roles have dedicated screens, permissions, and actions.","textPreview":"Guests and five business roles have dedicated screens, permissions, and actions.","textChars":80,"textLines":1,"bbox":[148,94,1040,38]}
+{"kind":"shape","id":"sh/1krmxwnq","slide":3,"name":"table-header-bg","bbox":[52,154,1136,68]}
+{"kind":"textbox","id":"sh/0jil4rml","slide":3,"text":"User group","textPreview":"User group","textChars":10,"textLines":1,"bbox":[62,161,190,54]}
+{"kind":"textbox","id":"sh/zy94v650","slide":3,"text":"Primary responsibility","textPreview":"Primary responsibility","textChars":22,"textLines":1,"bbox":[272,161,370,54]}
+{"kind":"textbox","id":"sh/ex03214f","slide":3,"text":"Representative actions","textPreview":"Representative actions","textChars":22,"textLines":1,"bbox":[662,161,516,54]}
+{"kind":"shape","id":"sh/9obm1gn2","slide":3,"name":"table-row-0","bbox":[52,222,1136,68]}
+{"kind":"textbox","id":"sh/on2l8bmh","slide":3,"text":"Guest","textPreview":"Guest","textChars":5,"textLines":1,"bbox":[62,227,190,58]}
+{"kind":"textbox","id":"sh/u9gz2t4r","slide":3,"text":"Explore the platform","textPreview":"Explore the platform","textChars":20,"textLines":1,"bbox":[272,227,370,58]}
+{"kind":"textbox","id":"sh/fapgvylc","slide":3,"text":"View races and leaderboard; create an account","textPreview":"View races and leaderboard; create an account","textChars":45,"textLines":1,"bbox":[662,227,516,58]}
+{"kind":"shape","id":"sh/gbyh43mx","slide":3,"name":"table-row-1","bbox":[52,290,1136,68]}
+{"kind":"textbox","id":"sh/hc7yx83i","slide":3,"text":"Horse Owner","textPreview":"Horse Owner","textChars":11,"textLines":1,"bbox":[62,295,190,58]}
+{"kind":"textbox","id":"sh/2dgz6d43","slide":3,"text":"Manage horses and entries","textPreview":"Manage horses and entries","textChars":25,"textLines":1,"bbox":[272,295,370,58]}
+{"kind":"textbox","id":"sh/3e9gzilo","slide":3,"text":"Create horses, invite jockeys, submit race pairs","textPreview":"Create horses, invite jockeys, submit race pairs","textChars":48,"textLines":1,"bbox":[662,295,516,58]}
+{"kind":"shape","id":"sh/4fih8nm9","slide":3,"name":"table-row-2","bbox":[52,358,1136,68]}
+{"kind":"textbox","id":"sh/pgri1s3e","slide":3,"text":"Jockey","textPreview":"Jockey","textChars":6,"textLines":1,"bbox":[62,363,190,58]}
+{"kind":"textbox","id":"sh/ihwzu94j","slide":3,"text":"Confirm collaboration","textPreview":"Confirm collaboration","textChars":21,"textLines":1,"bbox":[272,363,370,58]}
+{"kind":"textbox","id":"sh/ji5gnel4","slide":3,"text":"Accept or reject invitations; view assignments","textPreview":"Accept or reject invitations; view assignments","textChars":46,"textLines":1,"bbox":[662,363,516,58]}
+{"kind":"shape","id":"sh/na14fqx0","slide":3,"name":"table-row-3","bbox":[52,426,1136,68]}
+{"kind":"textbox","id":"sh/298n6lgf","slide":3,"text":"Referee","textPreview":"Referee","textChars":7,"textLines":1,"bbox":[62,431,190,58]}
+{"kind":"textbox","id":"sh/pcjmh0fq","slide":3,"text":"Operate the race","textPreview":"Operate the race","textChars":16,"textLines":1,"bbox":[272,431,370,58]}
+{"kind":"textbox","id":"sh/oba58vy5","slide":3,"text":"Run fitness checks, start, simulate, and report","textPreview":"Run fitness checks, start, simulate, and report","textChars":47,"textLines":1,"bbox":[662,431,516,58]}
+{"kind":"shape","id":"sh/f6h4b6xo","slide":3,"name":"table-row-4","bbox":[52,494,1136,68]}
+{"kind":"textbox","id":"sh/e58n21g3","slide":3,"text":"Spectator","textPreview":"Spectator","textChars":9,"textLines":1,"bbox":[62,499,190,58]}
+{"kind":"textbox","id":"sh/18zmdgfu","slide":3,"text":"Follow and engage","textPreview":"Follow and engage","textChars":17,"textLines":1,"bbox":[272,499,370,58]}
+{"kind":"textbox","id":"sh/07q54by9","slide":3,"text":"Predict with points; claim and redeem rewards","textPreview":"Predict with points; claim and redeem rewards","textChars":45,"textLines":1,"bbox":[662,499,516,58]}
+{"kind":"shape","id":"sh/z2lonaxs","slide":3,"name":"table-row-5","bbox":[52,562,1136,68]}
+{"kind":"textbox","id":"sh/y1sne5gn","slide":3,"text":"Administrator","textPreview":"Administrator","textChars":13,"textLines":1,"bbox":[62,567,190,58]}
+{"kind":"textbox","id":"sh/gnm187e5","slide":3,"text":"Govern and control","textPreview":"Govern and control","textChars":18,"textLines":1,"bbox":[272,567,370,58]}
+{"kind":"textbox","id":"sh/hov2hcva","slide":3,"text":"Approve accounts/pairs, create events, publish results","textPreview":"Approve accounts/pairs, create events, publish results","textChars":54,"textLines":1,"bbox":[662,567,516,58]}
+{"kind":"textbox","id":"sh/ul4j6xwz","slide":3,"name":"footer-label-3","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/vmdkf2dk","slide":3,"name":"footer-page-3","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/tulb0u","slide":3,"text":"Referees have no public registration flow; only an Administrator can create a referee account.\nHorse Owners and Jockeys require Administrator verification, while Spectators are activated immediately to reduce friction."}
+{"kind":"slide","id":"sl/k3z64q","slide":4,"title":"Three layers keep business rules independent of the UI","textShapes":15}
+{"kind":"textbox","id":"sh/1kn6d0ra","slide":4,"name":"slide-title","text":"Three layers keep business rules independent of the UI","textPreview":"Three layers keep business rules independent of the UI","textChars":54,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/excn2l8j","slide":4,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/zilobq94","slide":4,"name":"slide-subtitle","text":"Every request passes through the API and authorization checks before SQL Server is updated.","textPreview":"Every request passes through the API and authorization checks before SQL Server is updated.","textChars":91,"textLines":1,"bbox":[148,94,1040,38]}
+{"kind":"shape","id":"sh/one58fql","slide":4,"name":"frontend-backend-connector","bbox":[385,299,105,0]}
+{"kind":"shape","id":"sh/9on6hkr6","slide":4,"name":"backend-database-connector","bbox":[790,299,105,0]}
+{"kind":"shape","id":"sh/mlwn658v","slide":4,"name":"architecture-0","bbox":[70,188,315,300]}
+{"kind":"shape","id":"sh/nm5ofa9g","slide":4,"name":"architecture-accent-0","bbox":[70,188,315,10]}
+{"kind":"textbox","id":"sh/wry5cfqx","slide":4,"text":"PRESENTATION","textPreview":"PRESENTATION","textChars":12,"textLines":1,"bbox":[94,224,265,26]}
+{"kind":"textbox","id":"sh/xs76lkri","slide":4,"text":"ReactJS SPA","textPreview":"ReactJS SPA","textChars":11,"textLines":1,"bbox":[94,270,267,46]}
+{"kind":"textbox","id":"sh/h0f6hg7y","slide":4,"text":"Role-based routing\nShared components\nReal-time race tracking","textPreview":"Role-based routing | Shared components | Real-time race tracking","textChars":60,"textLines":3,"bbox":[94,340,267,112]}
+{"kind":"shape","id":"sh/gz65ob6d","slide":4,"name":"architecture-1","bbox":[490,188,315,300]}
+{"kind":"shape","id":"sh/vyxof6ps","slide":4,"name":"architecture-accent-1","bbox":[490,188,315,10]}
+{"kind":"textbox","id":"sh/uxonmlo7","slide":4,"text":"BUSINESS LOGIC","textPreview":"BUSINESS LOGIC","textChars":14,"textLines":1,"bbox":[514,224,265,26]}
+{"kind":"textbox","id":"sh/5of6l07u","slide":4,"text":"Spring Boot REST","textPreview":"Spring Boot REST","textChars":16,"textLines":1,"bbox":[514,270,267,46]}
+{"kind":"textbox","id":"sh/4n65sv6p","slide":4,"text":"RBAC + JWT\nWorkflow services\nTransaction validation","textPreview":"RBAC + JWT | Workflow services | Transaction validation","textChars":51,"textLines":3,"bbox":[514,340,267,112]}
+{"kind":"shape","id":"sh/32xojqp4","slide":4,"name":"architecture-2","bbox":[895,188,315,300]}
+{"kind":"shape","id":"sh/i1onqloj","slide":4,"name":"architecture-accent-2","bbox":[895,188,315,10]}
+{"kind":"textbox","id":"sh/lsvm9w7q","slide":4,"text":"DATA ACCESS","textPreview":"DATA ACCESS","textChars":11,"textLines":1,"bbox":[919,224,265,26]}
+{"kind":"textbox","id":"sh/krm5gr65","slide":4,"text":"SQL Server 2019+","textPreview":"SQL Server 2019+","textChars":16,"textLines":1,"bbox":[919,270,267,46]}
+{"kind":"textbox","id":"sh/cbq5wre1","slide":4,"text":"Spring Data JPA\nForeign keys + indexes\nTransaction integrity","textPreview":"Spring Data JPA | Foreign keys + indexes | Transaction integrity","textChars":60,"textLines":3,"bbox":[919,340,267,112]}
+{"kind":"shape","id":"sh/dcz6pwfm","slide":4,"name":"security-band","bbox":[70,526,1140,92]}
+{"kind":"textbox","id":"sh/q9onu1wv","slide":4,"text":"Security flow","textPreview":"Security flow","textChars":13,"textLines":1,"bbox":[94,550,180,24]}
+{"kind":"textbox","id":"sh/baxon6xg","slide":4,"text":"Sign in → JWT carries user/role → Spring Security authenticates → Service validates rules → JPA commits transaction","textPreview":"Sign in → JWT carries user/role → Spring Security authenticates → Service validates rules → JPA commits transaction","textChars":115,"textLines":1,"bbox":[286,544,872,42]}
+{"kind":"textbox","id":"sh/0fq50bed","slide":4,"name":"footer-label-4","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/lgz6tgfi","slide":4,"name":"footer-page-4","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/k3z64q","slide":4,"text":"JWT supports stateless REST; the backend never trusts a role supplied by the frontend.\nSQL Server is the production runtime. H2 is used only by automated tests."}
+{"kind":"slide","id":"sl/zektcs","slide":5,"title":"Five roles form a system of mutual control","textShapes":23}
+{"kind":"textbox","id":"sh/u5ovatc3","slide":5,"name":"slide-title","text":"Five roles form a system of mutual control","textPreview":"Five roles form a system of mutual control","textChars":42,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/h8fu5obu","slide":5,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"shape","id":"sh/g76dcju9","slide":5,"name":"role-0","bbox":[52,176,212,422]}
+{"kind":"shape","id":"sh/72xczets","slide":5,"name":"role-num-0-circle","bbox":[74,200,42,42]}
+{"kind":"textbox","id":"sh/61ob69c7","slide":5,"name":"role-num-0-text","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[74,201,42,40]}
+{"kind":"textbox","id":"sh/t4fu1oby","slide":5,"text":"Horse Owner","textPreview":"Horse Owner","textChars":11,"textLines":1,"bbox":[74,272,170,66]}
+{"kind":"textbox","id":"sh/s36t8jud","slide":5,"text":"Own horse records\nInvite jockeys\nRegister for races","textPreview":"Own horse records | Invite jockeys | Register for races","textChars":51,"textLines":3,"bbox":[74,372,170,142]}
+{"kind":"textbox","id":"sh/jydcvudg","slide":5,"text":"ISOLATED SCOPE","textPreview":"ISOLATED SCOPE","textChars":14,"textLines":1,"bbox":[74,552,170,22]}
+{"kind":"shape","id":"sh/id4b29cb","slide":5,"name":"role-1","bbox":[288,176,212,422]}
+{"kind":"shape","id":"sh/krml0jy1","slide":5,"name":"role-num-1-circle","bbox":[310,200,42,42]}
+{"kind":"textbox","id":"sh/lsv29ofm","slide":5,"name":"role-num-1-text","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[310,201,42,40]}
+{"kind":"textbox","id":"sh/ypk3y9gv","slide":5,"text":"Jockey","textPreview":"Jockey","textChars":6,"textLines":1,"bbox":[310,272,170,66]}
+{"kind":"textbox","id":"sh/jqdk7exg","slide":5,"text":"Decide invitations\nMaintain pairings\nTrack performance","textPreview":"Decide invitations | Maintain pairings | Track performance","textChars":54,"textLines":3,"bbox":[310,372,170,142]}
+{"kind":"textbox","id":"sh/w32lwzyp","slide":5,"text":"ISOLATED SCOPE","textPreview":"ISOLATED SCOPE","textChars":14,"textLines":1,"bbox":[310,552,170,22]}
+{"kind":"shape","id":"sh/xob254za","slide":5,"name":"role-2","bbox":[524,176,212,422]}
+{"kind":"shape","id":"sh/a1k3upgj","slide":5,"name":"role-num-2-circle","bbox":[546,200,42,42]}
+{"kind":"textbox","id":"sh/b2tk3uh4","slide":5,"name":"role-num-2-text","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[546,201,42,40]}
+{"kind":"textbox","id":"sh/gj6l83y9","slide":5,"text":"Referee","textPreview":"Referee","textChars":7,"textLines":1,"bbox":[546,272,170,66]}
+{"kind":"textbox","id":"sh/hkfmh8fe","slide":5,"text":"Run pre-race checks\nOperate live races\nSign reports","textPreview":"Run pre-race checks | Operate live races | Sign reports","textChars":51,"textLines":3,"bbox":[546,372,170,142]}
+{"kind":"textbox","id":"sh/pgb21o7y","slide":5,"text":"ASSIGNED ONLY","textPreview":"ASSIGNED ONLY","textChars":13,"textLines":1,"bbox":[546,552,170,22]}
+{"kind":"shape","id":"sh/4f2ls3qd","slide":5,"name":"role-3","bbox":[760,176,212,422]}
+{"kind":"shape","id":"sh/3etkzyps","slide":5,"name":"role-num-3-circle","bbox":[782,200,42,42]}
+{"kind":"textbox","id":"sh/2dk3qt87","slide":5,"name":"role-num-3-text","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[782,201,42,40]}
+{"kind":"textbox","id":"sh/hcr2xo7m","slide":5,"text":"Spectator","textPreview":"Spectator","textChars":9,"textLines":1,"bbox":[782,272,170,66]}
+{"kind":"textbox","id":"sh/gbilojq1","slide":5,"text":"Watch races\nPredict with points\nClaim rewards","textPreview":"Watch races | Predict with points | Claim rewards","textChars":45,"textLines":3,"bbox":[782,372,170,142]}
+{"kind":"textbox","id":"sh/fa9kvepg","slide":5,"text":"ISOLATED SCOPE","textPreview":"ISOLATED SCOPE","textChars":14,"textLines":1,"bbox":[782,552,170,22]}
+{"kind":"shape","id":"sh/u90jm98v","slide":5,"name":"role-4","bbox":[996,176,212,422]}
+{"kind":"shape","id":"sh/t8r2t47q","slide":5,"name":"role-num-4-circle","bbox":[1018,200,42,42]}
+{"kind":"textbox","id":"sh/sni1kjq5","slide":5,"name":"role-num-4-text","text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1018,201,42,40]}
+{"kind":"textbox","id":"sh/itwzu5on","slide":5,"text":"Administrator","textPreview":"Administrator","textChars":13,"textLines":1,"bbox":[1018,272,170,66]}
+{"kind":"textbox","id":"sh/jep0na58","slide":5,"text":"Create events and races\nApprove data\nPublish results","textPreview":"Create events and races | Approve data | Publish results","textChars":52,"textLines":3,"bbox":[1018,372,170,142]}
+{"kind":"textbox","id":"sh/kfyhwf6t","slide":5,"text":"ISOLATED SCOPE","textPreview":"ISOLATED SCOPE","textChars":14,"textLines":1,"bbox":[1018,552,170,22]}
+{"kind":"textbox","id":"sh/5g7ipkne","slide":5,"name":"footer-label-5","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/apwzq5or","slide":5,"name":"footer-page-5","text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/zektcs","slide":5,"text":"An Administrator cannot start a race; that permission belongs only to the assigned Referee.\nThis separation of responsibilities prevents one role from controlling the entire process."}
+{"kind":"slide","id":"sl/a8oc03","slide":6,"title":"A pairing can race only after six validation steps","textShapes":23}
+{"kind":"textbox","id":"sh/03ux8vex","slide":6,"name":"slide-title","text":"A pairing can race only after six validation steps","textPreview":"A pairing can race only after six validation steps","textChars":50,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/z2lwfqdc","slide":6,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/e1cv6lwr","slide":6,"name":"slide-subtitle","text":"The one-to-one constraint is stored as a pairing contract, not as temporary UI state.","textPreview":"The one-to-one constraint is stored as a pairing contract, not as temporary UI state.","textChars":85,"textLines":1,"bbox":[148,94,1040,38]}
+{"kind":"shape","id":"sh/9snel0ve","slide":6,"name":"pair-flow-0","bbox":[210,350,96,0]}
+{"kind":"shape","id":"sh/o7excve9","slide":6,"name":"pair-flow-1","bbox":[400,350,96,0]}
+{"kind":"shape","id":"sh/n65wjqdo","slide":6,"name":"pair-flow-2","bbox":[590,350,96,0]}
+{"kind":"shape","id":"sh/m5cfalw3","slide":6,"name":"pair-flow-3","bbox":[780,350,96,0]}
+{"kind":"shape","id":"sh/xwnep0vq","slide":6,"name":"pair-flow-4","bbox":[970,350,96,0]}
+{"kind":"shape","id":"sh/wvexgfu5","slide":6,"name":"pair-step-0","bbox":[54,245,156,226]}
+{"kind":"shape","id":"sh/ux8jux0j","slide":6,"name":"pair-step-num-0-circle","bbox":[110,218,44,44]}
+{"kind":"textbox","id":"sh/fyhk3214","slide":6,"name":"pair-step-num-0-text","text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[110,219,44,42]}
+{"kind":"textbox","id":"sh/gza1wnip","slide":6,"text":"Select horse","textPreview":"Select horse","textChars":12,"textLines":1,"bbox":[70,286,124,56]}
+{"kind":"textbox","id":"sh/h0j25sja","slide":6,"text":"Horse must be\nAVAILABLE","textPreview":"Horse must be | AVAILABLE","textChars":23,"textLines":2,"bbox":[70,374,124,72]}
+{"kind":"shape","id":"sh/21sjyx0v","slide":6,"name":"pair-step-1","bbox":[244,245,156,226]}
+{"kind":"shape","id":"sh/321k7210","slide":6,"name":"pair-step-num-1-circle","bbox":[300,218,44,44]}
+{"kind":"textbox","id":"sh/43a107il","slide":6,"name":"pair-step-num-1-text","text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[300,219,44,42]}
+{"kind":"textbox","id":"sh/p4j29cj6","slide":6,"text":"Send invitation","textPreview":"Send invitation","textChars":15,"textLines":1,"bbox":[260,286,124,56]}
+{"kind":"textbox","id":"sh/y5ojmdkb","slide":6,"text":"Owner selects a race\nand jockey","textPreview":"Owner selects a race | and jockey","textChars":31,"textLines":2,"bbox":[260,374,124,72]}
+{"kind":"shape","id":"sh/j6x0vi1w","slide":6,"name":"pair-step-2","bbox":[434,245,156,226]}
+{"kind":"shape","id":"sh/nadg3eho","slide":6,"name":"pair-step-num-2-circle","bbox":[490,218,44,44]}
+{"kind":"textbox","id":"sh/m94zu903","slide":6,"name":"pair-step-num-2-text","text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[490,219,44,42]}
+{"kind":"textbox","id":"sh/9cvy54zu","slide":6,"text":"Jockey accepts","textPreview":"Jockey accepts","textChars":14,"textLines":1,"bbox":[450,286,124,56]}
+{"kind":"textbox","id":"sh/obmhwji9","slide":6,"text":"Create pairing\ncontract","textPreview":"Create pairing | contract","textChars":23,"textLines":2,"bbox":[450,374,124,72]}
+{"kind":"shape","id":"sh/z6tgzuhs","slide":6,"name":"pair-step-3","bbox":[624,245,156,226]}
+{"kind":"shape","id":"sh/e5kzqp07","slide":6,"name":"pair-step-num-3-circle","bbox":[680,218,44,44]}
+{"kind":"textbox","id":"sh/18vy14zi","slide":6,"name":"pair-step-num-3-text","text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[680,219,44,42]}
+{"kind":"textbox","id":"sh/072hszix","slide":6,"text":"Submit entry","textPreview":"Submit entry","textChars":12,"textLines":1,"bbox":[640,286,124,56]}
+{"kind":"textbox","id":"sh/j2xgbyhw","slide":6,"text":"Move to\nPENDING_\nADMIN","textPreview":"Move to | PENDING_ | ADMIN","textChars":22,"textLines":3,"bbox":[640,374,124,72]}
+{"kind":"shape","id":"sh/y1oz2tgb","slide":6,"name":"pair-step-4","bbox":[814,245,156,226]}
+{"kind":"shape","id":"sh/gnydwvyt","slide":6,"name":"pair-step-num-4-circle","bbox":[870,218,44,44]}
+{"kind":"textbox","id":"sh/ho7ep0fe","slide":6,"name":"pair-step-num-4-text","text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[870,219,44,42]}
+{"kind":"textbox","id":"sh/ulgvulgn","slide":6,"text":"Admin approves","textPreview":"Admin approves","textChars":14,"textLines":1,"bbox":[830,286,124,56]}
+{"kind":"textbox","id":"sh/fmpwnqx8","slide":6,"text":"Eligible for\nREADY_FOR_\nCHECK","textPreview":"Eligible for | READY_FOR_ | CHECK","textChars":29,"textLines":3,"bbox":[830,374,124,72]}
+{"kind":"shape","id":"sh/4bid0vyp","slide":6,"name":"pair-step-5","bbox":[1004,245,156,226]}
+{"kind":"shape","id":"sh/pcret0fa","slide":6,"name":"pair-step-num-5-circle","bbox":[1060,218,44,44]}
+{"kind":"textbox","id":"sh/2p0vylgz","slide":6,"name":"pair-step-num-5-text","text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[1060,219,44,42]}
+{"kind":"textbox","id":"sh/3a9wrqxk","slide":6,"text":"Referee checks","textPreview":"Referee checks","textChars":14,"textLines":1,"bbox":[1020,286,124,56]}
+{"kind":"textbox","id":"sh/cfix4fe1","slide":6,"text":"FIT →\nCLEARED_TO_\nRACE","textPreview":"FIT → | CLEARED_TO_ | RACE","textChars":22,"textLines":3,"bbox":[1020,374,124,72]}
+{"kind":"shape","id":"sh/dgrexkfm","slide":6,"name":"pair-rule-callout","bbox":[250,520,780,78]}
+{"kind":"textbox","id":"sh/dcz6xwfa","slide":6,"text":"Core rule: one horse ↔ one jockey in an active pairing; registration is blocked until the pair exists.","textPreview":"Core rule: one horse ↔ one jockey in an active pairing; registration is blocked until the pair exists.","textChars":102,"textLines":1,"bbox":[282,541,716,36]}
+{"kind":"textbox","id":"sh/cbq5oby5","slide":6,"name":"footer-label-6","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/bah4v6xk","slide":6,"name":"footer-page-6","text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/a8oc03","slide":6,"text":"If registration is disabled, check the horse status, invitation, pairing, deadline, and Administrator approval in that order.\nThis workflow prevents incomplete race entries without a horse or jockey."}
+{"kind":"slide","id":"sl/n1rb55","slide":7,"title":"The race lifecycle is the backbone of the platform","textShapes":23}
+{"kind":"textbox","id":"sh/3u1sz2hs","slide":7,"name":"slide-title","text":"The race lifecycle is the backbone of the platform","textPreview":"The race lifecycle is the backbone of the platform","textChars":50,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/4fa9s7id","slide":7,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/pgja1czy","slide":7,"name":"slide-subtitle","text":"Each state enables valid actions and locks operations that are no longer allowed.","textPreview":"Each state enables valid actions and locks operations that are no longer allowed.","textChars":81,"textLines":1,"bbox":[148,94,1040,38]}
+{"kind":"shape","id":"sh/up8rmx0b","slide":7,"name":"status-line-0-0","bbox":[276,263,48,0]}
+{"kind":"shape","id":"sh/vqh8v21w","slide":7,"name":"status-line-0-1","bbox":[580,263,48,0]}
+{"kind":"shape","id":"sh/grq9o7ih","slide":7,"name":"status-line-0-2","bbox":[884,263,48,0]}
+{"kind":"shape","id":"sh/hsjaxczm","slide":7,"name":"status-line-1-0","bbox":[276,471,48,0]}
+{"kind":"shape","id":"sh/6l8rix0z","slide":7,"name":"status-line-1-1","bbox":[580,471,48,0]}
+{"kind":"shape","id":"sh/7mh8ri1k","slide":7,"name":"status-line-1-2","bbox":[884,471,48,0]}
+{"kind":"shape","id":"sh/j69kzuxk","slide":7,"name":"status-0","bbox":[52,200,224,126]}
+{"kind":"textbox","id":"sh/ilgj6pwz","slide":7,"text":"DRAFT","textPreview":"DRAFT","textChars":5,"textLines":1,"bbox":[70,220,188,24]}
+{"kind":"textbox","id":"sh/58r214fq","slide":7,"text":"Draft","textPreview":"Draft","textChars":5,"textLines":1,"bbox":[70,262,188,38]}
+{"kind":"shape","id":"sh/k7i18ze5","slide":7,"name":"status-1","bbox":[356,200,224,126]}
+{"kind":"textbox","id":"sh/7a9k3exw","slide":7,"text":"REGISTRATION_OPEN","textPreview":"REGISTRATION_OPEN","textChars":17,"textLines":1,"bbox":[374,220,188,24]}
+{"kind":"textbox","id":"sh/690ja9wb","slide":7,"text":"Registration open","textPreview":"Registration open","textChars":17,"textLines":1,"bbox":[374,262,188,38]}
+{"kind":"shape","id":"sh/tcr254fm","slide":7,"name":"status-2","bbox":[660,200,224,126]}
+{"kind":"textbox","id":"sh/sbilcze1","slide":7,"text":"REGISTRATION_CLOSED","textPreview":"REGISTRATION_CLOSED","textChars":19,"textLines":1,"bbox":[678,220,188,24]}
+{"kind":"textbox","id":"sh/nepkraxc","slide":7,"text":"Registration closed","textPreview":"Registration closed","textChars":19,"textLines":1,"bbox":[678,262,188,38]}
+{"kind":"shape","id":"sh/mdwjy5wr","slide":7,"name":"status-3","bbox":[964,200,224,126]}
+{"kind":"textbox","id":"sh/q94n6dgf","slide":7,"text":"STANDBY","textPreview":"STANDBY","textChars":7,"textLines":1,"bbox":[982,220,188,24]}
+{"kind":"textbox","id":"sh/rad4fih0","slide":7,"text":"Awaiting start","textPreview":"Awaiting start","textChars":14,"textLines":1,"bbox":[982,262,188,38]}
+{"kind":"shape","id":"sh/cbm58nyl","slide":7,"name":"status-4","bbox":[52,408,224,126]}
+{"kind":"textbox","id":"sh/dwfmhsz6","slide":7,"text":"IN_PROGRESS","textPreview":"IN_PROGRESS","textChars":11,"textLines":1,"bbox":[70,428,188,24]}
+{"kind":"textbox","id":"sh/254n2dgj","slide":7,"text":"Live","textPreview":"Live","textChars":4,"textLines":1,"bbox":[70,470,188,38]}
+{"kind":"shape","id":"sh/36d4byh4","slide":7,"name":"status-5","bbox":[356,408,224,126]}
+{"kind":"textbox","id":"sh/47m543y9","slide":7,"text":"COMPLETED","textPreview":"COMPLETED","textChars":9,"textLines":1,"bbox":[374,428,188,24]}
+{"kind":"textbox","id":"sh/p8vmd8zu","slide":7,"text":"Provisional result","textPreview":"Provisional result","textChars":18,"textLines":1,"bbox":[374,470,188,38]}
+{"kind":"shape","id":"sh/u1knytg7","slide":7,"name":"status-6","bbox":[660,408,224,126]}
+{"kind":"textbox","id":"sh/f2t47yhs","slide":7,"text":"REPORT_READY","textPreview":"REPORT_READY","textChars":12,"textLines":1,"bbox":[678,428,188,24]}
+{"kind":"textbox","id":"sh/xwjqdwza","slide":7,"text":"Report ready","textPreview":"Report ready","textChars":12,"textLines":1,"bbox":[678,470,188,38]}
+{"kind":"shape","id":"sh/wvqp4rip","slide":7,"name":"status-7","bbox":[964,408,224,126]}
+{"kind":"textbox","id":"sh/vuh8bm1k","slide":7,"text":"OFFICIAL","textPreview":"OFFICIAL","textChars":8,"textLines":1,"bbox":[982,428,188,24]}
+{"kind":"textbox","id":"sh/at87210z","slide":7,"text":"Official","textPreview":"Official","textChars":8,"textLines":1,"bbox":[982,470,188,38]}
+{"kind":"textbox","id":"sh/9szq9wje","slide":7,"text":"Administrator: Draft / Open / Close","textPreview":"Administrator: Draft / Open / Close","textChars":35,"textLines":1,"bbox":[72,594,350,26]}
+{"kind":"textbox","id":"sh/8rqp0rit","slide":7,"text":"Referee: Standby → Complete → Submit report","textPreview":"Referee: Standby → Complete → Submit report","textChars":43,"textLines":1,"bbox":[432,594,440,26]}
+{"kind":"textbox","id":"sh/nqh87m18","slide":7,"text":"Administrator: Report → Official","textPreview":"Administrator: Report → Official","textChars":32,"textLines":1,"bbox":[884,594,320,26]}
+{"kind":"textbox","id":"sh/m587yh0n","slide":7,"name":"footer-label-7","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/l4zq5cj2","slide":7,"name":"footer-page-7","text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/n1rb55","slide":7,"text":"Predictions lock when the race reaches STANDBY.\nThe Administrator manages registration states, but only the assigned Referee can start or complete a race.\nSpecial branch: REPORT_READY ↔ REVISION_REQUIRED; a race that has not started may become CANCELLED."}
+{"kind":"slide","id":"sl/702oqa","slide":8,"title":"V4 rules are enforced on the server, not only in the UI","textShapes":16}
+{"kind":"textbox","id":"sh/sbmtsj65","slide":8,"name":"slide-title","text":"V4 rules are enforced on the server, not only in the UI","textPreview":"V4 rules are enforced on the server, not only in the UI","textChars":55,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/7adczepk","slide":8,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/694bq9of","slide":8,"text":"The business document defines 25 hard rules. These five rules preserve the consistency of the demo workflow and address key review questions.","textPreview":"The business document defines 25 hard rules. These five rules preserve the consistency of the demo workflow and address key review questi...","textChars":141,"textLines":1,"bbox":[52,170,570,130]}
+{"kind":"shape","id":"sh/h0fu5o72","slide":8,"name":"rules-principle","bbox":[52,350,570,226]}
+{"kind":"textbox","id":"sh/gz6dw36h","slide":8,"text":"Design principle","textPreview":"Design principle","textChars":16,"textLines":1,"bbox":[84,384,480,30]}
+{"kind":"textbox","id":"sh/fedc3ypw","slide":8,"text":"The UI guides the user.\nThe server decides whether an action is valid.\nThe database preserves relationships and transactions.","textPreview":"The UI guides the user. | The server decides whether an action is valid. | The database preserves relationships and transactions.","textChars":125,"textLines":3,"bbox":[84,442,480,104]}
+{"kind":"shape","id":"sh/ud4butob","slide":8,"name":"bullet-0-184-circle","bbox":[690,187,22,22]}
+{"kind":"textbox","id":"sh/p4fu987y","slide":8,"name":"bullet-0-184-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[690,188,22,20]}
+{"kind":"textbox","id":"sh/436d036d","slide":8,"text":"Each race requires 6–18 pairs","textPreview":"Each race requires 6–18 pairs","textChars":29,"textLines":1,"bbox":[726,184,474,68]}
+{"kind":"shape","id":"sh/et8f2pg7","slide":8,"name":"bullet-1-184-circle","bbox":[690,259,22,22]}
+{"kind":"textbox","id":"sh/fuhgvuxs","slide":8,"name":"bullet-1-184-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[690,260,22,20]}
+{"kind":"textbox","id":"sh/0vqx4zed","slide":8,"text":"Registration closes one week before race time","textPreview":"Registration closes one week before race time","textChars":45,"textLines":1,"bbox":[726,256,474,68]}
+{"kind":"shape","id":"sh/1wzyxkfi","slide":8,"name":"bullet-2-184-circle","bbox":[690,331,22,22]}
+{"kind":"textbox","id":"sh/2x8f6pw3","slide":8,"name":"bullet-2-184-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[690,332,22,20]}
+{"kind":"textbox","id":"sh/nyhgzuxo","slide":8,"text":"Each spectator gets one prediction per race","textPreview":"Each spectator gets one prediction per race","textChars":43,"textLines":1,"bbox":[726,328,474,68]}
+{"kind":"shape","id":"sh/ozax8ze9","slide":8,"name":"bullet-3-184-circle","bbox":[690,403,22,22]}
+{"kind":"textbox","id":"sh/pkjy14fu","slide":8,"name":"bullet-3-184-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[690,404,22,20]}
+{"kind":"textbox","id":"sh/i1ofu5gz","slide":8,"text":"Only the assigned referee can start a race","textPreview":"Only the assigned referee can start a race","textChars":42,"textLines":1,"bbox":[726,400,474,68]}
+{"kind":"shape","id":"sh/32xwnaxk","slide":8,"name":"bullet-4-184-circle","bbox":[690,475,22,22]}
+{"kind":"textbox","id":"sh/76tcv6dc","slide":8,"name":"bullet-4-184-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[690,476,22,20]}
+{"kind":"textbox","id":"sh/65kv21wr","slide":8,"text":"Results require a report + Administrator approval","textPreview":"Results require a report + Administrator approval","textChars":49,"textLines":1,"bbox":[726,472,474,68]}
+{"kind":"textbox","id":"sh/t8vuxwvi","slide":8,"name":"footer-label-8","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/872d4bex","slide":8,"name":"footer-page-8","text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/702oqa","slide":8,"text":"Additional rules include: all races use Turf, the prize pool cannot be negative, referees cannot have schedule conflicts, and disqualification requires a reason.\nCritical validations live in the service layer so direct API calls cannot bypass the UI."}
+{"kind":"slide","id":"sl/hq3j9r","slide":9,"title":"Predictions engage spectators without real-money betting","textShapes":15}
+{"kind":"textbox","id":"sh/tknetgz2","slide":9,"name":"slide-title","text":"Predictions engage spectators without real-money betting","textPreview":"Predictions engage spectators without real-money betting","textChars":56,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/6hwvi1gb","slide":9,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/7i5wr6hw","slide":9,"name":"slide-subtitle","text":"Spectators use points; rewards are issued only after results become OFFICIAL.","textPreview":"Spectators use points; rewards are issued only after results become OFFICIAL.","textChars":77,"textLines":1,"bbox":[148,94,1040,38]}
+{"kind":"shape","id":"sh/g7edobyd","slide":9,"name":"guess-timeline","bbox":[190,306,900,0]}
+{"kind":"shape","id":"sh/h87exgzy","slide":9,"name":"guess-0-circle","bbox":[166,284,44,44]}
+{"kind":"textbox","id":"sh/ulwvmlg7","slide":9,"name":"guess-0-text","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[166,285,44,42]}
+{"kind":"textbox","id":"sh/f65wvqhs","slide":9,"text":"Predict","textPreview":"Predict","textChars":7,"textLines":1,"bbox":[102,356,250,42]}
+{"kind":"textbox","id":"sh/wbudcry9","slide":9,"text":"Choose a horse–jockey pair\nand place points before STANDBY","textPreview":"Choose a horse–jockey pair | and place points before STANDBY","textChars":58,"textLines":2,"bbox":[102,420,250,88]}
+{"kind":"shape","id":"sh/xc3ulwzu","slide":9,"name":"guess-1-circle","bbox":[576,284,44,44]}
+{"kind":"textbox","id":"sh/pkreto3i","slide":9,"name":"guess-1-text","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[576,285,44,42]}
+{"kind":"textbox","id":"sh/ozix0j2x","slide":9,"text":"Lock","textPreview":"Lock","textChars":4,"textLines":1,"bbox":[512,356,250,42]}
+{"kind":"textbox","id":"sh/3y9w7elc","slide":9,"text":"Race reaches STANDBY\n→ prediction cannot be edited","textPreview":"Race reaches STANDBY | → prediction cannot be edited","textChars":50,"textLines":2,"bbox":[512,420,250,88]}
+{"kind":"shape","id":"sh/2x0fy9kr","slide":9,"name":"guess-2-circle","bbox":[986,284,44,44]}
+{"kind":"textbox","id":"sh/dobex8je","slide":9,"name":"guess-2-text","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[986,285,44,42]}
+{"kind":"textbox","id":"sh/cnix432t","slide":9,"text":"Reward","textPreview":"Reward","textChars":6,"textLines":1,"bbox":[922,356,250,42]}
+{"kind":"textbox","id":"sh/bm9wvyl8","slide":9,"text":"Administrator publishes OFFICIAL\n→ settle points and issue rewards","textPreview":"Administrator publishes OFFICIAL | → settle points and issue rewards","textChars":66,"textLines":2,"bbox":[922,420,250,88]}
+{"kind":"shape","id":"sh/ql0f2tkn","slide":9,"name":"digital-reward-flow","bbox":[92,548,500,74]}
+{"kind":"shape","id":"sh/lsbe18ja","slide":9,"name":"goods-reward-flow","bbox":[688,548,500,74]}
+{"kind":"textbox","id":"sh/0r2x8325","slide":9,"text":"Digital: ISSUED → CLAIMED → REDEEMED","textPreview":"Digital: ISSUED → CLAIMED → REDEEMED","textChars":36,"textLines":1,"bbox":[116,570,452,30]}
+{"kind":"textbox","id":"sh/47upkbed","slide":9,"text":"Goods: CLAIMED → PROCESSING → SHIPPED → FULFILLED","textPreview":"Goods: CLAIMED → PROCESSING → SHIPPED → FULFILLED","textChars":49,"textLines":1,"bbox":[712,570,452,30]}
+{"kind":"textbox","id":"sh/583qtgvy","slide":9,"name":"footer-label-9","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/i5c7i1w7","slide":9,"name":"footer-page-9","text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/hq3j9r","slide":9,"text":"Under V4, first place receives horse goods, second place a voucher, and third place a drink coupon.\nThe prize pool is display data allocated 60/30/10; it does not represent a real-money transaction."}
+{"kind":"slide","id":"sl/namf45","slide":10,"title":"Simulation starts only after the workflow is valid","textShapes":13}
+{"kind":"textbox","id":"sh/18bu9c7u","slide":10,"name":"slide-title","text":"Simulation starts only after the workflow is valid","textPreview":"Simulation starts only after the workflow is valid","textChars":50,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/e50vexo3","slide":10,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/z6tc72po","slide":10,"text":"The live race view synchronizes time and lane positions. Final positions remain provisional until the report is submitted and approved.","textPreview":"The live race view synchronizes time and lane positions. Final positions remain provisional until the report is submitted and approved.","textChars":135,"textLines":1,"bbox":[52,176,448,138]}
+{"kind":"shape","id":"sh/cjidcn6x","slide":10,"name":"bullet-0-352-circle","bbox":[52,355,22,22]}
+{"kind":"textbox","id":"sh/dkru5s7i","slide":10,"name":"bullet-0-352-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[52,356,22,20]}
+{"kind":"textbox","id":"sh/qh0vaxo7","slide":10,"text":"At least 6 pairs are FIT","textPreview":"At least 6 pairs are FIT","textChars":24,"textLines":1,"bbox":[88,352,412,54]}
+{"kind":"shape","id":"sh/ri9c3ipc","slide":10,"name":"bullet-1-352-circle","bbox":[52,413,22,22]}
+{"kind":"textbox","id":"sh/wfmdor6h","slide":10,"name":"bullet-1-352-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[52,414,22,20]}
+{"kind":"textbox","id":"sh/x0vehw72","slide":10,"text":"Race is in STANDBY","textPreview":"Race is in STANDBY","textChars":18,"textLines":1,"bbox":[88,410,412,54]}
+{"kind":"shape","id":"sh/94f6lkfa","slide":10,"name":"bullet-2-352-circle","bbox":[52,471,22,22]}
+{"kind":"textbox","id":"sh/o36psfep","slide":10,"name":"bullet-2-352-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[52,472,22,20]}
+{"kind":"textbox","id":"sh/n2xojax4","slide":10,"text":"The assigned referee is operating","textPreview":"The assigned referee is operating","textChars":33,"textLines":1,"bbox":[88,468,412,54]}
+{"kind":"shape","id":"sh/m1o7q5gj","slide":10,"name":"bullet-3-352-circle","bbox":[52,529,22,22]}
+{"kind":"textbox","id":"sh/10v6h0fy","slide":10,"name":"bullet-3-352-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[52,530,22,20]}
+{"kind":"textbox","id":"sh/0zmpovyd","slide":10,"text":"Predictions are locked before the start","textPreview":"Predictions are locked before the start","textChars":39,"textLines":1,"bbox":[88,526,412,54]}
+{"kind":"shape","id":"sh/zydofaxs","slide":10,"name":"simulation-frame","bbox":[532,148,696,474]}
+{"kind":"shape","id":"sh/lwzqt4f2","slide":10,"name":"badge-12 SYNCHRONIZED LANES","bbox":[926,572,244,34]}
+{"kind":"textbox","id":"sh/kvqp0zex","slide":10,"text":"12 SYNCHRONIZED LANES","textPreview":"12 SYNCHRONIZED LANES","textChars":21,"textLines":1,"bbox":[938,579,220,20]}
+{"kind":"textbox","id":"sh/4fy9w3mt","slide":10,"name":"footer-label-10","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/507ap8ne","slide":10,"name":"footer-page-10","text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"image","id":"im/tofa10zy","slide":10,"name":"","geometry":"roundRect","alt":"Live race track with 12 horses moving simultaneously","bbox":[552,168,656,434]}
+{"kind":"notes","id":"nt/namf45","slide":10,"text":"For the demo, select a prepared race with enough FIT entries before moving it to STANDBY.\nRaceTrack keeps horseId separate from registrationId so every horse receives the correct real-time update."}
+{"kind":"slide","id":"sl/jurozk","slide":11,"title":"Official results require two-person control","textShapes":11}
+{"kind":"textbox","id":"sh/psf2lob6","slide":11,"name":"slide-title","text":"Official results require two-person control","textPreview":"Official results require two-person control","textChars":43,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/2pojq9cf","slide":11,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/nqxkjet0","slide":11,"name":"slide-subtitle","text":"This chain prevents one role from both operating and publishing the entire race.","textPreview":"This chain prevents one role from both operating and publishing the entire race.","textChars":80,"textLines":1,"bbox":[148,94,1040,38]}
+{"kind":"shape","id":"sh/03m1ozu9","slide":11,"name":"referee-admin-line","bbox":[422,329,112,0]}
+{"kind":"shape","id":"sh/14f2h4bu","slide":11,"name":"admin-official-line","bbox":[842,329,96,0]}
+{"kind":"shape","id":"sh/e14jm9cj","slide":11,"name":"final-0","bbox":[70,204,308,296]}
+{"kind":"shape","id":"sh/f2dkfeto","slide":11,"name":"final-accent-0","bbox":[70,204,308,9]}
+{"kind":"textbox","id":"sh/szm1kzud","slide":11,"text":"REFEREE","textPreview":"REFEREE","textChars":7,"textLines":1,"bbox":[94,244,260,28]}
+{"kind":"textbox","id":"sh/d0v2d4by","slide":11,"text":"Complete simulation\nRecord incidents / DNF / DQ\nSign and submit report","textPreview":"Complete simulation | Record incidents / DNF / DQ | Sign and submit report","textChars":70,"textLines":3,"bbox":[94,310,260,130]}
+{"kind":"shape","id":"sh/hoz6107u","slide":11,"name":"final-1","bbox":[534,204,308,296]}
+{"kind":"shape","id":"sh/wnq5sv6p","slide":11,"name":"final-accent-1","bbox":[534,204,308,9]}
+{"kind":"textbox","id":"sh/vmhozqp4","slide":11,"text":"ADMINISTRATOR","textPreview":"ADMINISTRATOR","textChars":13,"textLines":1,"bbox":[558,244,260,28]}
+{"kind":"textbox","id":"sh/alonqloj","slide":11,"text":"Review the report\nApply valid rank changes\nPublish or request revision","textPreview":"Review the report | Apply valid rank changes | Publish or request revision","textChars":70,"textLines":3,"bbox":[558,310,260,130]}
+{"kind":"shape","id":"sh/9kf6xg7y","slide":11,"name":"final-2","bbox":[938,204,272,296]}
+{"kind":"shape","id":"sh/8j65ov6d","slide":11,"name":"final-accent-2","bbox":[938,204,272,9]}
+{"kind":"textbox","id":"sh/nixovqps","slide":11,"text":"OFFICIAL","textPreview":"OFFICIAL","textChars":8,"textLines":1,"bbox":[962,244,224,28]}
+{"kind":"textbox","id":"sh/mhonmlo7","slide":11,"text":"Update leaderboard\nAllocate prizes 60/30/10\nSettle predictions + rewards","textPreview":"Update leaderboard | Allocate prizes 60/30/10 | Settle predictions + rewards","textChars":72,"textLines":3,"bbox":[962,310,224,130]}
+{"kind":"shape","id":"sh/lgfmtg7m","slide":11,"name":"revision-loop","bbox":[238,548,804,72]}
+{"kind":"textbox","id":"sh/0f65kb6h","slide":11,"text":"If the report fails review: REPORT_READY → REVISION_REQUIRED → referee revises and resubmits","textPreview":"If the report fails review: REPORT_READY → REVISION_REQUIRED → referee revises and resubmits","textChars":92,"textLines":1,"bbox":[274,570,732,28]}
+{"kind":"textbox","id":"sh/czq50bed","slide":11,"name":"footer-label-11","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/d0j69gfi","slide":11,"name":"footer-page-11","text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/jurozk","slide":11,"text":"This is the most important separation of duties in the project.\nEven a clean race requires a minimally signed report; there is no shortcut to OFFICIAL."}
+{"kind":"slide","id":"sl/1plf8x","slide":12,"title":"Quality evidence was rerun before presentation","textShapes":14}
+{"kind":"textbox","id":"sh/76t8fe90","slide":12,"name":"slide-title","text":"Quality evidence was rerun before presentation","textPreview":"Quality evidence was rerun before presentation","textChars":46,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/87298ja5","slide":12,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/98bqh4rq","slide":12,"name":"slide-subtitle","text":"Test run completed on July 19, 2026.","textPreview":"Test run completed on July 19, 2026.","textChars":36,"textLines":1,"bbox":[148,94,1040,38]}
+{"kind":"shape","id":"sh/y10r2ps3","slide":12,"name":"metric-0","bbox":[52,224,366,292]}
+{"kind":"textbox","id":"sh/z2t8bu9o","slide":12,"text":"52","textPreview":"52","textChars":2,"textLines":1,"bbox":[80,258,310,94]}
+{"kind":"textbox","id":"sh/k3294za9","slide":12,"text":"TOTAL TESTS PASSED","textPreview":"TOTAL TESTS PASSED","textChars":18,"textLines":1,"bbox":[80,374,310,28]}
+{"kind":"textbox","id":"sh/l4bqd4ru","slide":12,"text":"No failures, errors, or skipped tests","textPreview":"No failures, errors, or skipped tests","textChars":37,"textLines":1,"bbox":[80,430,310,62]}
+{"kind":"shape","id":"sh/ad0ryps7","slide":12,"name":"metric-1","bbox":[454,224,366,292]}
+{"kind":"textbox","id":"sh/be987u9s","slide":12,"text":"40","textPreview":"40","textChars":2,"textLines":1,"bbox":[482,258,310,94]}
+{"kind":"textbox","id":"sh/3ilgfydo","slide":12,"text":"BACKEND INTEGRATION TESTS","textPreview":"BACKEND INTEGRATION TESTS","textChars":25,"textLines":1,"bbox":[482,374,310,28]}
+{"kind":"textbox","id":"sh/2hcfmtw3","slide":12,"text":"Authentication, notifications, workflows, extensions, and rewards","textPreview":"Authentication, notifications, workflows, extensions, and rewards","textChars":65,"textLines":1,"bbox":[482,430,310,62]}
+{"kind":"shape","id":"sh/pk3yh8ve","slide":12,"name":"metric-2","bbox":[856,224,366,292]}
+{"kind":"textbox","id":"sh/ojuxo3e9","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[884,258,310,94]}
+{"kind":"textbox","id":"sh/b65gjidk","slide":12,"text":"FRONTEND TESTS","textPreview":"FRONTEND TESTS","textChars":14,"textLines":1,"bbox":[884,374,310,28]}
+{"kind":"textbox","id":"sh/q5cfqdwz","slide":12,"text":"Role routing, avatars, race mapping, and localization","textPreview":"Role routing, avatars, race mapping, and localization","textChars":53,"textLines":1,"bbox":[884,430,310,62]}
+{"kind":"shape","id":"sh/d8nyl8vq","slide":12,"name":"quality-band","bbox":[52,554,1170,66]}
+{"kind":"textbox","id":"sh/c7exs3e5","slide":12,"text":"✓ Maven BUILD SUCCESS     ✓ ESLint passed     ✓ Vite production build succeeded","textPreview":"✓ Maven BUILD SUCCESS     ✓ ESLint passed     ✓ Vite production build succeeded","textChars":79,"textLines":1,"bbox":[84,574,1106,28]}
+{"kind":"textbox","id":"sh/ra1w7edg","slide":12,"name":"footer-label-12","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/6psfe9wv","slide":12,"name":"footer-page-12","text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/1plf8x","slide":12,"text":"Backend tests use the test profile and temporary H2 database; they do not replace the SQL Server runtime.\nFrontend tests and the production build were run independently to validate logic and packaging."}
+{"kind":"slide","id":"sl/uoplat","slide":13,"title":"A 12–15 minute demo follows the business workflow","textShapes":36}
+{"kind":"textbox","id":"sh/tgzipcjy","slide":13,"name":"slide-title","text":"A 12–15 minute demo follows the business workflow","textPreview":"A 12–15 minute demo follows the business workflow","textChars":49,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/6d8zuh0n","slide":13,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"textbox","id":"sh/reh0nm1s","slide":13,"name":"slide-subtitle","text":"This order reduces risk and shows how data moves across multiple roles.","textPreview":"This order reduces risk and shows how data moves across multiple roles.","textChars":71,"textLines":1,"bbox":[148,94,1040,38]}
+{"kind":"shape","id":"sh/4bqhs7ih","slide":13,"name":"table-header-bg","bbox":[52,150,1116,61]}
+{"kind":"textbox","id":"sh/5czilcj2","slide":13,"text":"Step","textPreview":"Step","textChars":4,"textLines":1,"bbox":[62,157,66,47]}
+{"kind":"textbox","id":"sh/i9ozqx0b","slide":13,"text":"Role","textPreview":"Role","textChars":4,"textLines":1,"bbox":[148,157,190,47]}
+{"kind":"textbox","id":"sh/jax0j21w","slide":13,"text":"Demo activity","textPreview":"Demo activity","textChars":13,"textLines":1,"bbox":[358,157,620,47]}
+{"kind":"textbox","id":"sh/o7a14bil","slide":13,"text":"Duration","textPreview":"Duration","textChars":8,"textLines":1,"bbox":[998,157,160,47]}
+{"kind":"shape","id":"sh/p8jixwj6","slide":13,"name":"table-row-0","bbox":[52,211,1116,61]}
+{"kind":"textbox","id":"sh/lwj2d4r2","slide":13,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[62,216,66,51]}
+{"kind":"textbox","id":"sh/kva14zah","slide":13,"text":"Guest","textPreview":"Guest","textChars":5,"textLines":1,"bbox":[148,216,190,51]}
+{"kind":"textbox","id":"sh/ju1kbu9w","slide":13,"text":"Public pages, race list, leaderboard, and registration","textPreview":"Public pages, race list, leaderboard, and registration","textChars":54,"textLines":1,"bbox":[358,216,620,51]}
+{"kind":"textbox","id":"sh/ytsj29sb","slide":13,"text":"1 min","textPreview":"1 min","textChars":5,"textLines":1,"bbox":[998,216,160,51]}
+{"kind":"shape","id":"sh/xsj294r6","slide":13,"name":"table-row-1","bbox":[52,272,1116,61]}
+{"kind":"textbox","id":"sh/wra10zal","slide":13,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[62,277,66,51]}
+{"kind":"textbox","id":"sh/bqhk7u90","slide":13,"text":"Spectator","textPreview":"Spectator","textChars":9,"textLines":1,"bbox":[148,277,190,51]}
+{"kind":"textbox","id":"sh/ap8jypsf","slide":13,"text":"Place one prediction before the race reaches STANDBY","textPreview":"Place one prediction before the race reaches STANDBY","textChars":52,"textLines":1,"bbox":[358,277,620,51]}
+{"kind":"textbox","id":"sh/ho32lora","slide":13,"text":"1 min","textPreview":"1 min","textChars":5,"textLines":1,"bbox":[998,277,160,51]}
+{"kind":"shape","id":"sh/gnulcjqp","slide":13,"name":"table-row-2","bbox":[52,333,1116,61]}
+{"kind":"textbox","id":"sh/03md4r2d","slide":13,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[62,338,66,51]}
+{"kind":"textbox","id":"sh/14vuxw3i","slide":13,"text":"Owner + Jockey","textPreview":"Owner + Jockey","textChars":14,"textLines":1,"bbox":[148,338,190,51]}
+{"kind":"textbox","id":"sh/e14v2hk7","slide":13,"text":"Manage horses; send and accept an invitation","textPreview":"Manage horses; send and accept an invitation","textChars":44,"textLines":1,"bbox":[358,338,620,51]}
+{"kind":"textbox","id":"sh/z2dcvmls","slide":13,"text":"3 min","textPreview":"3 min","textChars":5,"textLines":1,"bbox":[998,338,160,51]}
+{"kind":"shape","id":"sh/cf2d0r21","slide":13,"name":"table-row-3","bbox":[52,394,1116,61]}
+{"kind":"textbox","id":"sh/dgvutw3m","slide":13,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[62,399,66,51]}
+{"kind":"textbox","id":"sh/qdkvyhkv","slide":13,"text":"Administrator","textPreview":"Administrator","textChars":13,"textLines":1,"bbox":[148,399,190,51]}
+{"kind":"textbox","id":"sh/retcrmlg","slide":13,"text":"Approve a pair; create and manage race schedules","textPreview":"Approve a pair; create and manage race schedules","textChars":48,"textLines":1,"bbox":[358,399,620,51]}
+{"kind":"textbox","id":"sh/4b2dw725","slide":13,"text":"2 min","textPreview":"2 min","textChars":5,"textLines":1,"bbox":[998,399,160,51]}
+{"kind":"shape","id":"sh/pcbupc3a","slide":13,"name":"table-row-4","bbox":[52,455,1116,61]}
+{"kind":"textbox","id":"sh/769wz25c","slide":13,"text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[62,460,66,51]}
+{"kind":"textbox","id":"sh/650v6xor","slide":13,"text":"Referee","textPreview":"Referee","textChars":7,"textLines":1,"bbox":[148,460,190,51]}
+{"kind":"textbox","id":"sh/t8re1cni","slide":13,"text":"Fitness check → STANDBY → Start → Simulate → Report","textPreview":"Fitness check → STANDBY → Start → Simulate → Report","textChars":51,"textLines":1,"bbox":[358,460,620,51]}
+{"kind":"textbox","id":"sh/87id876x","slide":13,"text":"3 min","textPreview":"3 min","textChars":5,"textLines":1,"bbox":[998,460,160,51]}
+{"kind":"shape","id":"sh/fatw3m58","slide":13,"name":"table-row-5","bbox":[52,516,1116,61]}
+{"kind":"textbox","id":"sh/u9kvaho3","slide":13,"text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[62,521,66,51]}
+{"kind":"textbox","id":"sh/hcbe5cne","slide":13,"text":"Administrator","textPreview":"Administrator","textChars":13,"textLines":1,"bbox":[148,521,190,51]}
+{"kind":"textbox","id":"sh/gb2dc76t","slide":13,"text":"Review and publish the result as OFFICIAL","textPreview":"Review and publish the result as OFFICIAL","textChars":41,"textLines":1,"bbox":[358,521,620,51]}
+{"kind":"textbox","id":"sh/3etw7m5k","slide":13,"text":"2 min","textPreview":"2 min","textChars":5,"textLines":1,"bbox":[998,521,160,51]}
+{"kind":"shape","id":"sh/2dkfehoz","slide":13,"name":"table-row-6","bbox":[52,577,1116,61]}
+{"kind":"textbox","id":"sh/2hsfa5cb","slide":13,"text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[62,582,66,51]}
+{"kind":"textbox","id":"sh/ni1g3qdw","slide":13,"text":"Spectator + Admin","textPreview":"Spectator + Admin","textChars":17,"textLines":1,"bbox":[148,582,190,51]}
+{"kind":"textbox","id":"sh/ojahcvu1","slide":13,"text":"Claim/redeem rewards or process goods fulfillment","textPreview":"Claim/redeem rewards or process goods fulfillment","textChars":49,"textLines":1,"bbox":[358,582,620,51]}
+{"kind":"textbox","id":"sh/pk3y50vm","slide":13,"text":"2 min","textPreview":"2 min","textChars":5,"textLines":1,"bbox":[998,582,160,51]}
+{"kind":"textbox","id":"sh/alcze5c7","slide":13,"name":"footer-label-13","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/b6lg7ads","slide":13,"name":"footer-page-13","text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/uoplat","slide":13,"text":"Do not cancel the race used for the demo flow.\nIf a step already changed state, use another prepared race instead of editing SQL directly.\nBack up the database before the presentation."}
+{"kind":"slide","id":"sl/x7gz7b","slide":14,"title":"V4 closes the main gaps; deployment is the next step","textShapes":16}
+{"kind":"textbox","id":"sh/lgrm18j2","slide":14,"name":"slide-title","text":"V4 closes the main gaps; deployment is the next step","textPreview":"V4 closes the main gaps; deployment is the next step","textChars":52,"textLines":1,"bbox":[52,34,1120,58]}
+{"kind":"shape","id":"sh/yd03qdkb","slide":14,"name":"title-accent","bbox":[52,101,74,5]}
+{"kind":"shape","id":"sh/ze94zi1w","slide":14,"name":"closed-gaps","bbox":[52,166,562,444]}
+{"kind":"shape","id":"sh/crylo32l","slide":14,"name":"roadmap","bbox":[646,166,582,444]}
+{"kind":"textbox","id":"sh/xc7mx8jq","slide":14,"text":"Completed in V4","textPreview":"Completed in V4","textChars":15,"textLines":1,"bbox":[84,204,480,40]}
+{"kind":"shape","id":"sh/apg3mtkf","slide":14,"name":"bullet-0-286-circle","bbox":[84,289,22,22]}
+{"kind":"textbox","id":"sh/bqp4vy10","slide":14,"name":"bullet-0-286-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[84,290,22,20]}
+{"kind":"textbox","id":"sh/w7250n2p","slide":14,"text":"Password reset and verified email change","textPreview":"Password reset and verified email change","textChars":40,"textLines":1,"bbox":[120,286,444,52]}
+{"kind":"shape","id":"sh/h8bm9sja","slide":14,"name":"bullet-1-286-circle","bbox":[84,345,22,22]}
+{"kind":"textbox","id":"sh/98vaxgbi","slide":14,"name":"bullet-1-286-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[84,346,22,20]}
+{"kind":"textbox","id":"sh/87mt4vax","slide":14,"text":"Notification center and fixed-position toasts","textPreview":"Notification center and fixed-position toasts","textChars":45,"textLines":1,"bbox":[120,342,444,52]}
+{"kind":"shape","id":"sh/n6dsvqtc","slide":14,"name":"bullet-2-286-circle","bbox":[84,401,22,22]}
+{"kind":"textbox","id":"sh/m54b2lsr","slide":14,"name":"bullet-2-286-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[84,402,22,20]}
+{"kind":"textbox","id":"sh/l4vatgbm","slide":14,"text":"DNF, dead heat, and disqualification","textPreview":"DNF, dead heat, and disqualification","textChars":36,"textLines":1,"bbox":[120,398,444,52]}
+{"kind":"shape","id":"sh/03mt0ba1","slide":14,"name":"bullet-3-286-circle","bbox":[84,457,22,22]}
+{"kind":"textbox","id":"sh/zidsr6tg","slide":14,"name":"bullet-3-286-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[84,458,22,20]}
+{"kind":"textbox","id":"sh/yhkby1sv","slide":14,"text":"Referee reassignment, rescheduling, and cancellation","textPreview":"Referee reassignment, rescheduling, and cancellation","textChars":52,"textLines":1,"bbox":[120,454,444,52]}
+{"kind":"shape","id":"sh/50fu50bq","slide":14,"name":"bullet-4-286-circle","bbox":[84,513,22,22]}
+{"kind":"textbox","id":"sh/kz6tcfa5","slide":14,"name":"bullet-4-286-text","text":"✓","textPreview":"✓","textChars":1,"textLines":1,"bbox":[84,514,22,20]}
+{"kind":"textbox","id":"sh/4vylo3mt","slide":14,"text":"Reward codes, QR, and fulfillment queue","textPreview":"Reward codes, QR, and fulfillment queue","textChars":39,"textLines":1,"bbox":[120,510,444,52]}
+{"kind":"textbox","id":"sh/pw7mx8ny","slide":14,"text":"Development roadmap","textPreview":"Development roadmap","textChars":19,"textLines":1,"bbox":[680,204,480,40]}
+{"kind":"textbox","id":"sh/2tg3md4n","slide":14,"text":"01  Production SMTP email service\n\n02  Containerization and CI/CD\n\n03  Real-time monitoring and advanced audit logs\n\n04  Frontend bundle optimization and data pagination\n\n05  Cloud deployment + automated backups","textPreview":"01  Production SMTP email service |  | 02  Containerization and CI/CD |  | 03  Real-time monitoring and advanced audit logs |  | 04  Fron...","textChars":211,"textLines":9,"bbox":[680,284,484,280]}
+{"kind":"textbox","id":"sh/3up4vi58","slide":14,"name":"footer-label-14","text":"EQUIX · SWP391","textPreview":"EQUIX · SWP391","textChars":14,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/grylk3mh","slide":14,"name":"footer-page-14","text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/x7gz7b","slide":14,"text":"Clearly distinguish completed project capabilities from future development.\nLocal email currently uses a logging adapter; real SMTP is required for production deployment."}
+{"kind":"slide","id":"sl/mgfk33","slide":15,"title":"CONCLUSION","textShapes":7}
+{"kind":"textbox","id":"sh/14bqxkje","slide":15,"text":"CONCLUSION","textPreview":"CONCLUSION","textChars":10,"textLines":1,"bbox":[52,46,240,32]}
+{"kind":"textbox","id":"sh/eh07m5kn","slide":15,"name":"closing-title","text":"EquiX turns complex business logic\ninto a controlled workflow.","textPreview":"EquiX turns complex business logic | into a controlled workflow.","textChars":62,"textLines":2,"bbox":[52,174,1090,188]}
+{"kind":"shape","id":"sh/fi98va18","slide":15,"name":"closing-red-line","bbox":[52,408,310,8]}
+{"kind":"textbox","id":"sh/sfipkf2x","slide":15,"text":"Full-stack · 5 roles · SQL Server · JWT/RBAC · 52 tests passed","textPreview":"Full-stack · 5 roles · SQL Server · JWT/RBAC · 52 tests passed","textChars":62,"textLines":1,"bbox":[52,468,850,40]}
+{"kind":"textbox","id":"sh/dgrqt0ji","slide":15,"text":"Ready for a live demonstration and discussion.","textPreview":"Ready for a live demonstration and discussion.","textChars":46,"textLines":1,"bbox":[52,562,640,50]}
+{"kind":"shape","id":"sh/qd07i5kr","slide":15,"name":"badge-QUESTIONS & DISCUSSION","bbox":[930,548,270,34]}
+{"kind":"textbox","id":"sh/re98ra1c","slide":15,"text":"QUESTIONS & DISCUSSION","textPreview":"QUESTIONS & DISCUSSION","textChars":22,"textLines":1,"bbox":[942,555,246,20]}
+{"kind":"textbox","id":"sh/4bipgv2l","slide":15,"name":"footer-label-15","text":"EQUIX · SWP391 TEAM","textPreview":"EQUIX · SWP391 TEAM","textChars":19,"textLines":1,"bbox":[52,674,300,18]}
+{"kind":"textbox","id":"sh/5crqp0j6","slide":15,"name":"footer-page-15","text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[1172,670,55,22]}
+{"kind":"notes","id":"nt/mgfk33","slide":15,"text":"Close with three points: the cross-role workflow, two-step result control, and test evidence.\nInvite questions from the lecturer or move directly to the live demonstration."}
