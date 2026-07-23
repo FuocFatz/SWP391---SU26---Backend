@@ -1,0 +1,52 @@
+HELP.md
+**/target/
+.mvn/wrapper/maven-wrapper.jar
+**/node_modules/
+equix-frontend/dist/
+equix-frontend/coverage/
+equix-frontend/.vite/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Local secrets / runtime overrides ###
+.env
+.env.*
+!.env.example
+*.pid
+*.log
+
+### User-uploaded runtime files ###
+/uploads/
+
+### Generated reports and local deliverables ###
+/outputs/
+*.zip
+*.bak
+*.bacpac
+*.class

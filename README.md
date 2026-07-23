@@ -17,7 +17,7 @@ An end-to-end SWP391 project for managing horse-racing tournaments, role-based o
 
 </div>
 
-![EquiX home page](horse-racing-system/docs/demo-screenshots/final-demo/01-guest-home-desktop.png)
+![EquiX home page](docs/demo-screenshots/final-demo/01-guest-home-desktop.png)
 
 ## Table of contents
 
@@ -48,7 +48,7 @@ The application provides five role-specific workspaces:
 - **Referee** — performs pre-race checks, controls races, records incidents, and signs reports.
 - **Spectator** — browses races, submits predictions, earns points, exchanges rewards, and redeems gift codes.
 
-The current business behavior follows [`EquiX_Business_Logic_Definitive_v4.md`](horse-racing-system/EquiX_Business_Logic_Definitive_v4.md).
+The current business behavior follows [`EquiX_Business_Logic_Definitive_v4.md`](EquiX_Business_Logic_Definitive_v4.md).
 
 ## Core features
 
@@ -175,7 +175,7 @@ Primary keys, foreign keys, unique constraints, check constraints, transactional
 ## Project structure
 
 ```text
-horse-racing-system/
+SWP391---SU26---Backend/
 ├── src/
 │   ├── main/java/com/equix/horseracingsystem/
 │   │   ├── config/          # Security, JWT, WebSocket, demo initialization
@@ -205,7 +205,7 @@ horse-racing-system/
 └── README.md
 ```
 
-The application is located in the repository's `horse-racing-system/` directory. The Spring Boot backend is directly inside that project directory; there is no separate `equix-backend` directory.
+The Spring Boot backend is located at the repository root, and the React client is in `equix-frontend/`. There is no duplicated or nested project directory.
 
 ## Getting started
 
@@ -229,7 +229,7 @@ npm --version
 
 ```bash
 git clone https://github.com/FuocFatz/SWP391---SU26---Backend.git
-cd SWP391---SU26---Backend/horse-racing-system
+cd SWP391---SU26---Backend
 ```
 
 ### 2. Prepare SQL Server
@@ -239,8 +239,8 @@ The backend uses `spring.jpa.hibernate.ddl-auto=validate`, so it validates an ex
 1. Restore a valid `EquiX` database backup in SQL Server, or import the complete project schema and data.
 2. Enable **SQL Server and Windows Authentication mode**.
 3. Enable TCP/IP on port `1433` when required.
-4. Run [`docs/database/create-equix-login.sql`](horse-racing-system/docs/database/create-equix-login.sql) with an administrative SQL Server account.
-5. Apply the scripts in [`docs/database/migrations`](horse-racing-system/docs/database/migrations) in filename order when upgrading an older EquiX database.
+4. Run [`docs/database/create-equix-login.sql`](docs/database/create-equix-login.sql) with an administrative SQL Server account.
+5. Apply the scripts in [`docs/database/migrations`](docs/database/migrations) in filename order when upgrading an older EquiX database.
 
 The local demonstration defaults are:
 
@@ -255,7 +255,7 @@ These credentials are intended for local academic demonstration only. Replace th
 
 ### 3. Configure and run the backend
 
-The backend reads a single runtime configuration file: [`src/main/resources/application.properties`](horse-racing-system/src/main/resources/application.properties). Environment variables override its local defaults.
+The backend reads a single runtime configuration file: [`src/main/resources/application.properties`](src/main/resources/application.properties). Environment variables override its local defaults.
 
 PowerShell example:
 
@@ -342,7 +342,7 @@ VITE_ENABLE_QUICK_LOGIN=true
 
 > Disable Quick Login in production. Hiding only the frontend buttons is insufficient; the backend endpoint must also be disabled.
 
-For a larger presentation-ready data set, review [`docs/database/seed-presentation-ready.sql`](horse-racing-system/docs/database/seed-presentation-ready.sql) before running it.
+For a larger presentation-ready data set, review [`docs/database/seed-presentation-ready.sql`](docs/database/seed-presentation-ready.sql) before running it.
 
 ## Testing
 
@@ -380,26 +380,26 @@ A complete presentation can follow this order:
 9. **Administrator** reviews the report and declares the result official.
 10. **Spectator** checks settled points, notifications, reward exchange, and the one-time gift code.
 
-The full Vietnamese runbook is available in [`HUONG_DAN_CHAY_VA_DEMO_EQUIX.md`](horse-racing-system/HUONG_DAN_CHAY_VA_DEMO_EQUIX.md).
+The full Vietnamese runbook is available in [`HUONG_DAN_CHAY_VA_DEMO_EQUIX.md`](HUONG_DAN_CHAY_VA_DEMO_EQUIX.md).
 
 ## Screenshots
 
 | Quick Login | Administrator workspace |
 |---|---|
-| ![Quick Login](horse-racing-system/docs/demo-screenshots/final-demo/03-quick-login-five-roles.png) | ![Admin dashboard](horse-racing-system/docs/demo-screenshots/final-demo/04-admin-dashboard.png) |
+| ![Quick Login](docs/demo-screenshots/final-demo/03-quick-login-five-roles.png) | ![Admin dashboard](docs/demo-screenshots/final-demo/04-admin-dashboard.png) |
 
 | Referee workflow | Spectator rewards |
 |---|---|
-| ![Referee check](horse-racing-system/docs/demo-screenshots/final-demo/08-referee-check-completed.png) | ![Spectator rewards](horse-racing-system/docs/demo-screenshots/final-demo/11-spectator-rewards-claimed.png) |
+| ![Referee check](docs/demo-screenshots/final-demo/08-referee-check-completed.png) | ![Spectator rewards](docs/demo-screenshots/final-demo/11-spectator-rewards-claimed.png) |
 
 ## Documentation
 
-- [Business logic v4](horse-racing-system/EquiX_Business_Logic_Definitive_v4.md)
-- [Detailed run and demo guide](horse-racing-system/HUONG_DAN_CHAY_VA_DEMO_EQUIX.md)
-- [Project study and defense handbook](horse-racing-system/EQUIX_CAM_NANG_HOC_PROJECT_VA_VAN_DAP.md)
-- [SQL Server transfer guide](horse-racing-system/docs/database/SQL_SERVER_TRANSFER_GUIDE.md)
-- [Database scripts](horse-racing-system/docs/database)
-- [Demo screenshots](horse-racing-system/docs/demo-screenshots)
+- [Business logic v4](EquiX_Business_Logic_Definitive_v4.md)
+- [Detailed run and demo guide](HUONG_DAN_CHAY_VA_DEMO_EQUIX.md)
+- [Project study and defense handbook](EQUIX_CAM_NANG_HOC_PROJECT_VA_VAN_DAP.md)
+- [SQL Server transfer guide](docs/database/SQL_SERVER_TRANSFER_GUIDE.md)
+- [Database scripts](docs/database)
+- [Demo screenshots](docs/demo-screenshots/final-demo)
 
 ## Security notes
 
